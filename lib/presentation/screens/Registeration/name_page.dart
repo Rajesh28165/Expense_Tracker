@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import '../../../constants/app_constants.dart';
 import '../../../router/route_name.dart';
 import '../../components/BaseField/baseTextField.dart';
-import '../../components/allFields.dart';
 
 class NamePage extends StatefulWidget {
   const NamePage({super.key});
@@ -14,29 +13,29 @@ class NamePage extends StatefulWidget {
 }
 
 class _NamePageState extends State<NamePage> {
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _nameController.addListener(_onTextChanged);
-    _phoneController.addListener(_onTextChanged);
+    _firstNameController.addListener(_onTextChanged);
+    _lastNameController.addListener(_onTextChanged);
   }
 
   void _onTextChanged() => setState(() {});
 
   @override
   void dispose() {
-    _nameController.dispose();
-    _phoneController.dispose();
+    _firstNameController.dispose();
+    _lastNameController.dispose();
     super.dispose();
   }
 
   bool get canRegister {
-    final name = _nameController.text.trim();
-    final phone = _phoneController.text.trim();
-    return name.isNotEmpty && phone.length == 10;
+    final firstName = _firstNameController.text.trim();
+    final lastName = _lastNameController.text.trim();
+    return firstName.isNotEmpty && lastName.isNotEmpty;
   }
 
   @override
@@ -84,20 +83,22 @@ class _NamePageState extends State<NamePage> {
                         SizedBox(height: context.getPercentHeight(5)),
 
                         BaseTextField(
-                          controller: _nameController,
-                          labelText: "Name",
-                          hintText: "Enter your full name",
+                          controller: _firstNameController,
+                          labelText: "First name",
+                          hintText: "Enter your first name",
                           onChanged: (_) => setState(() {}),
                         ),
 
                         SizedBox(height: context.getPercentHeight(4)),
 
-                        PhoneNumberTextField(
-                          controller: _phoneController,
+                        BaseTextField(
+                          controller: _lastNameController,
+                          labelText: "Last name",
+                          hintText: "Enter your last name",
                           onChanged: (_) => setState(() {}),
                         ),
 
-                        SizedBox(height: context.getPercentHeight(5)),
+                        SizedBox(height: context.getPercentHeight(19)),
 
                         Padding(
                           padding: EdgeInsets.only(right: context.getPercentWidth(11)),
@@ -106,23 +107,23 @@ class _NamePageState extends State<NamePage> {
                             canNavigate: canRegister,
                             height: 6,
                             width: 100,
-                            onBtnPress: () => context.pushNamedUnAuthenticated(RouteName.otp),
+                            onBtnPress: () => context.pushNamedUnAuthenticated(RouteName.email),
                           ),
                         ),
 
-                        SizedBox(height: context.getPercentHeight(4)),
+                        // SizedBox(height: context.getPercentHeight(2)),
 
-                        Center(
-                          child: Padding(
-                            padding: EdgeInsets.only(right: context.getPercentWidth(10)),
-                            child: context.textedButton(
-                              text: "Already have an account? Login",
-                              onButtonPress: () => context.pushNamedUnAuthenticated(RouteName.login),
-                            ),
-                          ),
-                        ),
+                        // Center(
+                        //   child: Padding(
+                        //     padding: EdgeInsets.only(right: context.getPercentWidth(10)),
+                        //     child: context.textedButton(
+                        //       text: "Already have an account? Login",
+                        //       onButtonPress: () => context.pushNamedUnAuthenticated(RouteName.login),
+                        //     ),
+                        //   ),
+                        // ),
 
-                        SizedBox(height: context.getPercentHeight(5)),
+                        SizedBox(height: context.getPercentHeight(2)),
                       ],
                     ),
                   ),

@@ -1,7 +1,9 @@
 // ignore_for_file: non_constant_identifier_names
 
+import 'package:expense_tracker/constants/app_constants.dart';
 import 'package:expense_tracker/constants/entension.dart';
 import 'package:flutter/material.dart';
+import 'package:pin_code_fields/pin_code_fields.dart';
 import '../../util/colors.dart';
 import '../../util/styles.dart';
 import 'countDownTimer.dart';
@@ -24,18 +26,46 @@ import 'countDownTimer.dart';
 extension GeneralComponents on BuildContext {
 
   // ------------------ General Gradient ------------------
-  BoxDecoration generalGradient() {
-    return BoxDecoration(
-      gradient: LinearGradient(
-        stops: const [0, 0.5, 1],
-        colors: [
-          const Color(0xFFEAF1F5),
-          Colors.white,
-          Color.alphaBlend(const Color(0x36166FA7), Colors.white),
-        ],
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
+  Widget gradientScreen({
+    required Widget child,
+    List<Color>? colors,
+    Alignment begin = Alignment.topLeft,
+    Alignment end = Alignment.bottomRight,
+    EdgeInsetsGeometry padding = const EdgeInsets.all(24),
+    bool safeArea = true,
+  }) {
+    Widget content = Padding(
+      padding: padding,
+      child: child,
+    );
+
+    if (safeArea) {
+      content = SafeArea(child: content);
+    }
+
+    return Container(
+      width: double.infinity,
+      height: double.infinity,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: begin,
+          end: end,
+          colors: colors ??
+const [
+  Color(0xFFF5F7FA),
+  Color(0xFFE4E7EB),
+  Color(0xFFCBD2D9),
+]
+
+
+
+
+
+
+
+        ),
       ),
+      child: content,
     );
   }
 
@@ -193,7 +223,7 @@ extension GeneralComponents on BuildContext {
                     text!,
                     style: TextStyle(
                       fontSize: fontsize ?? 14,
-                      fontFamily: 'Montserrat',
+                      fontFamily: AppConstants.Montserrat,
                       fontStyle: fontStyle ?? FontStyle.normal
                     ),
                   ),
@@ -562,6 +592,45 @@ extension GeneralComponents on BuildContext {
           ),
           SizedBox(height: getPercentHeight(belowSpace ?? 1)),
         ],
+      ),
+    );
+  }
+
+
+  // -------------------------OTP Field----------------------------------
+
+  Widget OtpField({
+    required BuildContext context,
+    required TextEditingController otpController,
+    required int otpLength,
+  }) {
+    return PinCodeTextField(
+      appContext: context,
+      length: 6,
+      controller: otpController,
+      keyboardType: TextInputType.number,
+      autoFocus: true,
+      enableActiveFill: true,
+      animationType: AnimationType.fade,
+
+      textStyle: const TextStyle(
+        color: Colors.black,
+        fontWeight: FontWeight.bold,
+      ),
+
+      pinTheme: PinTheme(
+        shape: PinCodeFieldShape.box,
+        borderRadius: BorderRadius.circular(10),
+        fieldHeight: 50,
+        fieldWidth: 50,
+        
+        activeColor: Colors.black,
+        inactiveColor: Colors.black,
+        selectedColor: Colors.blue[100],
+
+        activeFillColor: Colors.brown[50],
+        inactiveFillColor: Colors.white,
+        selectedFillColor: Colors.white,
       ),
     );
   }

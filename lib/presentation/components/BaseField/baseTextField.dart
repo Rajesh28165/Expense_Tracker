@@ -30,6 +30,7 @@ class BaseTextField extends StatelessWidget {
   final String? deniedExpression;
 
   final int maxLines;
+  final double rightGapWidth;
 
   final TextInputType keyboardType;
   final List<TextInputFormatter>? inputFormatters;
@@ -72,6 +73,7 @@ class BaseTextField extends StatelessWidget {
     this.onTap,
     this.onChanged,
     this.maxLines = 1,
+    this.rightGapWidth = 10,
     this.keyboardType = TextInputType.text,
     this.isEnabled = true,
     this.obscureText = false,
@@ -87,7 +89,7 @@ class BaseTextField extends StatelessWidget {
         initialObscureText: obscureText,
       ),
       child: Padding(
-        padding: EdgeInsets.only(right: context.getPercentWidth(10)),
+        padding: EdgeInsets.only(right: context.getPercentWidth(rightGapWidth)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -106,6 +108,7 @@ class BaseTextField extends StatelessWidget {
                   controller: controller ?? cubit.controller,
                   focusNode: focusNode,
                   enabled: isEnabled,
+                  
                   autofocus: autofocus,
                   cursorColor: cursorColor ?? Colors.black,
                   keyboardType: keyboardType,
@@ -150,8 +153,8 @@ class BaseTextField extends StatelessWidget {
                     contentPadding: contentPadding ?? const EdgeInsets.symmetric( horizontal: 14, vertical: 16),
                     enabledBorder: _border(Colors.grey),
                     focusedBorder: _border(Colors.black, width: 1.5),
-                    errorBorder: _border(Colors.red),
-                    focusedErrorBorder:_border(Colors.red, width: 1.5),
+                    errorBorder: _border(Colors.black),
+                    focusedErrorBorder:_border(Colors.black, width: 1.5),
                     counterText: '',
                   ),
                 );

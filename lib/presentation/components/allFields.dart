@@ -1,4 +1,3 @@
-import 'package:expense_tracker/constants/entension.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../constants/app_constants.dart';
@@ -59,6 +58,7 @@ class EmailTextField extends StatelessWidget {
       keyboardType: TextInputType.emailAddress,
       deniedExpression: RegexConstants.FORWARD_BACKWARD_SLASH,
       maxInputLength: 50,
+      rightGapWidth: 5,
     );
   }
 
@@ -88,6 +88,7 @@ class PhoneNumberTextField extends StatelessWidget {
   final Function(String)? onChanged;
   final FormFieldValidator<String>? validator;
   final TextInputType? keyboardType;
+  final double rightGapWidth;
 
   const PhoneNumberTextField({
     super.key,
@@ -99,6 +100,7 @@ class PhoneNumberTextField extends StatelessWidget {
     this.onChanged,
     this.maxInputLength,
     this.keyboardType, 
+    this.rightGapWidth=5
   });
 
   @override
@@ -112,6 +114,7 @@ class PhoneNumberTextField extends StatelessWidget {
       maxInputLength: maxInputLength ?? 10,
       validator: validator ?? _validatePhoneNumber,
       allowedExpression: RegexConstants.DIGIT,
+      rightGapWidth: rightGapWidth,
     );
   }
 
@@ -150,6 +153,7 @@ class PasswordTextField extends StatelessWidget {
   final bool? obscureText, isEnabled, autofocus;
   final EdgeInsetsGeometry? contentPadding;
   final Widget? suffixIcon;
+  final double rightGapWidth;
 
   const PasswordTextField({
     super.key,
@@ -171,6 +175,7 @@ class PasswordTextField extends StatelessWidget {
     this.allowedExpression,
     this.deniedExpression,
     this.maxInputLength,
+    this.rightGapWidth = 5
   });
 
   String? _validatePassword(String? value) {
@@ -197,6 +202,7 @@ class PasswordTextField extends StatelessWidget {
       errorText: errorText,
       labelStyle: labelStyle,
       hintStyle: hintStyle,
+      rightGapWidth: rightGapWidth,
       errorStyle: errorStyle,
       validator: validator ?? _validatePassword,
       autofocus: autofocus ?? false,

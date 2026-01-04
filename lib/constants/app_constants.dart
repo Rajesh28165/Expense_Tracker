@@ -35,8 +35,17 @@ class RegexConstants {
 }
 
 class AppConstants {
+  static const appName = 'Hisabkitab';
   static const users = 'users';
   static const expenses = 'expenses';
+
+  // FontFamily
+  static const Roboto = 'Roboto';
+  static const Montserrat = 'Montserrat';
+  static const DancingScript = 'DancingScript';
+  static const OpenSans = 'OpenSans';
+  static const Pacifico = 'Pacifico';
+  static const PlayfairDisplay = 'PlayfairDisplay';
 }
 
 class ImagePathConstants {

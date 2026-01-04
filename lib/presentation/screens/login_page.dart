@@ -140,7 +140,7 @@ class _LoginPageState extends State<LoginPage> {
                                 padding: EdgeInsets.only(right: context.getPercentWidth(10)),
                                 child: context.textedButton(
                                   text: "Don’t have an account? Register",
-                                  onButtonPress: () => context.pushNamedUnAuthenticated(RouteName.name),
+                                  onButtonPress: () => context.pushNamedUnAuthenticated(RouteName.phone),
                                   // onButtonPress: () => context.pushNamedUnAuthenticated(RouteName.dashboard),
                                 ),
                               ),
