@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../constants/entension.dart';
 import 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
@@ -12,7 +13,8 @@ class AuthCubit extends Cubit<AuthState> {
   void checkAuthStatus() {
     final user = _auth.currentUser;
     if (user != null) {
-      emit(AuthAuthenticated());
+      emit(AuthAuthenticated(_auth.currentUser!.uid));
+
     } else {
       emit(AuthUnauthenticated());
     }
@@ -25,8 +27,10 @@ class AuthCubit extends Cubit<AuthState> {
         email: email,
         password: password,
       );
-      emit(AuthAuthenticated());
+      emit(AuthAuthenticated(_auth.currentUser!.uid));
+
     } on FirebaseAuthException catch (e) {
+      log.d(' Error is $e');
       emit(AuthError(_mapFirebaseError(e)));
     } catch (_) {
       emit(AuthError('Something went wrong'));
@@ -40,13 +44,20 @@ class AuthCubit extends Cubit<AuthState> {
         email: email,
         password: password,
       );
-      emit(AuthAuthenticated());
+      emit(AuthAuthenticated(_auth.currentUser!.uid));
+
     } on FirebaseAuthException catch (e) {
       emit(AuthError(_mapFirebaseError(e)));
     } catch (_) {
       emit(AuthError('Something went wrong'));
     }
   }
+
+  Future<bool> isEmailRegistered(String email) async {
+    final methods =  await _auth.fetchSignInMethodsForEmail(email);
+    return methods.isNotEmpty;
+  }
+
 
   Future<void> logout() async {
     await _auth.signOut();

@@ -9,6 +9,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'data/repositories/expense_repository.dart';
+import 'data/cubit/userCubit.dart';
 import 'logic/auth/auth_cubit.dart';
 import 'logic/expense/expense_cubit.dart';
 
@@ -23,18 +24,16 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    
     return MultiBlocProvider(
       providers: [
-        BlocProvider<AuthCubit>(
-          create: (_) => AuthCubit(FirebaseAuth.instance),
-        ),
-        BlocProvider<ExpenseCubit>(
-          create: (_) => ExpenseCubit(ExpenseRepository()),
-        ),
+        BlocProvider<AuthCubit>(create: (_) => AuthCubit(FirebaseAuth.instance)),
+        BlocProvider<ExpenseCubit>(create: (_) => ExpenseCubit(ExpenseRepository())),
+        BlocProvider(create: (_) => UserCubit()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'Expense Tracker',
+        title: 'HISABKITAB',
         navigatorKey: BuildContextExtensionFunctions.navigatorUnauthenticated,
         onGenerateRoute: AppRouter.generateRoute,
         initialRoute: RouteName.login

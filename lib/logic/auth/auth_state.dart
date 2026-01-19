@@ -4,7 +4,11 @@ class AuthInitial extends AuthState {}
 
 class AuthLoading extends AuthState{}
 
-class AuthAuthenticated extends AuthState{}
+class AuthAuthenticated extends AuthState {
+  final String uid;
+  AuthAuthenticated(this.uid);
+}
+
 
 class AuthUnauthenticated extends AuthState{}
 

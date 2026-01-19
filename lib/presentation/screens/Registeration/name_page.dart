@@ -1,9 +1,12 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../constants/app_constants.dart';
+import '../../../data/cubit/userCubit.dart';
+import '../../../router/route_name.dart';
+import '../../../util/colors.dart';
+import '../../components/BaseField/baseTextField.dart';
 import 'package:expense_tracker/constants/entension.dart';
 import 'package:expense_tracker/presentation/widgets/generalComponents.dart';
-import 'package:flutter/material.dart';
-import '../../../constants/app_constants.dart';
-import '../../../router/route_name.dart';
-import '../../components/BaseField/baseTextField.dart';
 
 class NamePage extends StatefulWidget {
   const NamePage({super.key});
@@ -32,107 +35,118 @@ class _NamePageState extends State<NamePage> {
     super.dispose();
   }
 
-  bool get canRegister {
+  bool get canNavigate {
     final firstName = _firstNameController.text.trim();
     final lastName = _lastNameController.text.trim();
     return firstName.isNotEmpty && lastName.isNotEmpty;
   }
 
+  void onProceed() {
+    context.read<UserCubit>().setName(
+      firstName: _firstNameController.text.trim(),
+      lastName: _lastNameController.text.trim(),
+    );
+    context.pushNamedUnAuthenticated(RouteName.email);
+  }
+
+
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async => false,
-      child: Scaffold(
-        appBar: context.customAppBar(title: 'Registeration', showBackButton: false),
-        body: Stack(
+    return Scaffold(
+      appBar: context.customAppBar(title: 'Registeration'),
+      body: context.gradientScreen(
+        child: Column(
           children: [
-            context.imageContainer(
-              imagePath: ImagePathConstants.space,
-              height: context.getPercentHeight(100),
-            ),
-            SafeArea(
+            /// -------- SCROLLABLE CONTENT --------
+            Expanded(
               child: SingleChildScrollView(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: context.getPercentHeight(100),
-                  ),
-                  child: Padding(
-                    padding: EdgeInsets.only(left: context.getPercentWidth(8)),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.only(left: context.getPercentWidth(20)),
-                          child: context.header(
-                            title: "Create Account",
-                            color: Colors.cyan,
-                          ),
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+
+                    SizedBox(height: context.getPercentHeight(1)),
+
+                    RichText(
+                      text: const TextSpan(
+                        text: "Welcome to ",
+                        style: TextStyle(
+                          fontSize: 30,
+                          color: WidgetColors.black,
+                          fontFamily: AppConstants.PlayfairDisplay
                         ),
-
-                        SizedBox(height: context.getPercentHeight(2)),
-
-                        const Text(
-                          "Register and track your expenses",
-                          style: TextStyle(
-                            color: Colors.amber,
-                            fontSize: 20,
-                          ),
-                        ),
-
-                        SizedBox(height: context.getPercentHeight(5)),
-
-                        BaseTextField(
-                          controller: _firstNameController,
-                          labelText: "First name",
-                          hintText: "Enter your first name",
-                          onChanged: (_) => setState(() {}),
-                        ),
-
-                        SizedBox(height: context.getPercentHeight(4)),
-
-                        BaseTextField(
-                          controller: _lastNameController,
-                          labelText: "Last name",
-                          hintText: "Enter your last name",
-                          onChanged: (_) => setState(() {}),
-                        ),
-
-                        SizedBox(height: context.getPercentHeight(19)),
-
-                        Padding(
-                          padding: EdgeInsets.only(right: context.getPercentWidth(11)),
-                          child: context.navigationButton(
-                            text: "Proceed",
-                            canNavigate: canRegister,
-                            height: 6,
-                            width: 100,
-                            onBtnPress: () => context.pushNamedUnAuthenticated(RouteName.email),
-                          ),
-                        ),
-
-                        // SizedBox(height: context.getPercentHeight(2)),
-
-                        // Center(
-                        //   child: Padding(
-                        //     padding: EdgeInsets.only(right: context.getPercentWidth(10)),
-                        //     child: context.textedButton(
-                        //       text: "Already have an account? Login",
-                        //       onButtonPress: () => context.pushNamedUnAuthenticated(RouteName.login),
-                        //     ),
-                        //   ),
-                        // ),
-
-                        SizedBox(height: context.getPercentHeight(2)),
-                      ],
+                        children: [
+                          TextSpan(
+                            text: AppConstants.appName,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold)
+                          )
+                        ]
+                      )
                     ),
-                  ),
+
+
+                    SizedBox(height: context.getPercentHeight(4)),
+
+                    const Text(
+                      "Know where your money goes",
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontFamily: AppConstants.OpenSans,
+                        color: WidgetColors.cyanBlue,
+                        fontWeight: FontWeight.w800
+                      ),
+                    ),
+
+                    SizedBox(height: context.getPercentHeight(4)),
+
+                    BaseTextField(
+                      controller: _firstNameController,
+                      labelText: "First name",
+                      hintText: "Enter your first name",
+                      onChanged: (_) => setState(() {}),
+                      rightGapWidth: 0
+                    ),
+
+                    SizedBox(height: context.getPercentHeight(4)),
+
+                    BaseTextField(
+                      controller: _lastNameController,
+                      labelText: "Last name",
+                      hintText: "Enter your last name",
+                      onChanged: (_) => setState(() {}),
+                      rightGapWidth: 0
+                    ),
+
+
+                  ],
                 ),
               ),
-            )
+            ),
+
+            /// -------- FIXED PROCEED BUTTON --------
+
+            SafeArea(
+              child: Column(
+                children: [
+                  SizedBox(height: context.getPercentHeight(1)),
+                  context.navigationButton(
+                    text: "Proceed",
+                    canNavigate: canNavigate,
+                    height: 6,
+                    width: 100,
+                    onBtnPress: onProceed,
+                  ),
+                  SizedBox(height: context.getPercentHeight(2)),
+                ],
+              ),
+            ),
           ],
         ),
       ),
     );
   }
+
 }

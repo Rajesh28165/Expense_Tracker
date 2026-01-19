@@ -36,8 +36,14 @@ class RegexConstants {
 
 class AppConstants {
   static const appName = 'Hisabkitab';
+
+  static const otpTimer = 30;
   static const users = 'users';
   static const expenses = 'expenses';
+
+  static const Password_rule = 'Your password must be 8 - 20 characters long, and must contain at least 1 number, 1 lower case letter, 1 upper case letter and 1 special character';
+  static const SecurityQuestionRule = 'Choose a security question and answer. This will help us verify your identity if you forget your password.';
+
 
   // FontFamily
   static const Roboto = 'Roboto';
@@ -46,6 +52,25 @@ class AppConstants {
   static const OpenSans = 'OpenSans';
   static const Pacifico = 'Pacifico';
   static const PlayfairDisplay = 'PlayfairDisplay';
+
+
+  static const listOfSecurityQuestions = [
+    'What nickname do your friends call you?',
+    'What is the name of your childhood friend?',
+    'Who is your favourite sportsperson?',
+    'What was the first mobile app you installed?',
+    'What is the best movie you watched in a theatre?',
+  ];
+
+  static const listOfSecurityHints = [
+    'Your question is related to a name people used for you.',
+    'Your question is related to someone you knew growing up.',
+    'Your question is related to a public figure you admire.',
+    'Your question is related to your early mobile experience.',
+    'Your question is related to an entertainment experience.',
+  ];
+
+
 }
 
 class ImagePathConstants {
@@ -60,7 +85,7 @@ class ImagePathConstants {
 
 
 class ErrorMsg {
-  static const String pswdError = "Password must be 8+ characters\nwith uppercase, lowercase,\nnumber, and special character.";  
+  static const String pswdError = "Please enter valid password";  
 }
 
 class SuccessMsg {

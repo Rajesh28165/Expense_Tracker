@@ -20,6 +20,7 @@ class EmailTextField extends StatelessWidget {
   final bool? autofocus;
   final EdgeInsetsGeometry? contentPadding;
   final Function(String)? onChanged;
+  final double rightGapWidth;
 
   const EmailTextField({
     super.key,
@@ -38,7 +39,8 @@ class EmailTextField extends StatelessWidget {
     this.onChanged,
     this.allowedExpression,
     this.deniedExpression,
-    this.maxInputLength
+    this.maxInputLength,
+    this.rightGapWidth = 0
   });
 
   @override
@@ -58,7 +60,7 @@ class EmailTextField extends StatelessWidget {
       keyboardType: TextInputType.emailAddress,
       deniedExpression: RegexConstants.FORWARD_BACKWARD_SLASH,
       maxInputLength: 50,
-      rightGapWidth: 5,
+      rightGapWidth: rightGapWidth,
     );
   }
 
@@ -175,16 +177,13 @@ class PasswordTextField extends StatelessWidget {
     this.allowedExpression,
     this.deniedExpression,
     this.maxInputLength,
-    this.rightGapWidth = 5
+    this.rightGapWidth = 0
   });
 
   String? _validatePassword(String? value) {
     final RegExp regex = RegExp(RegexConstants.PASSWORD_PATTERN);
     final trimmedValue = value?.trim();
-
-    if (errorText != "") {
-      return errorText;
-    }
+    
     if (trimmedValue == null || trimmedValue.isEmpty) {
       return '';
     } else if (!regex.hasMatch(trimmedValue)) {

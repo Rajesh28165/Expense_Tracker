@@ -1,12 +1,13 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:expense_tracker/constants/entension.dart';
 import 'package:expense_tracker/logic/auth/auth_cubit.dart';
 import 'package:expense_tracker/presentation/widgets/generalComponents.dart';
 import 'package:expense_tracker/router/route_name.dart';
+import 'package:expense_tracker/util/colors.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../constants/app_constants.dart';
-import '../../data/models/expense_model.dart';
 import '../../logic/expense/expense_cubit.dart';
 import '../../logic/expense/expense_state.dart';
 
@@ -18,12 +19,9 @@ class DashboardPage extends StatelessWidget {
     return WillPopScope(
       onWillPop: () async => false,
       child: Scaffold(
+        appBar: context.customAppBar(title: 'Dashboard'),
         body: Stack(
           children: [
-            context.imageContainer(
-              imagePath: ImagePathConstants.shultter,
-              height: context.getPercentHeight(100),
-            ),
             SafeArea(
               child: SingleChildScrollView(
                 padding: EdgeInsets.symmetric(
@@ -33,14 +31,14 @@ class DashboardPage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _header(context),
+                    // _header(context),
                     SizedBox(height: context.getPercentHeight(4)),
-                    _balanceCard(context),
-                    SizedBox(height: context.getPercentHeight(4)),
-                    _incomeExpenseRow(context),
-                    SizedBox(height: context.getPercentHeight(4)),
+
+                    _userSummary(context),
+                    SizedBox(height: context.getPercentHeight(3)),
+
                     _quickActions(context),
-                    SizedBox(height: context.getPercentHeight(4)),
+                    SizedBox(height: context.getPercentHeight(5)),
                     _recentTransactions(),
                   ],
                 ),
@@ -52,41 +50,22 @@ class DashboardPage extends StatelessWidget {
     );
   }
 
-  // ================= STYLES =================
-  static const _titleStyle = TextStyle(
-    color: Colors.white70,
-    fontSize: 16,
-  );
-
-  static const _amountStyle = TextStyle(
-    color: Colors.white,
-    fontSize: 22,
-    fontWeight: FontWeight.bold,
-  );
-
-  static const _largeAmountStyle = TextStyle(
-    color: Colors.white,
-    fontSize: 32,
-    fontWeight: FontWeight.bold,
-  );
-
-  static const _sectionHeaderStyle = TextStyle(
-    color: Colors.white,
-    fontSize: 18,
-    fontWeight: FontWeight.bold,
-  );
-
   // ================= HEADER =================
   Widget _header(BuildContext context) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
-        context.header(
-          title: "Dashboard",
-          color: Colors.cyan,
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            context.header(
+              title: "Dashboard",
+              color: Colors.cyan,
+            ),
+          ],
         ),
         IconButton(
-          icon: const Icon(Icons.logout, color: Colors.white),
+          icon: const Icon(Icons.logout, color: WidgetColors.black),
           onPressed: () {
             context.read<AuthCubit>().logout();
             context.pushNamedUnAuthenticated(RouteName.login);
@@ -96,89 +75,62 @@ class DashboardPage extends StatelessWidget {
     );
   }
 
-  // ================= REUSABLE CARD =================
-  Widget _buildCard({
-    required String title,
-    required String amount,
-    double? height,
-    double? width,
-    Color? backgroundColor,
-    Gradient? gradient,
-    TextStyle? amountStyle,
-  }) {
-    return Container(
-      height: height,
-      width: width,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: gradient == null ? backgroundColor : null,
-        gradient: gradient,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(title, style: _titleStyle),
-          const SizedBox(height: 8),
-          Text(
-            amount,
-            style: amountStyle ?? _amountStyle,
-          ),
-        ],
-      ),
-    );
-  }
+  // ================= USER SUMMARY =================
+  Widget _userSummary(BuildContext context) {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
 
-  // ================= BALANCE =================
-  Widget _balanceCard(BuildContext context) {
-    return BlocBuilder<ExpenseCubit, ExpenseState>(
-      builder: (context, state) {
-        if (state is ExpenseLoaded) {
-          final balance = state.totalIncome - state.totalExpense;
-          return _buildCard(
-            title: "Total Balance",
-            amount: "₹ ${balance.toStringAsFixed(0)}",
-            height: 100,
-            width: context.getPercentWidth(90),
-            gradient: const LinearGradient(
-              colors: [Colors.blueAccent, Colors.cyan],
-            ),
-            amountStyle: _largeAmountStyle,
-          );
-        }
-        return const SizedBox();
-      },
-    );
-  }
+    if (uid == null) return const SizedBox();
 
-  // ================= INCOME / EXPENSE =================
-  Widget _incomeExpenseRow(BuildContext context) {
-    return BlocBuilder<ExpenseCubit, ExpenseState>(
-      builder: (context, state) {
-        if (state is ExpenseLoaded) {
-          return Row(
-            children: [
-              Expanded(
-                child: _buildCard(
-                  title: "Income",
-                  amount: "₹ ${state.totalIncome}",
-                  height: 85,
-                  backgroundColor: Colors.green.withOpacity(0.85),
-                ),
-              ),
-              SizedBox(width: context.getPercentWidth(4)),
-              Expanded(
-                child: _buildCard(
-                  title: "Expense",
-                  amount: "₹ ${state.totalExpense}",
-                  height: 85,
-                  backgroundColor: Colors.redAccent.withOpacity(0.85),
-                ),
-              ),
-            ],
-          );
+    return FutureBuilder<DocumentSnapshot>(
+      future: FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .get(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const SizedBox();
         }
-        return const SizedBox();
+
+        final data = snapshot.data?.data() as Map<String, dynamic>;
+        final firstName = data['firstName'] ?? '';
+        final lastName = data['lastName'] ?? '';
+        final fullName = "$firstName $lastName";
+
+        return BlocBuilder<ExpenseCubit, ExpenseState>(
+          builder: (context, state) {
+            final totalExpense = state is ExpenseLoaded ? state.totalExpense : 0;
+
+            return Column(
+              children: [
+                context.shadowBox(
+                  width: 85,
+                  height: 12,
+                  textColor: Colors.black,
+                  text: 'Hey $firstName welcome to your money management system ',
+                  fontStyle: FontStyle.italic,
+                ),
+                SizedBox(height: context.getPercentHeight(4)),
+                context.shadowBox(
+                  width: 85,
+                  height: 15,
+                  header: 'Your total expenses',
+                  textColor: Colors.black,
+                  text: "₹ $totalExpense",
+                  fontStyle: FontStyle.normal,
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.blueAccent.shade100,
+                      Colors.pinkAccent.shade100,
+                      Colors.orangeAccent.shade100,
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
+              ],
+            );
+          },
+        );
       },
     );
   }
@@ -188,7 +140,14 @@ class DashboardPage extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text("Quick Actions", style: _sectionHeaderStyle),
+        const Text(
+          "Quick Actions",
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         const SizedBox(height: 12),
         Row(
           children: [
@@ -245,13 +204,20 @@ class DashboardPage extends StatelessWidget {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text("Recent Transactions", style: _sectionHeaderStyle),
+              const Text(
+                "Recent Expenses",
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
               const SizedBox(height: 12),
               ...state.expenses.take(5).map((e) {
                 return _transactionTile(
                   e.title,
-                  "${e.type == ExpenseType.expense ? '-' : '+'} ₹${e.amount}",
-                  e.type == ExpenseType.expense ? Colors.red : Colors.green,
+                  "💸 ₹${e.amount.toStringAsFixed(2)}",
+                  Colors.redAccent.shade400,
                 );
               }),
             ],
@@ -262,28 +228,46 @@ class DashboardPage extends StatelessWidget {
     );
   }
 
-
   Widget _transactionTile(String title, String amount, Color color) {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.4),
+        color: Colors.black.withOpacity(0.35),
         borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.white10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 8,
+            offset: const Offset(2, 4),
+          ),
+        ],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(title, style: const TextStyle(color: Colors.white)),
+          Expanded(
+            child: Text(
+              title,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w500,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
           Text(
             amount,
             style: TextStyle(
               color: color,
               fontWeight: FontWeight.bold,
+              fontSize: 16,
             ),
           ),
         ],
       ),
     );
   }
+
 }

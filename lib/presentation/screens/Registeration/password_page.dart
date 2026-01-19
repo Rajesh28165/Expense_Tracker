@@ -1,15 +1,14 @@
-import 'package:expense_tracker/constants/entension.dart';
-import 'package:expense_tracker/presentation/widgets/generalComponents.dart';
+import 'package:expense_tracker/data/cubit/userCubit.dart';
+import 'package:expense_tracker/util/colors.dart';
+import 'package:expense_tracker/util/styles.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import '../../../constants/app_constants.dart';
-import '../../../logic/auth/auth_cubit.dart';
-import '../../../logic/auth/auth_state.dart';
 import '../../../router/route_name.dart';
 import '../../components/BaseField/baseTextField.dart';
+import 'package:expense_tracker/constants/entension.dart';
+import 'package:expense_tracker/presentation/widgets/generalComponents.dart';
+
 import '../../components/allFields.dart';
 
 class PasswordPage extends StatefulWidget {
@@ -20,14 +19,13 @@ class PasswordPage extends StatefulWidget {
 }
 
 class _PasswordPageState extends State<PasswordPage> {
-  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _pswdController = TextEditingController();
   final TextEditingController _cnfmPswdController = TextEditingController();
+  final pswdRegex = RegExp(RegexConstants.PASSWORD_PATTERN);
 
-    @override
+  @override
   void initState() {
     super.initState();
-    _emailController.addListener(_onTextChanged);
     _pswdController.addListener(_onTextChanged);
     _cnfmPswdController.addListener(_onTextChanged);
   }
@@ -36,115 +34,120 @@ class _PasswordPageState extends State<PasswordPage> {
 
   @override
   void dispose() {
-    _emailController.dispose();
     _pswdController.dispose();
     _cnfmPswdController.dispose();
     super.dispose();
   }
 
   bool get canRegister {
-    final emailRegex = RegExp(RegexConstants.EMAIL_ADDRESS_PATTERN);
-    final pswdRegex = RegExp(RegexConstants.PASSWORD_PATTERN);
-
-    final email = _emailController.text.trim();
     final pswd = _pswdController.text.trim();
     final cnfmPswd = _cnfmPswdController.text.trim();
+    return pswdRegex.hasMatch(pswd) && pswd == cnfmPswd;
+  }
 
-    return emailRegex.hasMatch(email) && pswdRegex.hasMatch(pswd) && pswd == cnfmPswd;
+  String passwordError(password) {
+    final value = password.trim();
+    if (value!="" && value!=null) {
+      if (value.length < 8){
+        return 'Minimum 8 characters are required.';
+      }
+      if (!pswdRegex.hasMatch(value)){
+        return 'Please enter valid password';
+      }
+      return "";
+    }
+    return "";
+  }
+
+  
+  String cnfmPasswordError(password, confirmPassword) {
+    final pswd = password.trim();
+    final cnfmPswd = confirmPassword.trim();
+    if (cnfmPswd!="" && cnfmPswd!=null) {
+      if (pswd=="" || pswd==null || !pswdRegex.hasMatch(pswd)) {
+        return "Please enter the valid password above first";
+      }
+      if (pswd != cnfmPswd) {
+        return "The 2 entered password are not matching";
+      }
+      return "";
+    }
+    return "";
+  }
+
+  void onProceed() {
+    final password = _pswdController.text.trim();
+    context.read<UserCubit>().settempPassword(password);
+    final storedPassword = context.read<UserCubit>().state.tempPassword;
+    log.d('stored password is $storedPassword');
+    context.pushNamedUnAuthenticated(RouteName.security);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: context.customAppBar(title: "Registeration"),
+      appBar: context.customAppBar(title: 'Registeration'),
       body: context.gradientScreen(
-        child: Stack(
+        child: Column(
           children: [
-            BlocConsumer<AuthCubit, AuthState>(
-              listener: (context, state) {
-                if (state is AuthAuthenticated) {
-                  context.pushNamedUnAuthenticated(RouteName.dashboard);
-                }
-      
-                if (state is AuthError) {
-                  context.showCustomDialog(description: state.message);
-                }
-              },
-              builder: (context, state) {
-                return SafeArea(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [                        
-                        SizedBox(height: context.getPercentHeight(5)),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: context.getPercentHeight(2)),
 
-                        EmailTextField(
-                          controller: _emailController,
-                          labelStyle: const TextStyle(color: Colors.black),
-                          onChanged: (_) => setState(() {}),
-                        ),
-                        
-                        SizedBox(height: context.getPercentHeight(4)),
-                        
-                        PasswordTextField(
-                          controller: _pswdController,
-                          hintText: "Enter password",
-                          labelStyle: const TextStyle(color: Colors.black),
-                          onChanged: (_) => setState(() {}),
-                        ),
-                        
-                        SizedBox(height: context.getPercentHeight(4)),
-                        
-                        PasswordTextField(
-                          controller: _cnfmPswdController,
-                          labelText: "Confirm password",
-                          hintText: "Re-enter password",
-                          labelStyle: const TextStyle(color: Colors.black),
-                          onChanged: (_) => setState(() {}),
-                        ),
-                        
-                        SizedBox(height: context.getPercentHeight(20)),
-                        
-                        Center(
-                          child: context.navigationButton(
-                            text: "Register",
-                            canNavigate: canRegister,
-                            height: 6,
-                            width: 75,
-                            onBtnPress: () {
-                              context.read<AuthCubit>().register(
-                                _emailController.text.trim(),
-                                _pswdController.text.trim(),
-                              );
-                            },
-                          ),
-                        ),
-                        
-                        SizedBox(height: context.getPercentHeight(4)),
-                        
-                        Center(
-                          child: Padding(
-                            padding: EdgeInsets.only(
-                              right: context.getPercentWidth(10),
-                            ),
-                            child: context.textedButton(
-                              text: "Already have an account? Login",
-                              onButtonPress: () => context.pushNamedUnAuthenticated(RouteName.login),
-                            ),
-                          ),
-                        ),
-                        
-                        SizedBox(height: context.getPercentHeight(5)),
-                      ],
+                    const Text(AppConstants.Password_rule),
+
+                    SizedBox(height: context.getPercentHeight(4)),
+
+                    PasswordTextField(
+                      controller: _pswdController,
+                      hintText: "Enter password",
+                      errorText: passwordError(_pswdController.text),
+                      onChanged: (_) => setState(() {}),
                     ),
+                    
+                    SizedBox(height: context.getPercentHeight(4)),
+                    
+                    PasswordTextField(
+                      controller: _cnfmPswdController,
+                      labelText: "Confirm password",
+                      hintText: "Re-enter password",
+                      errorText: cnfmPasswordError(_pswdController.text, _cnfmPswdController.text),
+                      onChanged: (_) => setState(() {}),
+                    ),
+
+                    SizedBox(height: context.getPercentHeight(5)),
+
+                  ],
+                ),
+              ),
+            ),
+
+            /// -------- FIXED PROCEED BUTTON --------
+            SafeArea(
+              child: Column(
+                children: [
+                  SizedBox(height: context.getPercentHeight(1)),
+                  context.navigationButton(
+                    text: "Proceed",
+                    canNavigate: canRegister,
+                    height: 6,
+                    width: 100,
+                    onBtnPress: onProceed,
                   ),
-                );
-              },
+                  SizedBox(height: context.getPercentHeight(2)),
+                ],
+              ),
             ),
           ],
         ),
       ),
     );
   }
+
 }

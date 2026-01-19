@@ -51,18 +51,11 @@ extension GeneralComponents on BuildContext {
           begin: begin,
           end: end,
           colors: colors ??
-const [
-  Color(0xFFF5F7FA),
-  Color(0xFFE4E7EB),
-  Color(0xFFCBD2D9),
-]
-
-
-
-
-
-
-
+          const [
+            Color(0xFFF5F7FA),
+            Color(0xFFE4E7EB),
+            Color(0xFFCBD2D9),
+          ]        
         ),
       ),
       child: content,
@@ -155,6 +148,45 @@ const [
 
 
   // ------------------ Dropdown ------------------
+  // Widget customDropdown<T>({
+  //   required List<T> menuItems,
+  //   T? value,
+  //   String? labelText,
+  //   String? hintText,
+  //   ValueChanged<T?>? onChanged,
+  // }) {
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       if (labelText != null && labelText.isNotEmpty)
+  //         Text(
+  //           labelText,
+  //           style: AppStyles.labelStyle(),
+  //         ),
+  //       const SizedBox(height: 10),
+  //       FractionallySizedBox(
+  //         widthFactor: 0.97,
+  //         child: DropdownButtonFormField<T>(
+  //           value: value,
+  //           isExpanded: true,
+  //           decoration: InputDecoration(
+  //             contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+  //             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+  //           ),
+  //           hint: hintText != null ? Text(hintText) : null,
+  //           items: menuItems .map(
+  //             (item) => DropdownMenuItem<T>(
+  //               value: item,
+  //               child: Text(item.toString()),
+  //             ),
+  //           ) .toList(),
+  //           onChanged: onChanged,
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
+
   Widget customDropdown<T>({
     required List<T> menuItems,
     T? value,
@@ -166,30 +198,107 @@ const [
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (labelText != null && labelText.isNotEmpty)
-          Text(
-            labelText,
-            style: AppStyles.labelStyle(),
-          ),
-        DropdownButtonFormField<T>(
-          value: value,
-          decoration: InputDecoration(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+          Text(labelText, style: AppStyles.labelStyle()),
+
+        const SizedBox(height: 10),
+
+        FractionallySizedBox(
+          widthFactor: 0.97,
+          child: DropdownButtonFormField<T>(
+            value: value,
+            isExpanded: true,
+
+            decoration: InputDecoration(
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 16, // 🔴 increase height
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
+
+            hint: hintText != null
+                ? Text(
+                    hintText,
+                    maxLines: 2,
+                    overflow: TextOverflow.visible,
+                  )
+                : null,
+
+            items: menuItems.map(
+              (item) => DropdownMenuItem<T>(
+                value: item,
+                child: Text(
+                  item.toString(),
+                  maxLines: 3,
+                  softWrap: true,
+                ),
+              ),
+            ).toList(),
+
+            selectedItemBuilder: (context) {
+              return menuItems.map(
+                (item) => Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    item.toString(),
+                    maxLines: 3, // 🔴 allow 2–3 lines
+                    softWrap: true,
+                    overflow: TextOverflow.visible,
+                  ),
+                ),
+              ).toList();
+            },
+
+            onChanged: onChanged,
           ),
-          hint: hintText != null ? Text(hintText) : null,
-          items: menuItems .map(
-            (item) => DropdownMenuItem<T>(
-              value: item,
-              child: Text(item.toString()),
-            ),
-          ) .toList(),
-          onChanged: onChanged,
         ),
       ],
     );
   }
+
+  void showSecurityQuestionPicker(
+    BuildContext context,
+    List<String> items,
+    ValueChanged<String> onSelect,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (_) {
+        return SafeArea(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+
+                  ...items.map(
+                    (item) => ListTile(
+                      title: Text(item),
+                      onTap: () {
+                        Navigator.pop(context);
+                        onSelect(item);
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+}
+
+
+
 
 
   // ------------------ Radio Button ------------------
@@ -284,6 +393,8 @@ const [
     Color backgroundColor = Colors.white,
     Color textColor = Colors.black,
     VoidCallback? onTap,
+    Gradient? gradient,
+    String header = ""
   }) {
     return GestureDetector(
       onTap: onTap,
@@ -292,6 +403,7 @@ const [
         width: getPercentWidth(width ?? 30),
         alignment: Alignment.center,
         decoration: BoxDecoration(
+          gradient: gradient,
           color: backgroundColor,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
@@ -308,14 +420,31 @@ const [
             horizontal: getPercentWidth(4),
             vertical: getPercentHeight(1),
           ),
-          child: Text(
-            text,
-            style: TextStyle(
-              fontSize: fontSize,
-              fontWeight: fontWeight,
-              fontStyle: fontStyle,
-              color: textColor,
-            ),
+          child: Column(
+            children: [
+              SizedBox(height: getPercentHeight(header == "" ? 0 : 2)),
+              Center(
+                child: Text(
+                  header ?? "",
+                  style: TextStyle(
+                  fontSize: fontSize,
+                  fontWeight: fontWeight,
+                  fontStyle: fontStyle,
+                  color: textColor,
+                ),
+                )
+              ),
+              SizedBox(height: getPercentHeight(header == "" ? 0 : 2)),
+              Text(
+                text,
+                style: TextStyle(
+                  fontSize: fontSize,
+                  fontWeight: fontWeight,
+                  fontStyle: fontStyle,
+                  color: textColor,
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -488,9 +617,13 @@ const [
   }
 
   // ------------------ Hide Loader ------------------
-  void hideLoader(context) {
-    context.popTrue();
+  void hideLoader() {
+    final navigator =  BuildContextExtensionFunctions.navigatorUnauthenticated.currentState;
+    if (navigator != null && navigator.canPop()) {
+      navigator.pop();
+    }
   }
+
 
   // ------------------ Navigation Button ------------------
   Widget navigationButton({
@@ -585,7 +718,7 @@ const [
                     fontSize: fontSize ?? 14,
                     fontWeight: fontWeight ?? FontWeight.w400,
                     height: textHeight,
-                    color: textColor ?? Colors.grey,
+                    color: textColor ?? Color.fromARGB(255, 70, 66, 66),
                     decoration: textUnderline ? TextDecoration.underline : TextDecoration.none,
                   ),
             ),

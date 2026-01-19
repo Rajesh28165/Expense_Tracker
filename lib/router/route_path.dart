@@ -1,5 +1,5 @@
-import 'package:expense_tracker/presentation/screens/Registeration/email_page.dart';
 import 'package:expense_tracker/presentation/screens/Registeration/name_page.dart';
+import 'package:expense_tracker/presentation/screens/Registeration/security_page.dart';
 import 'package:expense_tracker/presentation/screens/dashboard_page.dart';
 import 'package:expense_tracker/presentation/screens/Registeration/password_page.dart';
 import 'package:expense_tracker/router/route_name.dart';
@@ -8,8 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../logic/auth/auth_cubit.dart';
-import '../presentation/screens/Registeration/otp_page.dart';
-import '../presentation/screens/Registeration/phone_page.dart';
+import '../presentation/screens/Registeration/email_page.dart';
 import '../presentation/screens/add_expense_page.dart';
 import '../presentation/screens/login_page.dart';
 import '../presentation/screens/reports_page.dart';
@@ -27,25 +26,6 @@ class AppRouter {
           ),
         );
 
-
-      case RouteName.phone:
-        return MaterialPageRoute(
-          settings: settings,
-          builder: (_) => BlocProvider(
-            create: (_) => AuthCubit(FirebaseAuth.instance),
-            child: const PhonePage(),
-          ),
-        );
-
-
-      case RouteName.otp:
-        return MaterialPageRoute(
-          settings: settings,
-          builder: (_) => OtpPage(
-            mobNumber: settings.arguments as String,
-          ),
-        );
-
       
       case RouteName.name:
         return MaterialPageRoute(
@@ -57,12 +37,8 @@ class AppRouter {
       case RouteName.email:
         return MaterialPageRoute(
           settings: settings,
-          builder: (_) => BlocProvider(
-            create: (_) => AuthCubit(FirebaseAuth.instance),
-            child: const EmailPage(),
-          ),
+          builder: (_) => const EmailPage(),
         );
-
 
       case RouteName.password:
         return MaterialPageRoute(
@@ -72,7 +48,18 @@ class AppRouter {
             child: const PasswordPage(),
           ),
         );
+
       
+      case RouteName.security:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => BlocProvider(
+            create: (_) => AuthCubit(FirebaseAuth.instance),
+            child: const SecurityPage(),
+          ),
+        );
+      
+
       case RouteName.dashboard:
         return MaterialPageRoute(
           settings: settings,
@@ -81,6 +68,7 @@ class AppRouter {
             child: const DashboardPage(),
           ),
         );
+
 
       case RouteName.addExpense:
         return MaterialPageRoute(
@@ -91,6 +79,7 @@ class AppRouter {
           ),
         );
 
+
       case RouteName.report:
         return MaterialPageRoute(
           settings: settings,
@@ -99,6 +88,7 @@ class AppRouter {
             child: const ReportsPage(),
           ),
         );
+
 
       default:
         return MaterialPageRoute(

@@ -73,7 +73,7 @@ class BaseTextField extends StatelessWidget {
     this.onTap,
     this.onChanged,
     this.maxLines = 1,
-    this.rightGapWidth = 10,
+    this.rightGapWidth = 5,
     this.keyboardType = TextInputType.text,
     this.isEnabled = true,
     this.obscureText = false,
@@ -118,7 +118,17 @@ class BaseTextField extends StatelessWidget {
                   obscuringCharacter: obscuringCharacter,
                   style: inputTextStyle ?? AppStyles.inputTextStyle(),
                   autovalidateMode: autovalidateMode,
-                  validator: validator ?? BaseTextFieldCubit.defaultValidator,
+                  validator: (value) {
+                    if (errorText != null && errorText!.isNotEmpty) {
+                      return errorText;
+                    }
+
+                    if (validator != null) {
+                      return validator!(value);
+                    }
+
+                    return BaseTextFieldCubit.defaultValidator(value);
+                  },
                   onTap: onTap,
                   onChanged: onChanged,
                   inputFormatters: inputFormatters ??
@@ -134,7 +144,7 @@ class BaseTextField extends StatelessWidget {
                   decoration: InputDecoration(
                     hintText: hintText ?? 'Enter details',
                     hintStyle: hintStyle ?? AppStyles.hintStyle(),
-                    errorText: errorText,
+                    // errorText: errorText,
                     errorStyle: errorStyle ?? AppStyles.errorStyle(),
                     prefixIcon: prefixIcon,
                     suffixIcon: suffixIcon ??

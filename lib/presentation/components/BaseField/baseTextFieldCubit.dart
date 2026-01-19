@@ -20,6 +20,7 @@ class BaseTextFieldCubit extends Cubit<bool> {
     return null;
   }
 
+
   @override
   Future<void> close() {
     controller.dispose();

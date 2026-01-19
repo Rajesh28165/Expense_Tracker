@@ -32,16 +32,16 @@ class AppStyles {
 
   static TextStyle inputTextStyle() {
     return const CustomTextStyle(
-      fontSize: 14,
-      fontWeight: FontWeight.w900,
+      fontSize: 16,
+      fontWeight: FontWeight.w700,
       color: Colors.black,
-      fontFamily: AppConstants.Montserrat
+      fontFamily: AppConstants.OpenSans
     );
   }
 
   static TextStyle labelStyle() {
     return const CustomTextStyle(
-      fontSize: 16,
+      fontSize: 18,
       fontWeight: FontWeight.w600,
       color: Colors.black,
       fontFamily: AppConstants.Montserrat

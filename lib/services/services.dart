@@ -11,15 +11,19 @@ class CredentialService {
     await _auth.verifyPhoneNumber(
       phoneNumber: phone,
       timeout: const Duration(seconds: 60),
-      verificationCompleted: (credential) async {
-        await _auth.signInWithCredential(credential);
+
+      verificationCompleted: (credential) {
+        // CURRENTLY DO NOTHING
       },
-      verificationFailed: (e) {
-        onError(e.message ?? "OTP failed");
+
+      verificationFailed: (FirebaseAuthException e) {
+        onError(e.message ?? 'OTP verification failed');
       },
+
       codeSent: (verificationId, _) {
         onCodeSent(verificationId);
       },
+
       codeAutoRetrievalTimeout: (_) {},
     );
   }
@@ -33,8 +37,6 @@ class CredentialService {
       smsCode: otp,
     );
 
-    await FirebaseAuth.instance.signInWithCredential(credential);
+    await _auth.signInWithCredential(credential);
   }
-
-
 }

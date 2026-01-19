@@ -1,14 +1,13 @@
-import 'package:expense_tracker/constants/entension.dart';
-import 'package:expense_tracker/logic/auth/auth_cubit.dart';
-import 'package:expense_tracker/logic/auth/auth_state.dart';
-import 'package:expense_tracker/presentation/components/allFields.dart';
-import 'package:expense_tracker/presentation/widgets/generalComponents.dart';
-import 'package:expense_tracker/router/route_name.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../../constants/app_constants.dart';
-
+import '../../../constants/app_constants.dart';
+import '../../../util/colors.dart';
+import 'package:expense_tracker/constants/entension.dart';
+import 'package:expense_tracker/presentation/widgets/generalComponents.dart';
+import '../../logic/auth/auth_cubit.dart';
+import '../../logic/auth/auth_state.dart';
+import '../../router/route_name.dart';
+import '../components/allFields.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -30,7 +29,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _onTextChanged() {
-    setState(() {}); 
+    setState(() {});
   }
 
   @override
@@ -39,7 +38,6 @@ class _LoginPageState extends State<LoginPage> {
     passwordController.dispose();
     super.dispose();
   }
-
 
   bool get canNavigate {
     final RegExp emailRegex = RegExp(RegexConstants.EMAIL_ADDRESS_PATTERN);
@@ -51,15 +49,12 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async => false,
-      child: Scaffold(
-        body: Stack(
+    return Scaffold(
+      
+      appBar: context.customAppBar(title: 'Login'),
+      body: context.gradientScreen(
+        child: Column(
           children: [
-            context.imageContainer(
-              imagePath: ImagePathConstants.techWall,
-              height: context.getPercentHeight(100)
-            ),
             BlocConsumer<AuthCubit, AuthState>(
               listener: (context, state) {
                 if (state is AuthAuthenticated) {
@@ -67,94 +62,84 @@ class _LoginPageState extends State<LoginPage> {
                 }
     
                 if(state is AuthError) {
+                  log.d(' Error is $AuthError');
                   context.showCustomDialog(description: 'Something went wrong');
                 }
               },
               builder: (context, state) {
-                return SafeArea(
+                return Expanded(
                   child: SingleChildScrollView(
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        minHeight: context.getPercentHeight(100),
-                      ),
-                      child: Padding(
-                        padding: EdgeInsets.only(left: context.getPercentWidth(8)),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.only(left: context.getPercentWidth(20)),
-                              child: context.header(title: "Welcome Back", color: Colors.cyan),
-                            ),
-                            SizedBox(height: context.getPercentHeight(2)),
-                            const Text(
-                              "Login to manage your expenses",
-                              style: TextStyle(
-                                color: Colors.amber,
-                                fontSize: 20,
-                              ),
-                            ),
-    
-                            SizedBox(height: context.getPercentHeight(5)),
-    
-                            EmailTextField(
-                              controller: emailController,
-                              hintText: "Enter your username",
-                              labelStyle: const TextStyle(color: Colors.white),
-                              onChanged: (_) => setState(() {}),
-                            ),
-    
-                            SizedBox(height: context.getPercentHeight(5)),
-    
-                            PasswordTextField(
-                              controller: passwordController,
-                              hintText: "Enter your password",
-                              labelStyle: const TextStyle(color: Colors.white),
-                              onChanged: (_) => setState(() {}),
-                            ),
-    
-                            SizedBox(height: context.getPercentHeight(5)),
-    
-                            Padding(
-                              padding: EdgeInsets.only(right: context.getPercentWidth(11)),
-                              child: context.navigationButton(
-                                height: 6,
-                                width: 100,
-                                text: "Login",
-                                canNavigate: canNavigate,
-                                onBtnPress: () {
-                                  context.read<AuthCubit>().login(
-                                    emailController.text.trim(),
-                                    passwordController.text.trim(),
-                                  );
-                                },
-                                
-                              ),
-                            ),
-    
-                            SizedBox(height: context.getPercentHeight(5)),
-    
-                            Center(
-                              child: Padding(
-                                padding: EdgeInsets.only(right: context.getPercentWidth(10)),
-                                child: context.textedButton(
-                                  text: "Don’t have an account? Register",
-                                  onButtonPress: () => context.pushNamedUnAuthenticated(RouteName.phone),
-                                  // onButtonPress: () => context.pushNamedUnAuthenticated(RouteName.dashboard),
-                                ),
-                              ),
-                            ),
-    
-                            SizedBox(height: context.getPercentHeight(5)),
-                          ],
+                    padding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).viewInsets.bottom,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(height: context.getPercentHeight(1)),
+                        const Text(
+                          "Welcome Back! ",
+                          style: TextStyle(
+                            fontSize: 30,
+                            color: WidgetColors.black,
+                            fontFamily: AppConstants.PlayfairDisplay
+                          )
                         ),
-                      ),
+                        SizedBox(height: context.getPercentHeight(1)),
+                        const Text(
+                          "Login to manage your expenses",
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontFamily: AppConstants.OpenSans,
+                            color: WidgetColors.cyanBlue,
+                            fontWeight: FontWeight.w800
+                          ),
+                        ),
+                        SizedBox(height: context.getPercentHeight(8)),
+                        EmailTextField(
+                          controller: emailController,
+                          labelText: "User Id",
+                          hintText: "Enter your username",
+                          onChanged: (_) => setState(() {}),
+                        ),
+                        SizedBox(height: context.getPercentHeight(5)),
+                        PasswordTextField(
+                          controller: passwordController,
+                          hintText: "Enter your password",
+                          onChanged: (_) => setState(() {}),
+                        ),
+                        SizedBox(height: context.getPercentHeight(5)),
+                      ],
                     ),
                   ),
                 );
-    
               },
+            ),
+            SafeArea(
+              child: Column(
+                children: [
+                  SizedBox(height: context.getPercentHeight(1)),
+                  context.navigationButton(
+                    height: 6,
+                    width: 100,
+                    text: "Login",
+                    canNavigate: canNavigate,
+                    onBtnPress: () {
+                      context.read<AuthCubit>().login(
+                        emailController.text.trim(),
+                        passwordController.text.trim(),
+                      );
+                    },
+                  ),
+                  SizedBox(height: context.getPercentHeight(2)),
+                ],
+              ),
+            ),
+            Center(
+              child: context.textedButton(
+                text: "Don’t have an account? Register",
+                textUnderline: true,
+                onButtonPress: () => context.pushNamedUnAuthenticated(RouteName.name),
+              ),
             ),
           ],
         ),

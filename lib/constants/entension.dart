@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 final log = logger(BuildContext);
 
 extension StringExtensions on String {
+
   /// Capitalizes only the first letter of a single word
   String capitalize() {
     if (trim().isEmpty) return this;

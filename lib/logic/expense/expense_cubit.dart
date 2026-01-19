@@ -8,24 +8,21 @@ class ExpenseCubit extends Cubit<ExpenseState> {
 
   ExpenseCubit(this.repository) : super(ExpenseInitial());
 
+  /// Load all expenses from repository
   Future<void> loadExpenses() async {
     try {
       emit(ExpenseLoading());
 
       final expenses = await repository.fetchExpenses();
 
-      final totalIncome = expenses
-          .where((e) => e.type == ExpenseType.income)
-          .fold(0.0, (sum, e) => sum + e.amount);
-
-      final totalExpense = expenses
-          .where((e) => e.type == ExpenseType.expense)
-          .fold(0.0, (sum, e) => sum + e.amount);
+      final totalExpense = expenses.fold(
+        0.0,
+        (sum, e) => sum + e.amount,
+      );
 
       emit(
         ExpenseLoaded(
           expenses: expenses,
-          totalIncome: totalIncome,
           totalExpense: totalExpense,
         ),
       );
@@ -34,8 +31,9 @@ class ExpenseCubit extends Cubit<ExpenseState> {
     }
   }
 
+  /// Add a new expense and refresh the list
   Future<void> addExpense(ExpenseModel expense) async {
     await repository.addExpense(expense);
-    await loadExpenses(); // refresh UI
+    await loadExpenses();
   }
 }

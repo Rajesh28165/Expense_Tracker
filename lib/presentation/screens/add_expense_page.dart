@@ -56,22 +56,17 @@ class _AddExpensePageState extends State<AddExpensePage> {
   }
 
   void _saveExpense(BuildContext context) {
-    context.read<ExpenseCubit>().addExpense(
-      ExpenseModel(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        title: selectedCategory,
-        amount: double.parse(amountController.text),
-        category: selectedCategory,
-        type: ExpenseType.expense,
-        date: selectedDate,
-      ),
+    final expense = ExpenseModel(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      category: selectedCategory,
+      title: noteController.text.trim(),
+      amount: double.parse(amountController.text),
+      date: selectedDate,
     );
 
-    context.showCustomDialog(
-      description: "Expense added successfully",
-    );
+    context.read<ExpenseCubit>().addExpense(expense);
 
-    // Navigator.pop(context);
+    Navigator.pop(context); // Close page after saving
   }
 
   @override
@@ -184,10 +179,7 @@ class _AddExpensePageState extends State<AddExpensePage> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
-              "Date",
-              style: TextStyle(color: Colors.white70),
-            ),
+            const Text("Date", style: TextStyle(color: Colors.white70)),
             Text(
               "${selectedDate.day}-${selectedDate.month}-${selectedDate.year}",
               style: const TextStyle(color: Colors.white),
