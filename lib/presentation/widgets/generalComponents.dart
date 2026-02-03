@@ -1,7 +1,7 @@
 // ignore_for_file: non_constant_identifier_names
 
 import 'package:expense_tracker/constants/app_constants.dart';
-import 'package:expense_tracker/constants/entension.dart';
+import 'package:expense_tracker/constants/extension.dart';
 import 'package:flutter/material.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import '../../util/colors.dart';
@@ -50,12 +50,7 @@ extension GeneralComponents on BuildContext {
         gradient: LinearGradient(
           begin: begin,
           end: end,
-          colors: colors ??
-          const [
-            Color(0xFFF5F7FA),
-            Color(0xFFE4E7EB),
-            Color(0xFFCBD2D9),
-          ]        
+          colors: colors ?? [Colors.black, Colors.black87, Colors.blue.shade400],
         ),
       ),
       child: content,
@@ -63,6 +58,59 @@ extension GeneralComponents on BuildContext {
   }
 
   // ------------------ AppBar ------------------
+  // PreferredSizeWidget customAppBar({
+  //   required String title,
+  //   TextStyle? titleTextStyle,
+  //   Color? backgroundColor,
+  //   bool centerTitle = true,
+  //   List<Widget>? actions,
+  //   Widget? leading,
+  //   double? height,
+  //   double elevation = 0,
+  //   bool showBackButton = true,
+  //   Color arrowColor = WidgetColors.white,
+  // }) {
+  //   final double resolvedHeight = getPercentHeight(height ?? 6);
+
+  //   Widget? resolvedLeading;
+
+  //   if (showBackButton) {
+  //     resolvedLeading = leading ??
+  //         IconButton(
+  //           icon: Icon(
+  //             Icons.arrow_back,
+  //             color: arrowColor,
+  //           ),
+  //           onPressed: () => Navigator.of(this).pop(),
+  //         );
+  //   } else {
+  //     resolvedLeading = null;
+  //   }
+
+  //   return PreferredSize(
+  //     preferredSize: Size.fromHeight(resolvedHeight),
+  //     child: AppBar(
+  //       automaticallyImplyLeading: false,
+  //       backgroundColor: backgroundColor ?? Colors.purple[700],
+  //       elevation: elevation,
+  //       centerTitle: centerTitle,
+  //       leading: resolvedLeading,
+  //       title: Text(
+  //         title,
+  //         style: titleTextStyle ??
+  //           const TextStyle(
+  //             fontSize: 30,
+  //             fontWeight: FontWeight.bold,
+  //             color: WidgetColors.white,
+  //             fontFamily: AppConstants.OpenSans,
+  //           ),
+  //       ),
+  //       actions: actions,
+  //     ),
+  //   );
+  // }
+
+
   PreferredSizeWidget customAppBar({
     required String title,
     TextStyle? titleTextStyle,
@@ -73,34 +121,47 @@ extension GeneralComponents on BuildContext {
     double? height,
     double elevation = 0,
     bool showBackButton = true,
+    Color arrowColor = WidgetColors.white,
   }) {
     final double resolvedHeight = getPercentHeight(height ?? 6);
+
+    Widget? resolvedLeading;
+
+    if (showBackButton) {
+      resolvedLeading = leading ??
+          IconButton(
+            icon: Icon(
+              Icons.arrow_back,
+              color: arrowColor,
+            ),
+            onPressed: () => Navigator.of(this).pop(),
+          );
+    }
 
     return PreferredSize(
       preferredSize: Size.fromHeight(resolvedHeight),
       child: AppBar(
-        backgroundColor: backgroundColor ?? WidgetColors.greenColorCard,
+        automaticallyImplyLeading: false,
+        backgroundColor: backgroundColor ?? Colors.purple[700],
+        elevation: elevation,
+        centerTitle: centerTitle,
+        leading: resolvedLeading,
         title: Text(
           title,
-          style: titleTextStyle ?? const TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: WidgetColors.black,
-          ),
+          style: titleTextStyle ??
+              const TextStyle(
+                fontSize: 30,
+                fontWeight: FontWeight.bold,
+                color: WidgetColors.white,
+                fontFamily: AppConstants.OpenSans,
+              ),
         ),
-        centerTitle: centerTitle,
-        elevation: elevation,
-        actions: actions,
-        leading: leading ??
-          (showBackButton
-            ? IconButton(
-                icon: const Icon(Icons.arrow_back, color: WidgetColors.black),
-                onPressed: () => Navigator.of(this).pop(),
-              )
-            : null),
+        actions: actions, // 👈 key line
       ),
     );
   }
+
+
 
   // ------------------ Header ------------------
   Widget header({
@@ -148,45 +209,6 @@ extension GeneralComponents on BuildContext {
 
 
   // ------------------ Dropdown ------------------
-  // Widget customDropdown<T>({
-  //   required List<T> menuItems,
-  //   T? value,
-  //   String? labelText,
-  //   String? hintText,
-  //   ValueChanged<T?>? onChanged,
-  // }) {
-  //   return Column(
-  //     crossAxisAlignment: CrossAxisAlignment.start,
-  //     children: [
-  //       if (labelText != null && labelText.isNotEmpty)
-  //         Text(
-  //           labelText,
-  //           style: AppStyles.labelStyle(),
-  //         ),
-  //       const SizedBox(height: 10),
-  //       FractionallySizedBox(
-  //         widthFactor: 0.97,
-  //         child: DropdownButtonFormField<T>(
-  //           value: value,
-  //           isExpanded: true,
-  //           decoration: InputDecoration(
-  //             contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-  //             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-  //           ),
-  //           hint: hintText != null ? Text(hintText) : null,
-  //           items: menuItems .map(
-  //             (item) => DropdownMenuItem<T>(
-  //               value: item,
-  //               child: Text(item.toString()),
-  //             ),
-  //           ) .toList(),
-  //           onChanged: onChanged,
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
-
   Widget customDropdown<T>({
     required List<T> menuItems,
     T? value,
@@ -211,7 +233,7 @@ extension GeneralComponents on BuildContext {
             decoration: InputDecoration(
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 12,
-                vertical: 16, // 🔴 increase height
+                vertical: 16, // increase height
               ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
@@ -219,12 +241,12 @@ extension GeneralComponents on BuildContext {
             ),
 
             hint: hintText != null
-                ? Text(
-                    hintText,
-                    maxLines: 2,
-                    overflow: TextOverflow.visible,
-                  )
-                : null,
+              ? Text(
+                  hintText,
+                  maxLines: 2,
+                  overflow: TextOverflow.visible,
+                )
+              : null,
 
             items: menuItems.map(
               (item) => DropdownMenuItem<T>(
@@ -243,7 +265,7 @@ extension GeneralComponents on BuildContext {
                   alignment: Alignment.centerLeft,
                   child: Text(
                     item.toString(),
-                    maxLines: 3, // 🔴 allow 2–3 lines
+                    maxLines: 3, // allow 2–3 lines
                     softWrap: true,
                     overflow: TextOverflow.visible,
                   ),
@@ -295,11 +317,8 @@ extension GeneralComponents on BuildContext {
         );
       },
     );
-}
-
-
-
-
+  }
+  
 
   // ------------------ Radio Button ------------------
   Widget RadioButton(
@@ -425,7 +444,7 @@ extension GeneralComponents on BuildContext {
               SizedBox(height: getPercentHeight(header == "" ? 0 : 2)),
               Center(
                 child: Text(
-                  header ?? "",
+                  header,
                   style: TextStyle(
                   fontSize: fontSize,
                   fontWeight: fontWeight,
@@ -626,26 +645,53 @@ extension GeneralComponents on BuildContext {
 
 
   // ------------------ Navigation Button ------------------
-  Widget navigationButton({
-    required String text,
-    TextStyle? textStyle,
-    VoidCallback? onBtnPress,
-    double? height,
-    double? width,
-    double? aboveSpace,
-    double? belowSpace,
-    double? fontSize,
-    Color? activeBgColor,
-    Color? deActiveBgColor,
-    Color? foregroundColor,
-    Color? activeTextColor,
-    Color? deActiveTextColor,
-    Color? borderColor,
-    FontWeight? fontWeight,
-    bool canNavigate = false,
-  }) {
+    Widget navigationButton({
+      required String text,
+      TextStyle? textStyle,
+      VoidCallback? onBtnPress,
+      double? height,
+      double? width,
+      double? aboveSpace,
+      double? belowSpace,
+      double? fontSize,
+      Color? activeBgColor,
+      Color? deActiveBgColor,
+      Color? foregroundColor,
+      Color? activeTextColor,
+      Color? deActiveTextColor,
+      Color? borderColor,
+      FontWeight? fontWeight,
+      bool canNavigate = false,
+      Widget? iconWidget
+    }) {
     final Color bgColor = canNavigate ? activeBgColor ?? WidgetColors.activeCta : deActiveBgColor ?? WidgetColors.gray_86;
-    final Color textColor = canNavigate ? activeTextColor ?? Colors.white : deActiveTextColor ?? Colors.white;
+    final Color textColor = canNavigate ? activeTextColor ?? Colors.black : deActiveTextColor ?? Colors.white;
+    final Widget requiredText = Text(
+      text,
+      style: textStyle ?? TextStyle(
+        fontSize: fontSize ?? 14,
+        fontWeight: fontWeight ?? FontWeight.bold,
+        color: textColor,
+      ),
+    );
+
+    Widget textContent() {
+      if (iconWidget == null) return requiredText;
+
+      return Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          // mainAxisAlignment: MainAxisAlignment.spaceAround,
+          // mainAxisSize: MainAxisSize.min,
+          children: [
+            iconWidget,
+            const SizedBox(width: 30),
+            requiredText,
+          ],
+        ),
+      );
+    }
+
 
     return Column(
       children: [
@@ -660,25 +706,19 @@ extension GeneralComponents on BuildContext {
               foregroundColor: MaterialStateProperty.all(foregroundColor ?? WidgetColors.black),
               shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                 RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.0),
+                  borderRadius: BorderRadius.circular(25.0),
                   side: BorderSide(color: borderColor ?? Colors.transparent),
                 ),
               ),
             ),
-            child: Text(
-              text,
-              style: textStyle ?? TextStyle(
-                fontSize: fontSize ?? 14,
-                fontWeight: fontWeight ?? FontWeight.bold,
-                color: textColor,
-              ),
-            ),
+            child: textContent(),
           ),
         ),
         SizedBox(height: getPercentHeight(belowSpace ?? 1)),
       ],
     );
   }
+
 
 
   // ------------------ Texted Button ------------------
@@ -714,16 +754,15 @@ extension GeneralComponents on BuildContext {
             child: Text(
               text,
               style: textStyle ??
-                  TextStyle(
-                    fontSize: fontSize ?? 14,
-                    fontWeight: fontWeight ?? FontWeight.w400,
-                    height: textHeight,
-                    color: textColor ?? Color.fromARGB(255, 70, 66, 66),
-                    decoration: textUnderline ? TextDecoration.underline : TextDecoration.none,
-                  ),
+                TextStyle(
+                  fontSize: fontSize ?? 14,
+                  fontWeight: fontWeight ?? FontWeight.w400,
+                  height: textHeight,
+                  color: textColor ?? const Color.fromARGB(255, 70, 66, 66),
+                  decoration: textUnderline ? TextDecoration.underline : TextDecoration.none,
+                ),
             ),
           ),
-          SizedBox(height: getPercentHeight(belowSpace ?? 1)),
         ],
       ),
     );

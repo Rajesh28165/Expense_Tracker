@@ -24,12 +24,15 @@ flutter_icons:
   image_path: "lib/asset/icon/icon.png"
 
 flutter_native_splash:
-  color: "#FFFFFF"
-  image: lib/asset/splash/logo.png
+  color: "#00695C"
+  image: lib/asset/icon/icon.png
 
   android: true
   ios: true
   web: false
+
+  android_gravity: center
+  ios_content_mode: scaleAspectFill
 
 
 
@@ -77,6 +80,8 @@ dependencies:
   cupertino_icons: ^1.0.2
   auto_size_text: ^3.0.0
   url_launcher: ^6.1.11
+  uuid: ^4.1.0
+  google_sign_in: ^6.1.6
 
 dev_dependencies:
   flutter_test:
@@ -110,7 +115,20 @@ flutter:
     - lib/asset/images/space.jpg
     - lib/asset/images/techWall.jpg
     - lib/asset/images/shultter.jpg
-
+    - lib/asset/images/landing/bar_graph.png
+    - lib/asset/images/landing/progress_graph.png
+    - lib/asset/images/landing/cash.png
+    - lib/asset/images/landing/coins.png
+    - lib/asset/images/landing/calculator.png
+    - lib/asset/images/landing/money.png
+    - lib/asset/images/landing/money_management.png
+    - lib/asset/images/bg/black-solid.jpg
+    - lib/asset/images/bg/solid-black.jpg
+    - lib/asset/images/bg/sky-blue.jpg
+    - lib/asset/images/bg/gradient.jpg
+    - lib/asset/icon/google_icon.jpeg
+    
+    
   fonts:
     # 1) Roboto
     - family: Roboto

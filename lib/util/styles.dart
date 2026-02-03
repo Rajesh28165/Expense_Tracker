@@ -29,12 +29,13 @@ class CustomTextStyle extends TextStyle {
 
 
 class AppStyles {
+  
 
   static TextStyle inputTextStyle() {
     return const CustomTextStyle(
       fontSize: 16,
       fontWeight: FontWeight.w700,
-      color: Colors.black,
+      color: AppConstants.commonTextColor,
       fontFamily: AppConstants.OpenSans
     );
   }
@@ -43,7 +44,7 @@ class AppStyles {
     return const CustomTextStyle(
       fontSize: 18,
       fontWeight: FontWeight.w600,
-      color: Colors.black,
+      color: AppConstants.commonTextColor,
       fontFamily: AppConstants.Montserrat
     );
   }

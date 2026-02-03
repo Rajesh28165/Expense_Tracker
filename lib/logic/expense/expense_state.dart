@@ -1,6 +1,12 @@
+import 'package:equatable/equatable.dart';
 import '../../data/models/expense_model.dart';
 
-abstract class ExpenseState {}
+abstract class ExpenseState extends Equatable {
+  const ExpenseState();
+
+  @override
+  List<Object?> get props => [];
+}
 
 class ExpenseInitial extends ExpenseState {}
 
@@ -10,13 +16,20 @@ class ExpenseLoaded extends ExpenseState {
   final List<ExpenseModel> expenses;
   final double totalExpense;
 
-  ExpenseLoaded({
+  const ExpenseLoaded({
     required this.expenses,
     required this.totalExpense,
   });
+
+  @override
+  List<Object?> get props => [expenses, totalExpense];
 }
 
 class ExpenseError extends ExpenseState {
   final String message;
-  ExpenseError(this.message);
+
+  const ExpenseError(this.message);
+
+  @override
+  List<Object?> get props => [message];
 }

@@ -1,6 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class ExpenseModel {
   final String id;
-  final String title;     // note or category
+  final String title;
   final double amount;
   final String category;
   final DateTime date;
@@ -13,25 +15,43 @@ class ExpenseModel {
     required this.date,
   });
 
-  /// Convert object to Map for Firestore / storage
+  /// Convert object to Firestore Map
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
       'title': title,
       'amount': amount,
       'category': category,
-      'date': date.toIso8601String(),
+      'date': Timestamp.fromDate(date),
     };
   }
 
-  /// Create object from Map
-  factory ExpenseModel.fromMap(Map<String, dynamic> map) {
+  /// Create object from Firestore Map
+  factory ExpenseModel.fromMap(
+    Map<String, dynamic> map,
+    String docId,
+  ) {
     return ExpenseModel(
-      id: map['id'],
+      id: docId,
       title: map['title'] ?? '',
       amount: (map['amount'] as num).toDouble(),
       category: map['category'] ?? '',
-      date: map['date'] != null ? DateTime.parse(map['date']) : DateTime.now(),
+      date: (map['date'] as Timestamp).toDate(),
+    );
+  }
+
+  ExpenseModel copyWith({
+    String? id,
+    String? title,
+    double? amount,
+    String? category,
+    DateTime? date,
+  }) {
+    return ExpenseModel(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      amount: amount ?? this.amount,
+      category: category ?? this.category,
+      date: date ?? this.date,
     );
   }
 }

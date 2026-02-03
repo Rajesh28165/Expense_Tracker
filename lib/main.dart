@@ -1,6 +1,6 @@
 // ignore_for_file: prefer_const_constructors
 
-import 'package:expense_tracker/constants/entension.dart';
+import 'package:expense_tracker/constants/extension.dart';
 import 'package:expense_tracker/router/route_name.dart';
 import 'package:expense_tracker/router/route_path.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -12,6 +12,7 @@ import 'data/repositories/expense_repository.dart';
 import 'data/cubit/userCubit.dart';
 import 'logic/auth/auth_cubit.dart';
 import 'logic/expense/expense_cubit.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,18 +28,25 @@ class MyApp extends StatelessWidget {
     
     return MultiBlocProvider(
       providers: [
-        BlocProvider<AuthCubit>(create: (_) => AuthCubit(FirebaseAuth.instance)),
-        BlocProvider<ExpenseCubit>(create: (_) => ExpenseCubit(ExpenseRepository())),
-        BlocProvider(create: (_) => UserCubit()),
+        BlocProvider<AuthCubit>(
+          create: (_) => AuthCubit(FirebaseAuth.instance),
+        ),
+        BlocProvider<ExpenseCubit>(
+          create: (_) => ExpenseCubit(ExpenseRepository())..loadExpenses(),
+        ),
+        BlocProvider<UserCubit>(
+          create: (_) => UserCubit(),
+        ),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'HISABKITAB',
         navigatorKey: BuildContextExtensionFunctions.navigatorUnauthenticated,
         onGenerateRoute: AppRouter.generateRoute,
-        initialRoute: RouteName.login
+        initialRoute: RouteName.home,
       ),
     );
+
 
   }
 }

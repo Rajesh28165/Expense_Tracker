@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../constants/app_constants.dart';
-import 'BaseField/baseTextField.dart';
+import 'baseField.dart';
 
 // All Fields
 // 1) Email Text Field
@@ -60,7 +60,7 @@ class EmailTextField extends StatelessWidget {
       keyboardType: TextInputType.emailAddress,
       deniedExpression: RegexConstants.FORWARD_BACKWARD_SLASH,
       maxInputLength: 50,
-      rightGapWidth: rightGapWidth,
+      icon: Icons.person,
     );
   }
 
@@ -116,7 +116,6 @@ class PhoneNumberTextField extends StatelessWidget {
       maxInputLength: maxInputLength ?? 10,
       validator: validator ?? _validatePhoneNumber,
       allowedExpression: RegexConstants.DIGIT,
-      rightGapWidth: rightGapWidth,
     );
   }
 
@@ -201,7 +200,6 @@ class PasswordTextField extends StatelessWidget {
       errorText: errorText,
       labelStyle: labelStyle,
       hintStyle: hintStyle,
-      rightGapWidth: rightGapWidth,
       errorStyle: errorStyle,
       validator: validator ?? _validatePassword,
       autofocus: autofocus ?? false,
@@ -212,7 +210,7 @@ class PasswordTextField extends StatelessWidget {
       keyboardType: TextInputType.text,
       isEnabled: isEnabled ?? true,
       inputFormatters: inputFormatters,
-      suffixIcon: suffixIcon,
+      icon: Icons.lock,
     );
   }
 }

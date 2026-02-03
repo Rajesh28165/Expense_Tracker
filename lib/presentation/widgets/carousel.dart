@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:expense_tracker/constants/entension.dart';
+import 'package:expense_tracker/constants/extension.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 
 class CustomCarousel extends StatefulWidget {
-  final List<dynamic>? imagePaths;               // Can be String or Widget
-  final List<Widget>? elementBuilder;           // Optional custom widgets
-  final Widget Function(String item)? headerBuilder;
+  final List<dynamic>? imagePaths;
+  final List<Widget>? elementBuilder;
+  final Widget Function(int index)? headerBuilder;
   final double? carouselHeight;
   final ValueChanged<int>? onPageChanged;
   final bool showDot;
@@ -29,9 +29,9 @@ class CustomCarousel extends StatefulWidget {
     this.autoPlayAnimationDuration = const Duration(milliseconds: 800),
     this.autoPlayCurve = Curves.fastOutSlowIn,
   }) : assert(
-          imagePaths != null || elementBuilder != null,
-          "Either imagePaths or elementBuilder must be provided",
-        );
+    imagePaths != null || elementBuilder != null,
+    "Either imagePaths or elementBuilder must be provided",
+  );
 
   @override
   State<CustomCarousel> createState() => _CustomCarouselState();
@@ -41,7 +41,10 @@ class _CustomCarouselState extends State<CustomCarousel> {
   int _currentPage = 0;
 
   List<Widget> _defaultElementBuilder() {
-    return widget.imagePaths!.map((item) {
+    return widget.imagePaths!.asMap().entries.map((entry) {
+      final index = entry.key;
+      final item = entry.value;
+
       if (item is String) {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -50,7 +53,7 @@ class _CustomCarouselState extends State<CustomCarousel> {
               Container(
                 padding: const EdgeInsets.all(12),
                 color: Colors.black.withOpacity(0.6),
-                child: widget.headerBuilder!(item),
+                child: widget.headerBuilder!(index),
               ),
             Expanded(
               child: Image.asset(
@@ -61,11 +64,8 @@ class _CustomCarouselState extends State<CustomCarousel> {
             ),
           ],
         );
-      } else if (item is Widget) {
-        return item;
-      } else {
-        return const SizedBox.shrink();
       }
+      return const SizedBox.shrink();
     }).toList();
   }
 

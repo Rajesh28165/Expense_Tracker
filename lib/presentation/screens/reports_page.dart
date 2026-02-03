@@ -1,4 +1,4 @@
-import 'package:expense_tracker/constants/entension.dart';
+import 'package:expense_tracker/constants/extension.dart';
 import 'package:expense_tracker/data/models/expense_model.dart';
 import 'package:expense_tracker/logic/expense/expense_cubit.dart';
 import 'package:expense_tracker/logic/expense/expense_state.dart';
@@ -18,6 +18,11 @@ class ReportsPage extends StatefulWidget {
 
 class _ReportsPageState extends State<ReportsPage> {
   DateTime? selectedMonth;
+
+  final List<String> monthName = [
+    'Jan','Feb','Mar','Apr','May','Jun',
+    'Jul','Aug','Sep','Oct','Nov','Dec'
+  ];
 
   Future<void> _pickMonth(BuildContext context) async {
     final date = await showDatePicker(
@@ -45,15 +50,27 @@ class _ReportsPageState extends State<ReportsPage> {
           SafeArea(
             child: BlocBuilder<ExpenseCubit, ExpenseState>(
               builder: (context, state) {
+                if (state is ExpenseLoading) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+
+                if (state is ExpenseError) {
+                  return Center(
+                    child: Text(
+                      state.message,
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  );
+                }
+
                 if (state is ExpenseLoaded) {
-                  // Filter expenses by selected month
                   final filteredExpenses = _filterExpensesByMonth(state.expenses);
 
-                  // Calculate totals per category
                   final categoryData = _calculateCategoryTotals(filteredExpenses);
 
-                  // Total expense
-                  final totalExpense = categoryData.values.fold(0.0, (sum, item) => sum + item);
+                  final totalExpense = categoryData.values.fold(0.0, (a, b) => a + b);
 
                   return SingleChildScrollView(
                     padding: EdgeInsets.symmetric(
@@ -69,13 +86,8 @@ class _ReportsPageState extends State<ReportsPage> {
                         SizedBox(height: context.getPercentHeight(4)),
                         _summaryCard(totalExpense),
                         SizedBox(height: context.getPercentHeight(4)),
-
-                        // Pie Chart
                         ExpensePieChart(categoryData: categoryData),
-
                         SizedBox(height: context.getPercentHeight(4)),
-
-                        // Category list
                         _categoryList(categoryData),
                       ],
                     ),
@@ -91,7 +103,6 @@ class _ReportsPageState extends State<ReportsPage> {
     );
   }
 
-  // ================= HEADER =================
   Widget _header(BuildContext context) {
     return Row(
       children: [
@@ -104,7 +115,6 @@ class _ReportsPageState extends State<ReportsPage> {
     );
   }
 
-  // ================= MONTH SELECTOR =================
   Widget _monthSelector(BuildContext context) {
     return InkWell(
       onTap: () => _pickMonth(context),
@@ -121,8 +131,8 @@ class _ReportsPageState extends State<ReportsPage> {
             const Text("Selected Month", style: TextStyle(color: Colors.white70)),
             Text(
               selectedMonth == null
-                  ? "All Time"
-                  : "${selectedMonth!.month}-${selectedMonth!.year}",
+                ? "All Time"
+                : "${monthName[selectedMonth!.month - 1]} ${selectedMonth!.year}",
               style: const TextStyle(color: Colors.white),
             ),
           ],
@@ -131,7 +141,6 @@ class _ReportsPageState extends State<ReportsPage> {
     );
   }
 
-  // ================= SUMMARY CARD =================
   Widget _summaryCard(double totalExpense) {
     return Container(
       width: double.infinity,
@@ -143,10 +152,7 @@ class _ReportsPageState extends State<ReportsPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            "Total Expense",
-            style: TextStyle(color: Colors.white70),
-          ),
+          const Text("Total Expense", style: TextStyle(color: Colors.white70)),
           const SizedBox(height: 8),
           Text(
             "₹ ${totalExpense.toStringAsFixed(2)}",
@@ -161,7 +167,6 @@ class _ReportsPageState extends State<ReportsPage> {
     );
   }
 
-  // ================= CATEGORY LIST =================
   Widget _categoryList(Map<String, double> categoryData) {
     if (categoryData.isEmpty) {
       return const Text(
@@ -195,10 +200,7 @@ class _ReportsPageState extends State<ReportsPage> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  entry.key,
-                  style: const TextStyle(color: Colors.white),
-                ),
+                Text(entry.key, style: const TextStyle(color: Colors.white)),
                 Text(
                   "₹ ${entry.value.toStringAsFixed(0)}",
                   style: const TextStyle(
@@ -214,27 +216,21 @@ class _ReportsPageState extends State<ReportsPage> {
     );
   }
 
-  // ================= HELPERS =================
   List<ExpenseModel> _filterExpensesByMonth(List<ExpenseModel> expenses) {
     if (selectedMonth == null) return expenses;
 
-    return expenses.where((expense) {
-      return expense.date.month == selectedMonth!.month &&
-          expense.date.year == selectedMonth!.year;
-    }).toList();
+    return expenses.where((e) =>
+      e.date.month == selectedMonth!.month &&
+      e.date.year == selectedMonth!.year).toList();
   }
 
   Map<String, double> _calculateCategoryTotals(List<ExpenseModel> expenses) {
     final Map<String, double> data = {};
 
-    for (final expense in expenses) {
-      data.update(
-        expense.category,
-        (value) => value + expense.amount,
-        ifAbsent: () => expense.amount,
-      );
+    for (final e in expenses) {
+      data.update(e.category, (v) => v + e.amount,
+        ifAbsent: () => e.amount);
     }
-
     return data;
   }
 }

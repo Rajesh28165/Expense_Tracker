@@ -1,9 +1,11 @@
-import 'package:expense_tracker/constants/entension.dart';
+import 'package:expense_tracker/constants/extension.dart';
 import 'package:expense_tracker/data/models/expense_model.dart';
 import 'package:expense_tracker/logic/expense/expense_cubit.dart';
 import 'package:expense_tracker/presentation/widgets/generalComponents.dart';
+import 'package:expense_tracker/util/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../constants/app_constants.dart';
 
@@ -17,9 +19,15 @@ class AddExpensePage extends StatefulWidget {
 class _AddExpensePageState extends State<AddExpensePage> {
   final TextEditingController amountController = TextEditingController();
   final TextEditingController noteController = TextEditingController();
+  final log = logger(AddExpensePage);
 
   String selectedCategory = "Food";
   DateTime selectedDate = DateTime.now();
+
+  final List<String> monthName = [
+    'Jan','Feb','Mar','Apr','May','Jun',
+    'Jul','Aug','Sep','Oct','Nov','Dec'
+  ];
 
   final List<String> categories = [
     "Food",
@@ -31,9 +39,10 @@ class _AddExpensePageState extends State<AddExpensePage> {
     "Other",
   ];
 
-  bool get canSave =>
-      amountController.text.isNotEmpty &&
-      double.tryParse(amountController.text) != null;
+  bool get canSave {
+    final amount = double.tryParse(amountController.text.trim());
+    return amount != null && amount > 0;
+  }
 
   @override
   void dispose() {
@@ -55,19 +64,34 @@ class _AddExpensePageState extends State<AddExpensePage> {
     }
   }
 
-  void _saveExpense(BuildContext context) {
+  Future<void> _saveExpense(BuildContext context) async {
+    log.d("started");
+    if (!canSave) return;
+
+    final title = noteController.text.trim().isEmpty
+        ? selectedCategory
+        : noteController.text.trim();
+
     final expense = ExpenseModel(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      id: const Uuid().v4(),
+      title: title,
       category: selectedCategory,
-      title: noteController.text.trim(),
-      amount: double.parse(amountController.text),
+      amount: double.parse(amountController.text.trim()),
       date: selectedDate,
     );
 
-    context.read<ExpenseCubit>().addExpense(expense);
+    log.d('Expense amount is ${expense.amount}');
 
-    Navigator.pop(context); // Close page after saving
+    // ✅ CALL ONLY ONCE
+    await context.read<ExpenseCubit>().addExpense(expense);
+
+    log.d('Expense saved successfully');
+
+    if (context.mounted) {
+      Navigator.pop(context, true);
+    }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -107,7 +131,6 @@ class _AddExpensePageState extends State<AddExpensePage> {
     );
   }
 
-  // ================= HEADER =================
   Widget _header(BuildContext context) {
     return Row(
       children: [
@@ -120,7 +143,6 @@ class _AddExpensePageState extends State<AddExpensePage> {
     );
   }
 
-  // ================= AMOUNT =================
   Widget _amountField() {
     return TextField(
       controller: amountController,
@@ -134,7 +156,6 @@ class _AddExpensePageState extends State<AddExpensePage> {
     );
   }
 
-  // ================= CATEGORY =================
   Widget _categoryDropdown() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -145,27 +166,23 @@ class _AddExpensePageState extends State<AddExpensePage> {
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
-          dropdownColor: Colors.black,
           value: selectedCategory,
+          dropdownColor: Colors.black,
           iconEnabledColor: Colors.white,
           style: const TextStyle(color: Colors.white),
           items: categories
-              .map(
-                (category) => DropdownMenuItem(
-                  value: category,
-                  child: Text(category),
-                ),
-              )
+              .map((c) => DropdownMenuItem(value: c, child: Text(c)))
               .toList(),
           onChanged: (value) {
-            setState(() => selectedCategory = value!);
+            if (value != null) {
+              setState(() => selectedCategory = value);
+            }
           },
         ),
       ),
     );
   }
 
-  // ================= DATE =================
   Widget _datePicker(BuildContext context) {
     return InkWell(
       onTap: () => _pickDate(context),
@@ -179,9 +196,9 @@ class _AddExpensePageState extends State<AddExpensePage> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text("Date", style: TextStyle(color: Colors.white70)),
+            const Text("Select Date", style: TextStyle(color: Colors.white70)),
             Text(
-              "${selectedDate.day}-${selectedDate.month}-${selectedDate.year}",
+              "${selectedDate.day}-${monthName[selectedDate.month - 1]}-${selectedDate.year}",
               style: const TextStyle(color: Colors.white),
             ),
           ],
@@ -190,7 +207,6 @@ class _AddExpensePageState extends State<AddExpensePage> {
     );
   }
 
-  // ================= NOTE =================
   Widget _noteField() {
     return TextField(
       controller: noteController,
@@ -203,7 +219,6 @@ class _AddExpensePageState extends State<AddExpensePage> {
     );
   }
 
-  // ================= SAVE =================
   Widget _saveButton(BuildContext context) {
     return Center(
       child: context.navigationButton(
@@ -211,7 +226,9 @@ class _AddExpensePageState extends State<AddExpensePage> {
         height: 6,
         width: 100,
         canNavigate: canSave,
-        onBtnPress: () => _saveExpense(context),
+        onBtnPress: () async {
+          await _saveExpense(context);
+        },
       ),
     );
   }

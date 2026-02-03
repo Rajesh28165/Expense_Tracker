@@ -1,16 +1,20 @@
-abstract class AuthState{}
+abstract class AuthState {}
 
 class AuthInitial extends AuthState {}
 
-class AuthLoading extends AuthState{}
+class AuthLoading extends AuthState {}
 
 class AuthAuthenticated extends AuthState {
   final String uid;
-  AuthAuthenticated(this.uid);
+  final bool securityQuestionSelected;
+
+  AuthAuthenticated({
+    required this.uid,
+    required this.securityQuestionSelected,
+  });
 }
 
-
-class AuthUnauthenticated extends AuthState{}
+class AuthUnauthenticated extends AuthState {}
 
 class AuthError extends AuthState {
   final String message;
