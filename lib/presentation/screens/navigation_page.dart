@@ -23,18 +23,15 @@ class _NavigationPageState extends State<NavigationPage> {
 
     setState(() => _currentIndex = index);
 
-    // 🔑 Use authenticated navigator DIRECTLY
-    BuildContextExtensionFunctions
-        .navigatorAuthenticated
-        .currentState!
-        .pushReplacementNamed(_routes[index]);
+    authNavigatorKey.currentState!.pushNamed(_routes[index]);
+
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Navigator(
-        key: BuildContextExtensionFunctions.navigatorAuthenticated,
+        key: authNavigatorKey,
         initialRoute: RouteName.dashboard,
         onGenerateRoute: AuthenticatedRouter.generate,
       ),

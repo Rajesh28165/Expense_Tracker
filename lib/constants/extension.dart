@@ -3,49 +3,46 @@ import 'package:flutter/cupertino.dart';
 
 final log = logger(BuildContext);
 
-extension StringExtensions on String {
+/// ✅ SINGLE SOURCE OF TRUTH (already used in main.dart & NavigationPage)
+final GlobalKey<NavigatorState> unauthNavigatorKey =
+    GlobalKey<NavigatorState>();
 
-  /// Capitalizes only the first letter of a single word
+final GlobalKey<NavigatorState> authNavigatorKey =
+    GlobalKey<NavigatorState>();
+
+// -----------------------------------------------------------------------------
+// String Extensions
+// -----------------------------------------------------------------------------
+extension StringExtensions on String {
   String capitalize() {
     if (trim().isEmpty) return this;
-
     return this[0].toUpperCase() + substring(1).toLowerCase();
   }
 
-  /// Converts a full sentence to Title Case
   String toTitleCase() {
     if (trim().isEmpty) return this;
-
-    return split(' ').map(
-      (word) => word.isNotEmpty
-        ? word[0].toUpperCase() + word.substring(1).toLowerCase()
-        : ''
-      ).join(' ');
+    return split(' ')
+        .map((word) =>
+            word.isNotEmpty
+                ? word[0].toUpperCase() + word.substring(1).toLowerCase()
+                : '')
+        .join(' ');
   }
 
-  /// Capitalizes the first letter of the entire sentence only once
   String toSentenceCase() {
     if (trim().isEmpty) return this;
-
     return this[0].toUpperCase() + substring(1).toLowerCase();
   }
-  
 }
 
-
+// -----------------------------------------------------------------------------
+// BuildContext Extensions (NAVIGATION SAFE)
+// -----------------------------------------------------------------------------
 extension BuildContextExtensionFunctions on BuildContext {
-
   double getWidth() => MediaQuery.of(this).size.width;
-
   double getHeight() => MediaQuery.of(this).size.height;
-
   double getPercentWidth(double percentage) => getWidth() * percentage * 0.01;
-
   double getPercentHeight(double percentage) => getHeight() * percentage * 0.01;
-
-  /// Global navigator keys
-  static final navigatorUnauthenticated = GlobalKey<NavigatorState>();
-  static final navigatorAuthenticated = GlobalKey<NavigatorState>();
 
   // ------------------ Internal helpers ------------------
   void _safePop({bool useRoot = false, bool? result}) {
@@ -56,9 +53,26 @@ extension BuildContextExtensionFunctions on BuildContext {
     }
   }
 
-  void _pushNamed(GlobalKey<NavigatorState> key, String routeName, {Object? arguments}) {
-    key.currentState?.pushNamed(routeName, arguments: arguments)
-      ?? log.e("Navigator not ready to push '$routeName'");
+  void _pushNamed(
+    GlobalKey<NavigatorState> key,
+    String routeName, {
+    Object? arguments,
+  }) {
+    key.currentState?.pushNamed(routeName, arguments: arguments) ??
+        log.e("Navigator not ready to push '$routeName'");
+  }
+
+  void _pushNamedAndRemoveUntil(
+    GlobalKey<NavigatorState> key,
+    String routeName, {
+    Object? arguments,
+  }) {
+    key.currentState?.pushNamedAndRemoveUntil(
+          routeName,
+          (_) => false,
+          arguments: arguments,
+        ) ??
+        log.e("Navigator not ready to pushAndRemoveUntil '$routeName'");
   }
 
   void _popUntil(GlobalKey<NavigatorState> key, String routeName) {
@@ -70,11 +84,14 @@ extension BuildContextExtensionFunctions on BuildContext {
     }
   }
 
-
   // ------------------ Public methods ------------------
-  void popTrue({bool useRoot = false}) => _safePop(useRoot: useRoot, result: true);
-  void popFalse({bool useRoot = false}) => _safePop(useRoot: useRoot, result: false);
+  void popTrue({bool useRoot = false}) =>
+      _safePop(useRoot: useRoot, result: true);
 
+  void popFalse({bool useRoot = false}) =>
+      _safePop(useRoot: useRoot, result: false);
+
+  /// Default (context-based)
   void pushNamed(String routeName, {Object? arguments}) {
     try {
       Navigator.pushNamed(this, routeName, arguments: arguments);
@@ -83,62 +100,37 @@ extension BuildContextExtensionFunctions on BuildContext {
     }
   }
 
-  void pushAndRemoveUntil(String routeName, {Object? arguments}) {
-    try {
-      Navigator.of(this).pushNamedAndRemoveUntil(
-        routeName,
-        (_) => false,
-        arguments: arguments,
-      );
-    } catch (e) {
-      log.e("Failed to pushAndRemoveUntil '$routeName': $e");
-    }
-  }
-
+  // ------------------ Unauthenticated Navigator ------------------
   void pushNamedUnAuthenticated(String routeName, {Object? arguments}) =>
-    _pushNamed(navigatorUnauthenticated, routeName, arguments: arguments);
-
-  void popRouteUnAuthenticated(String routeName) =>
-    _popUntil(navigatorUnauthenticated, routeName);
-
-  void pushNamedAuthenticated(String routeName, {Object? arguments}) =>
-    _pushNamed(navigatorAuthenticated, routeName, arguments: arguments);
-
-  void popRouteAuthenticated(String routeName) =>
-    _popUntil(navigatorAuthenticated, routeName);
-
-
-  void pushNamedAuthenticatedAndRemoveUntil(
-    String routeName, {
-    Object? arguments,
-  }) {
-    final navState = navigatorAuthenticated.currentState;
-    if (navState != null) {
-      navState.pushNamedAndRemoveUntil(
-        routeName,
-        (_) => false,
-        arguments: arguments,
-      );
-    } else {
-      log.e("Authenticated navigator not ready to pushAndRemoveUntil '$routeName'");
-    }
-  }
+      _pushNamed(unauthNavigatorKey, routeName, arguments: arguments);
 
   void pushNamedUnAuthenticatedAndRemoveUntil(
     String routeName, {
     Object? arguments,
-  }) {
-    final navState = navigatorUnauthenticated.currentState;
-    if (navState != null) {
-      navState.pushNamedAndRemoveUntil(
+  }) =>
+      _pushNamedAndRemoveUntil(
+        unauthNavigatorKey,
         routeName,
-        (_) => false,
         arguments: arguments,
       );
-    } else {
-      log.e("Unauthenticated navigator not ready to pushAndRemoveUntil '$routeName'");
-    }
-  }
 
+  void popRouteUnAuthenticated(String routeName) =>
+      _popUntil(unauthNavigatorKey, routeName);
+
+  // ------------------ Authenticated Navigator ------------------
+  void pushNamedAuthenticated(String routeName, {Object? arguments}) =>
+      _pushNamed(authNavigatorKey, routeName, arguments: arguments);
+
+  void pushNamedAuthenticatedAndRemoveUntil(
+    String routeName, {
+    Object? arguments,
+  }) =>
+      _pushNamedAndRemoveUntil(
+        authNavigatorKey,
+        routeName,
+        arguments: arguments,
+      );
+
+  void popRouteAuthenticated(String routeName) =>
+      _popUntil(authNavigatorKey, routeName);
 }
-

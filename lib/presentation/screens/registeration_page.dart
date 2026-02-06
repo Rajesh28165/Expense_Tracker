@@ -67,10 +67,9 @@ class _RegisterationPageState extends State<RegisterationPage> {
 
   bool get canNavigate {
     return _nameController.text.trim().isNotEmpty &&
-        emailRegex.hasMatch(_emailController.text.trim()) &&
-        pswdRegex.hasMatch(_pswdController.text.trim()) &&
-        _pswdController.text.trim() ==
-            _cnfmPswdController.text.trim();
+      emailRegex.hasMatch(_emailController.text.trim()) &&
+      pswdRegex.hasMatch(_pswdController.text.trim()) &&
+      _pswdController.text.trim() == _cnfmPswdController.text.trim();
   }
 
   void onRegister() {
@@ -168,13 +167,10 @@ class _RegisterationPageState extends State<RegisterationPage> {
                             SizedBox(height: context.getPercentHeight(4)),
 
                             PasswordTextField(
-                              controller:
-                                  _cnfmPswdController,
+                              controller: _cnfmPswdController,
                               labelText: "Confirm password",
-                              hintText:
-                                  "Re-enter password",
-                              errorText:
-                                  confirmPasswordError(
+                              hintText: "Re-enter password",
+                              errorText: confirmPasswordError(
                                 _pswdController.text,
                                 _cnfmPswdController.text,
                               ),
@@ -195,9 +191,7 @@ class _RegisterationPageState extends State<RegisterationPage> {
                                 canNavigate && !isLoading,
                             onBtnPress: onRegister,
                           ),
-                          SizedBox(
-                              height:
-                                  context.getPercentHeight(1)),
+                          SizedBox(height: context.getPercentHeight(1)),
                         ],
                       ),
                     ),

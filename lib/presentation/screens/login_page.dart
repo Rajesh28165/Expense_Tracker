@@ -164,9 +164,6 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
 
-
-                // if (isLoading) 
-                //   context.showLoader(text: 'Verifying details...')
               ],
             );
           },

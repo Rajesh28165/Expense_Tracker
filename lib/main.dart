@@ -41,9 +41,9 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'HISABKITAB',
-        navigatorKey: BuildContextExtensionFunctions.navigatorUnauthenticated,
+        navigatorKey: unauthNavigatorKey,
         onGenerateRoute: AppRouter.generateRoute,
-        initialRoute: RouteName.home,
+        initialRoute: RouteName.login,
       ),
     );
 

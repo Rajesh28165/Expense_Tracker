@@ -637,11 +637,12 @@ extension GeneralComponents on BuildContext {
 
   // ------------------ Hide Loader ------------------
   void hideLoader() {
-    final navigator =  BuildContextExtensionFunctions.navigatorUnauthenticated.currentState;
+    final navigator = unauthNavigatorKey.currentState;
     if (navigator != null && navigator.canPop()) {
       navigator.pop();
     }
   }
+
 
 
   // ------------------ Navigation Button ------------------

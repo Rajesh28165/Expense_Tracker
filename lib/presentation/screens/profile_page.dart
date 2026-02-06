@@ -17,7 +17,7 @@ class ProfilePage extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         children: [
 
-          /// 🔐 Change Password
+          // / 🔐 Change Password
           // ListTile(
           //   leading: const Icon(Icons.lock_outline),
           //   title: const Text('Change / Update Password'),
@@ -27,17 +27,17 @@ class ProfilePage extends StatelessWidget {
           //   },
           // ),
 
-          // const Divider(),
+          const Divider(),
 
-          // /// 🛡 Security Questions
-          // ListTile(
-          //   leading: const Icon(Icons.security),
-          //   title: const Text('Change / Update Security Questions'),
-          //   trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-          //   onTap: () {
-          //     context.pushNamedAuthenticated(RouteName.securityQuestions);
-          //   },
-          // ),
+          /// 🛡 Security Questions
+          ListTile(
+            leading: const Icon(Icons.security),
+            title: const Text('Change / Update Security Questions'),
+            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+            onTap: () {
+              context.pushNamedUnAuthenticated(RouteName.security);
+            },
+          ),
 
           const Divider(),
 
@@ -61,28 +61,43 @@ class ProfilePage extends StatelessWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Sign Out'),
-        content: const Text('Are you sure you want to sign out?'),
+        // title: const Text('Sign Out'),
+        content: const Text(
+          'Are you sure you want to sign out?',
+          style: TextStyle(fontWeight: FontWeight.bold)
+        ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(ctx);
-
-              /// 🔥 AUTH LOGOUT
-              await context.read<AuthCubit>().logout();
-
-              /// 🔁 Go to unauth flow
-              // ignore: use_build_context_synchronously
-              context.pushNamedUnAuthenticated(RouteName.login);
-            },
-            child: const Text(
-              'Sign Out',
-              style: TextStyle(color: Colors.red),
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text(
+                  'Cancel', 
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold, 
+                    fontSize: 20
+                  )
+                ),
+              ),
+              const SizedBox(width: 20,),
+              TextButton(
+                onPressed: () async {
+                  Navigator.pop(ctx);
+                  await context.read<AuthCubit>().logout();
+                  // ignore: use_build_context_synchronously
+                  context.pushNamedUnAuthenticated(RouteName.login);
+                },
+                child: const Text(
+                  'Sign Out',
+                  style: TextStyle(
+                    fontSize: 20,
+                    color: Colors.red, 
+                    fontWeight: FontWeight.bold, 
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),

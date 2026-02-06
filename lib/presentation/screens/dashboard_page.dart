@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../logic/auth/auth_cubit.dart';
 import '../../logic/expense/expense_cubit.dart';
 import '../../logic/expense/expense_state.dart';
 
@@ -37,8 +38,27 @@ class _DashboardPageState extends State<DashboardPage> {
     }
   }
 
+  bool isGoogleUser() {
+    final user = FirebaseAuth.instance.currentUser;
+    return user?.providerData.any(
+      (p) => p.providerId == 'google.com',
+    ) ?? false;
+  }
+
+  bool isEmailUser() {
+    final user = FirebaseAuth.instance.currentUser;
+    return user?.providerData.any(
+      (p) => p.providerId == 'password',
+    ) ?? false;
+  }
+
+
+
   @override
   Widget build(BuildContext context) {
+    log.d('is email user: ${isEmailUser()}');
+    log.d('is google user: ${isGoogleUser()}');
+
     return Scaffold(
       appBar: context.customAppBar(
         title: 'Dashboard',
@@ -47,7 +67,13 @@ class _DashboardPageState extends State<DashboardPage> {
           IconButton(
             icon: const Icon(Icons.account_circle),
             iconSize: 30,
-            onPressed: () => context.pushNamed(RouteName.profile)
+            onPressed: () {
+              if (isEmailUser()) {
+                context.pushNamed(RouteName.profile);
+              } else {
+                _showSignOutDialog(context);
+              }
+            } 
           ),
         ],
       ),
@@ -248,6 +274,53 @@ class _DashboardPageState extends State<DashboardPage> {
               fontWeight: FontWeight.bold,
               fontSize: 16,
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showSignOutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        // title: const Text('Sign Out'),
+        content: const Text(
+          'Are you sure you want to sign out?',
+          style: TextStyle(fontWeight: FontWeight.bold)
+        ),
+        actions: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text(
+                  'Cancel', 
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold, 
+                    fontSize: 20
+                  )
+                ),
+              ),
+              const SizedBox(width: 20,),
+              TextButton(
+                onPressed: () async {
+                  Navigator.pop(ctx);
+                  await context.read<AuthCubit>().logout();
+                  // ignore: use_build_context_synchronously
+                  context.pushNamedUnAuthenticated(RouteName.login);
+                },
+                child: const Text(
+                  'Sign Out',
+                  style: TextStyle(
+                    fontSize: 20,
+                    color: Colors.red, 
+                    fontWeight: FontWeight.bold, 
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
