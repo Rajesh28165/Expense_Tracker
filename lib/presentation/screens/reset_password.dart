@@ -1,64 +1,64 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../constants/app_constants.dart';
 import '../../logic/auth/auth_cubit.dart';
 import '../../logic/auth/auth_state.dart';
 import '../../router/route_name.dart';
-import '../../util/colors.dart';
 import '../components/allFields.dart';
-import '../components/baseField.dart';
 import 'package:expense_tracker/constants/extension.dart';
 import 'package:expense_tracker/presentation/widgets/generalComponents.dart';
 
-class RegisterationPage extends StatefulWidget {
-  const RegisterationPage({super.key});
+class ResetPasswordPage extends StatefulWidget {
+  const ResetPasswordPage({super.key});
 
   @override
-  State<RegisterationPage> createState() => _RegisterationPageState();
+  State<ResetPasswordPage> createState() => _ResetPasswordPageState();
 }
 
-class _RegisterationPageState extends State<RegisterationPage> {
-  final _nameController = TextEditingController();
-  final _emailController = TextEditingController();
+class _ResetPasswordPageState extends State<ResetPasswordPage> {
+  Map<String, dynamic>? userData;
+  String email = '';
+
+  final _oldPswdController = TextEditingController();
   final _pswdController = TextEditingController();
   final _cnfmPswdController = TextEditingController();
 
   final emailRegex = RegExp(RegexConstants.EMAIL_ADDRESS_PATTERN);
   final pswdRegex = RegExp(RegexConstants.PASSWORD_PATTERN);
 
-  bool _isButtonEnabled = false;
-
   @override
   void initState() {
     super.initState();
-    _nameController.addListener(_validateForm);
-    _emailController.addListener(_validateForm);
-    _pswdController.addListener(_validateForm);
-    _cnfmPswdController.addListener(_validateForm);
+    _loadUser();
+    _oldPswdController.addListener(_rebuild);
+    _pswdController.addListener(_rebuild);
+    _cnfmPswdController.addListener(_rebuild);
   }
 
-  void _validateForm() {
-    final isValid =
-        _nameController.text.trim().isNotEmpty &&
-        emailRegex.hasMatch(_emailController.text.trim()) &&
-        pswdRegex.hasMatch(_pswdController.text.trim()) &&
-        _pswdController.text.trim() == _cnfmPswdController.text.trim();
-
-    if (isValid != _isButtonEnabled) {
-      setState(() => _isButtonEnabled = isValid);
-    } else {
-      setState(() {});
-    }
-  }
+  void _rebuild() => setState(() {});
 
   @override
   void dispose() {
-    _nameController.dispose();
-    _emailController.dispose();
+    _oldPswdController.dispose();
     _pswdController.dispose();
     _cnfmPswdController.dispose();
     super.dispose();
   }
+
+    Future<void> _loadUser() async {
+      final uid = FirebaseAuth.instance.currentUser?.uid;
+      if (uid == null) return;
+
+      final doc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+      if (mounted) {
+        setState(() => userData = doc.data());
+      }
+    }
+
+  // ---------- VALIDATION ----------
 
   String? passwordError(String password) {
     final value = password.trim();
@@ -74,32 +74,48 @@ class _RegisterationPageState extends State<RegisterationPage> {
     return null;
   }
 
-  void onRegister() {
-    context.read<AuthCubit>().register(
-      fullName: _nameController.text.trim(),
-      email: _emailController.text.trim().toLowerCase(),
-      password: _pswdController.text.trim(),
+  bool get canNavigate {
+    return 
+      pswdRegex.hasMatch(_pswdController.text.trim()) &&
+      _pswdController.text.trim() == _cnfmPswdController.text.trim();
+  }
+
+  void onReset() {
+    final oldPswd = _oldPswdController.text.trim();
+    final newPswd = _pswdController.text.trim();
+    if(email.isEmpty) return;
+    log.d('email is $email, old password is ${_oldPswdController.text} and new password is ${_pswdController.text}');
+
+    if (oldPswd.toLowerCase() == newPswd.toLowerCase()) {
+      context.showCustomDialog(description: 'New password cannot be the same to old password');
+      return;
+    }
+
+    context.read<AuthCubit>().updatePassword(
+      newPassword: newPswd,
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    email = userData?['email'] ?? '';
     return Scaffold(
-      appBar: context.customAppBar(title: 'Registration'),
+      appBar: context.customAppBar(title: 'Reset Password'),
       body: context.gradientScreen(
         child: BlocConsumer<AuthCubit, AuthState>(
           listener: (context, state) {
             if (state is AuthLoading) {
-              context.showLoader(text: 'Creating account...');
+              context.showLoader(text: 'Reseting Password...');
             }
 
             if (state is AuthAuthenticated) {
-              if (state.securityQuestionSelected) {
-                context.goTo(RouteName.navigation);
-              } else {
-                context.goTo(RouteName.security);
-              }
+              context.hideLoader(context);
+              context.showCustomDialog(
+                description: 'Password updated successfully',
+                onPressed: () => context.goTo(RouteName.dashboard),
+              );
             }
+
 
             if (state is AuthError) {
               context.showCustomDialog(description: state.message);
@@ -119,51 +135,36 @@ class _RegisterationPageState extends State<RegisterationPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             SizedBox(height: context.getPercentHeight(1)),
-                            RichText(
-                              text: const TextSpan(
-                                text: "Welcome to ",
-                                style: TextStyle(
-                                  fontSize: 30,
-                                  color: AppConstants.commonTextColor,
-                                  fontFamily: AppConstants.PlayfairDisplay,
-                                ),
-                                children: [
-                                  TextSpan(
-                                    text: AppConstants.appName,
-                                    style: TextStyle(fontWeight: FontWeight.bold),
-                                  )
-                                ],
-                              ),
-                            ),
-                            SizedBox(height: context.getPercentHeight(1)),
+
                             const Text(
-                              "Know where your money goes",
-                              style: TextStyle(
-                                fontSize: 22,
-                                fontFamily: AppConstants.OpenSans,
-                                color: WidgetColors.activeCta,
-                                fontWeight: FontWeight.w800,
-                              ),
+                              AppConstants.Password_rule,
+                              style: TextStyle(color: Colors.white,fontSize: 15),
                             ),
+
                             SizedBox(height: context.getPercentHeight(4)),
-                            BaseTextField(
-                              controller: _nameController,
-                              labelText: "Full name",
-                              hintText: "Enter your full name",
+
+                            PasswordTextField(
+                              controller: _oldPswdController,
+                              labelText: "Old password",
+                              hintText: "Enter old password",
+                              errorText: passwordError(_oldPswdController.text),
                             ),
+
                             SizedBox(height: context.getPercentHeight(4)),
-                            EmailTextField(controller: _emailController),
-                            SizedBox(height: context.getPercentHeight(4)),
+
                             PasswordTextField(
                               controller: _pswdController,
-                              hintText: "Enter password",
+                              labelText: "New password",
+                              hintText: "Enter new password",
                               errorText: passwordError(_pswdController.text),
                             ),
+
                             SizedBox(height: context.getPercentHeight(4)),
+
                             PasswordTextField(
                               controller: _cnfmPswdController,
-                              labelText: "Confirm password",
-                              hintText: "Re-enter password",
+                              labelText: "Confirm new password",
+                              hintText: "Re-enter new password",
                               errorText: confirmPasswordError(
                                 _pswdController.text,
                                 _cnfmPswdController.text,
@@ -174,16 +175,17 @@ class _RegisterationPageState extends State<RegisterationPage> {
                         ),
                       ),
                     ),
+
                     SafeArea(
                       child: Column(
                         children: [
                           SizedBox(height: context.getPercentHeight(2)),
                           context.navigationButton(
-                            text: "Register",
+                            text: "Proceed",
                             height: 6,
                             width: 100,
-                            canNavigate: _isButtonEnabled,
-                            onBtnPress: onRegister,
+                            canNavigate: canNavigate,
+                            onBtnPress: onReset,
                           ),
                           SizedBox(height: context.getPercentHeight(1)),
                         ],

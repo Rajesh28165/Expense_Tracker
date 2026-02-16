@@ -21,22 +21,57 @@ class ExpenseCubit extends Cubit<ExpenseState> {
       emit(
         ExpenseLoaded(
           expenses: expenses,
+          filteredExpenses: expenses, // default show all
           totalExpense: total,
         ),
       );
+
     } catch (e) {
       emit(const ExpenseError('Failed to load expenses'));
     }
   }
 
+  void filterExpenses(DateTime start, DateTime end) {
+    if (state is! ExpenseLoaded) return;
+
+    final current = state as ExpenseLoaded;
+
+    final filtered = current.expenses.where((e) {
+      return e.date.isAfter(start.subtract(const Duration(seconds: 1))) &&
+          e.date.isBefore(end.add(const Duration(seconds: 1)));
+    }).toList();
+
+    emit(
+      ExpenseLoaded(
+        expenses: current.expenses,
+        filteredExpenses: filtered,
+        totalExpense: _calculateTotal(filtered),
+      ),
+    );
+  }
+
+
+  void clearFilter() {
+    if (state is! ExpenseLoaded) return;
+
+    final current = state as ExpenseLoaded;
+
+    emit(
+      ExpenseLoaded(
+        expenses: current.expenses,
+        filteredExpenses: current.expenses,
+        totalExpense: _calculateTotal(current.expenses),
+      ),
+    );
+  }
+
+
   /// ADD EXPENSE
   Future<void> addExpense(ExpenseModel expense) async {
     try {
-      log.d('log 1');
       await _repository.addExpense(expense);
       await loadExpenses(); // refresh list
     } catch (e) {
-      log.d('log 2');
       emit(const ExpenseError('Failed to add expense'));
     }
   }

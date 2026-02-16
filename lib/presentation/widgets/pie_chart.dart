@@ -14,10 +14,7 @@ class ExpensePieChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (categoryData.isEmpty) {
-      return const Text(
-        "No data available",
-        style: TextStyle(color: Colors.white70),
-      );
+      return const Text("");
     }
 
     final total = categoryData.values.fold(0.0, (a, b) => a + b);

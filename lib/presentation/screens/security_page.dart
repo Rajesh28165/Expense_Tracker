@@ -21,14 +21,24 @@ class SecurityPage extends StatefulWidget {
 class _SecurityPageState extends State<SecurityPage> {
   final TextEditingController _securityAnsController = TextEditingController();
   String selectedQuestion = 'Select Anyone Question';
+  bool _canProceed = false;
 
   @override
   void initState() {
     super.initState();
-    _securityAnsController.addListener(_onTextChanged);
+    _securityAnsController.addListener(_validateForm);
   }
 
-  void _onTextChanged() => setState(() {});
+  void _validateForm() {
+    final isValid = selectedQuestion != 'Select Anyone Question' &&
+        _securityAnsController.text.trim().isNotEmpty;
+
+    if (isValid != _canProceed) {
+      setState(() => _canProceed = isValid);
+    } else {
+      setState(() {});
+    }
+  }
 
   @override
   void dispose() {
@@ -36,53 +46,38 @@ class _SecurityPageState extends State<SecurityPage> {
     super.dispose();
   }
 
-  bool get canProceed {
-    return selectedQuestion != 'Select Anyone Question' &&
-        _securityAnsController.text.trim().isNotEmpty;
-  }
-
   int get selectedQuestionIndex => AppConstants.listOfSecurityQuestions.indexOf(selectedQuestion);
 
   Future<void> onProceed() async {
-  final user = FirebaseAuth.instance.currentUser;
+    final user = FirebaseAuth.instance.currentUser;
 
-  if (user == null) {
-    context.showCustomDialog(description: 'User not logged in');
-    return;
+    if (user == null) {
+      context.showCustomDialog(description: 'User not logged in');
+      return;
+    }
+
+    context.showLoader(text: 'Saving security info');
+
+    try {
+      final securityAnswerHash = _securityAnsController.text.trim().hashCode.toString();
+
+      await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
+        'securityQuestionIndex': selectedQuestionIndex,
+        'securityAnswerHash': securityAnswerHash,
+        'securityQuestionSelected': true,
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+
+      context.hideLoader(context);
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        context.goTo(RouteName.dashboard);
+      });
+    } catch (e) {
+      context.hideLoader(context);
+      context.showCustomDialog(description: e.toString());
+    }
   }
-
-  context.showLoader(text: 'Saving security info');
-
-  try {
-    final securityAnswerHash =
-        _securityAnsController.text.trim().hashCode.toString();
-
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user.uid)
-        .set({
-          'securityQuestionIndex': selectedQuestionIndex,
-          'securityAnswerHash': securityAnswerHash,
-          'securityQuestionSelected': true,
-          'updatedAt': FieldValue.serverTimestamp(),
-        }, SetOptions(merge: true));
-
-    context.hideLoader();
-
-    /// ✅ IMPORTANT FIX HERE
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.pushNamedUnAuthenticated(
-        RouteName.navigation,
-      );
-    });
-  } catch (e) {
-    context.hideLoader();
-    context.showCustomDialog(description: e.toString());
-  }
-}
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -100,17 +95,13 @@ class _SecurityPageState extends State<SecurityPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(height: context.getPercentHeight(2)),
-
                     const Text(
                       AppConstants.SecurityQuestionRule,
                       style: TextStyle(color: AppConstants.commonTextColor),
                     ),
-
                     SizedBox(height: context.getPercentHeight(5)),
-
                     Text('Security question', style: AppStyles.labelStyle()),
                     SizedBox(height: context.getPercentHeight(1)),
-
                     GestureDetector(
                       onTap: () {
                         context.showSecurityQuestionPicker(
@@ -118,6 +109,7 @@ class _SecurityPageState extends State<SecurityPage> {
                           AppConstants.listOfSecurityQuestions,
                           (selected) {
                             setState(() => selectedQuestion = selected);
+                            _validateForm();
                           },
                         );
                       },
@@ -152,9 +144,7 @@ class _SecurityPageState extends State<SecurityPage> {
                         ),
                       ),
                     ),
-
                     SizedBox(height: context.getPercentHeight(5)),
-
                     BaseTextField(
                       labelText: "Security answer",
                       controller: _securityAnsController,
@@ -165,15 +155,13 @@ class _SecurityPageState extends State<SecurityPage> {
                 ),
               ),
             ),
-
-            /// -------- PROCEED BUTTON --------
             SafeArea(
               child: Column(
                 children: [
                   SizedBox(height: context.getPercentHeight(1)),
                   context.navigationButton(
                     text: "Proceed",
-                    canNavigate: canProceed,
+                    canNavigate: _canProceed,
                     height: 6,
                     width: 100,
                     onBtnPress: onProceed,

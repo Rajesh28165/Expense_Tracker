@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import '../../constants/extension.dart';
+import 'package:go_router/go_router.dart';
 import '../../router/route_name.dart';
-import '../../router/route_path.dart';
 
 class NavigationPage extends StatefulWidget {
-  const NavigationPage({super.key});
+  final Widget child;
+
+  const NavigationPage({super.key, required this.child});
 
   @override
   State<NavigationPage> createState() => _NavigationPageState();
@@ -15,26 +16,28 @@ class _NavigationPageState extends State<NavigationPage> {
 
   final List<String> _routes = [
     RouteName.dashboard,
-    RouteName.report,
+    RouteName.expenseReport,
+    RouteName.incomeReport
   ];
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final location = GoRouterState.of(context).matchedLocation;
+
+    _currentIndex = _routes.indexWhere(location.startsWith);
+    if (_currentIndex == -1) _currentIndex = 0;
+  }
+
   void _onTabTapped(int index) {
-    if (_currentIndex == index) return;
-
-    setState(() => _currentIndex = index);
-
-    authNavigatorKey.currentState!.pushNamed(_routes[index]);
-
+    if (index == _currentIndex) return;
+    context.go(_routes[index]);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Navigator(
-        key: authNavigatorKey,
-        initialRoute: RouteName.dashboard,
-        onGenerateRoute: AuthenticatedRouter.generate,
-      ),
+      body: widget.child,
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: _onTabTapped,
@@ -45,7 +48,11 @@ class _NavigationPageState extends State<NavigationPage> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.bar_chart),
-            label: 'Reports',
+            label: 'Expense Reports',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.bar_chart),
+            label: 'Income Reports',
           ),
         ],
       ),

@@ -61,12 +61,12 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   context.navigationButton(
                     text: "Sign In",
-                    onBtnPress: () => context.pushNamedUnAuthenticated(RouteName.login),
+                    onBtnPress: () => context.goTo(RouteName.login),
                     canNavigate: true),
                   SizedBox(height: context.getPercentHeight(5)),
                   context.navigationButton(
                     text: "Registeration",
-                    onBtnPress: () => context.pushNamedUnAuthenticated(RouteName.registeration),
+                    onBtnPress: () => context.goTo(RouteName.registeration),
                     canNavigate: true
                   ),
                 ],

@@ -1,25 +1,25 @@
 import 'package:expense_tracker/constants/extension.dart';
-import 'package:expense_tracker/data/models/expense_model.dart';
-import 'package:expense_tracker/logic/expense/expense_cubit.dart';
+import 'package:expense_tracker/data/models/income_model.dart';
+import 'package:expense_tracker/logic/income/income_cubit.dart';
 import 'package:expense_tracker/presentation/widgets/generalComponents.dart';
 import 'package:expense_tracker/util/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:uuid/uuid.dart';
 
-class AddExpensePage extends StatefulWidget {
-  const AddExpensePage({super.key});
+class AddIncomePage extends StatefulWidget {
+  const AddIncomePage({super.key});
 
   @override
-  State<AddExpensePage> createState() => _AddExpensePageState();
+  State<AddIncomePage> createState() => _AddIncomePageState();
 }
 
-class _AddExpensePageState extends State<AddExpensePage> {
+class _AddIncomePageState extends State<AddIncomePage> {
   final TextEditingController amountController = TextEditingController();
   final TextEditingController noteController = TextEditingController();
-  final log = logger(AddExpensePage);
+  final log = logger(AddIncomePage);
 
-  String selectedCategory = "Food";
+  String selectedCategory = "Salary";
   DateTime selectedDate = DateTime.now();
 
   final List<String> monthName = [
@@ -27,13 +27,14 @@ class _AddExpensePageState extends State<AddExpensePage> {
     'Jul','Aug','Sep','Oct','Nov','Dec'
   ];
 
+
   final List<String> categories = [
-    "Food",
-    "Transport",
-    "Shopping",
-    "Entertainment",
-    "Bills",
-    "Health",
+    "Salary",
+    "Freelance",
+    "Business",
+    "Investment",
+    "Gift",
+    "Bonus",
     "Other",
   ];
 
@@ -62,15 +63,14 @@ class _AddExpensePageState extends State<AddExpensePage> {
     }
   }
 
-  Future<void> _saveExpense(BuildContext context) async {
-    log.d("started");
+  Future<void> _saveIncome(BuildContext context) async {
     if (!canSave) return;
 
     final title = noteController.text.trim().isEmpty
         ? selectedCategory
         : noteController.text.trim();
 
-    final expense = ExpenseModel(
+    final income = IncomeModel(
       id: const Uuid().v4(),
       title: title,
       category: selectedCategory,
@@ -78,27 +78,22 @@ class _AddExpensePageState extends State<AddExpensePage> {
       date: selectedDate,
     );
 
-    log.d('Expense amount is ${expense.amount}');
-
-    await context.read<ExpenseCubit>().addExpense(expense);
-
-    log.d('Expense saved successfully');
+    await context.read<IncomeCubit>().addIncome(income);
 
     if (context.mounted) {
       Navigator.pop(context, true);
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: context.customAppBar(title: 'Add Expenses'),
+      appBar: context.customAppBar(title: 'Add Income'),
       body: context.gradientScreen(
         colors: const [
           Color(0xFFF5F7FA),
-          Color(0xFFB8D8FF),
-          Color(0xFF4A90E2),
+          Color(0xFFD4F8E8),
+          Color(0xFF2ECC71),
         ],
         child: Column(
           children: [
@@ -126,7 +121,6 @@ class _AddExpensePageState extends State<AddExpensePage> {
               ),
             ),
 
-            /// 🔹 BUTTON SECTION (Same as Registration Page)
             SafeArea(
               child: Column(
                 children: [
@@ -139,7 +133,6 @@ class _AddExpensePageState extends State<AddExpensePage> {
           ],
         ),
       ),
-
     );
   }
 
@@ -222,12 +215,12 @@ class _AddExpensePageState extends State<AddExpensePage> {
   Widget _saveButton(BuildContext context) {
     return Center(
       child: context.navigationButton(
-        text: "Save Expense",
+        text: "Save Income",
         height: 6,
         width: 100,
         canNavigate: canSave,
         onBtnPress: () async {
-          await _saveExpense(context);
+          await _saveIncome(context);
         },
       ),
     );

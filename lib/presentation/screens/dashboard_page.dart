@@ -9,6 +9,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../logic/auth/auth_cubit.dart';
 import '../../logic/expense/expense_cubit.dart';
 import '../../logic/expense/expense_state.dart';
+import '../../logic/income/income_cubit.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -25,6 +26,7 @@ class _DashboardPageState extends State<DashboardPage> {
     super.initState();
     _loadUser();
     context.read<ExpenseCubit>().loadExpenses();
+    context.read<IncomeCubit>().loadIncomes();
   }
 
   Future<void> _loadUser() async {
@@ -41,64 +43,89 @@ class _DashboardPageState extends State<DashboardPage> {
   bool isGoogleUser() {
     final user = FirebaseAuth.instance.currentUser;
     return user?.providerData.any(
-      (p) => p.providerId == 'google.com',
-    ) ?? false;
+          (p) => p.providerId == 'google.com',
+        ) ??
+        false;
   }
 
   bool isEmailUser() {
     final user = FirebaseAuth.instance.currentUser;
     return user?.providerData.any(
-      (p) => p.providerId == 'password',
-    ) ?? false;
+          (p) => p.providerId == 'password',
+        ) ??
+        false;
   }
-
-
 
   @override
   Widget build(BuildContext context) {
     log.d('is email user: ${isEmailUser()}');
     log.d('is google user: ${isGoogleUser()}');
+    
 
-    return Scaffold(
-      appBar: context.customAppBar(
-        title: 'Dashboard',
-        showBackButton: false,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.account_circle),
-            iconSize: 30,
-            onPressed: () {
-              if (isEmailUser()) {
-                context.pushNamed(RouteName.profile);
-              } else {
-                _showSignOutDialog(context);
+    return BlocListener<ExpenseCubit, ExpenseState>(
+      listener: (context, state) {
+        if (state is ExpenseLoading) {
+          context.showLoader(text: 'Loading expenses...');
+        }
+        if (state is ExpenseLoaded) {
+          context.hideLoader(context);
+        }
+        if (state is ExpenseError) {
+          context.hideLoader(context);
+          context.showCustomDialog(description: state.message);
+        }
+      },
+      child: Scaffold(
+        appBar: context.customAppBar(
+          title: 'Dashboard',
+          showBackButton: false,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.account_circle),
+              iconSize: 30,
+              onPressed: () {
+                if (isEmailUser()) {
+                  context.pushTo(RouteName.profile);
+                } else {
+                  _showSignOutDialog(context);
+                }
               }
-            } 
-          ),
-        ],
-      ),
-
-      body: context.gradientScreen(
-        colors: const [
-          Color.fromARGB(255, 235, 216, 215),
-          Colors.blue,
-        ],
-        child: SafeArea(
-          child: SingleChildScrollView(
-            padding: EdgeInsets.symmetric(
-              horizontal: context.getPercentWidth(6),
-              vertical: context.getPercentHeight(2),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(height: context.getPercentHeight(4)),
-                _userSummary(context),
-                SizedBox(height: context.getPercentHeight(3)),
-                _quickActions(context),
-                SizedBox(height: context.getPercentHeight(5)),
-                _recentTransactions(),
-              ],
+          ],
+        ),
+        body: context.gradientScreen(
+          colors: const [
+            Color.fromARGB(255, 235, 216, 215),
+            Colors.blue,
+          ],
+          child: SafeArea(
+            child: SingleChildScrollView(
+              padding: EdgeInsets.symmetric(
+                horizontal: context.getPercentWidth(2),
+                vertical: context.getPercentHeight(1),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _userSummary(context),
+                  SizedBox(height: context.getPercentHeight(5)),
+                  _quickActions(context),
+                  SizedBox(height: context.getPercentHeight(5)),
+                  context.navigationButton(
+                    text: "Expense transactions",
+                    canNavigate: true,
+                    activeBgColor: Colors.blue[100],
+                    onBtnPress: () => context.pushTo(RouteName.expenseTransaction)
+                  ),
+                  SizedBox(height: context.getPercentHeight(1)),
+                  context.navigationButton(
+                    text: "Income transactions",
+                    canNavigate: true,
+                    activeBgColor: Colors.blue[100],
+                    onBtnPress: () => context.pushTo(RouteName.incomeTransaction)
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -108,7 +135,8 @@ class _DashboardPageState extends State<DashboardPage> {
 
   // ================= USER SUMMARY =================
   Widget _userSummary(BuildContext context) {
-    final firstName = userData?['firstName'] ?? '';
+    final fullName = userData?['fullName'] ?? '';
+    final firstName = fullName.trim().split(' ').first;
 
     return BlocBuilder<ExpenseCubit, ExpenseState>(
       builder: (context, state) {
@@ -120,7 +148,7 @@ class _DashboardPageState extends State<DashboardPage> {
               width: 85,
               height: 12,
               textColor: Colors.black,
-              text: 'Hey $firstName welcome to your money management system',
+              text: 'Welcome to your money management system',
               fontStyle: FontStyle.italic,
             ),
             SizedBox(height: context.getPercentHeight(4)),
@@ -146,6 +174,7 @@ class _DashboardPageState extends State<DashboardPage> {
 
   // ================= QUICK ACTIONS =================
   Widget _quickActions(BuildContext context) {
+    log.d('action clicked');
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -163,19 +192,13 @@ class _DashboardPageState extends State<DashboardPage> {
             _actionButton(
               icon: Icons.add,
               label: "Add Expense",
-              onTap: () async {
-                await Navigator.pushNamed(context, RouteName.addExpense);
-
-                if (!mounted) return;
-                context.read<ExpenseCubit>().loadExpenses();
-              },
-
+              onTap: () => context.pushTo(RouteName.addExpense),
             ),
-            SizedBox(width: context.getPercentWidth(4)),
+            const SizedBox(width: 12),
             _actionButton(
-              icon: Icons.bar_chart,
-              label: "Reports",
-              onTap: () => context.pushNamed(RouteName.report),
+              icon: Icons.attach_money,
+              label: "Add Income",
+              onTap: () => context.pushTo(RouteName.addIncome),
             ),
           ],
         ),
@@ -183,40 +206,13 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  // ================= RECENT TRANSACTIONS =================
+
   Widget _recentTransactions() {
-    return BlocBuilder<ExpenseCubit, ExpenseState>(
-      builder: (context, state) {
-        if (state is ExpenseLoading) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        if (state is ExpenseLoaded && state.expenses.isNotEmpty) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                "Recent Expenses",
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 12),
-              ...state.expenses.take(5).map(
-                    (e) => _transactionTile(
-                      e.title,
-                      "₹ ${e.amount.toStringAsFixed(2)}",
-                      Colors.redAccent.shade400,
-                    ),
-                  ),
-            ],
-          );
-        }
-
-        return const SizedBox();
-      },
+    return context.navigationButton(
+      text: "Expense transactions",
+      canNavigate: true,
+      activeBgColor: Colors.blue[100],
+      onBtnPress: () => context.pushTo(RouteName.expenseTransaction)
     );
   }
 
@@ -248,43 +244,10 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  Widget _transactionTile(String title, String amount, Color color) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.35),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.white10),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: Text(
-              title,
-              style: const TextStyle(color: Colors.white),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-          Text(
-            amount,
-            style: TextStyle(
-              color: color,
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   void _showSignOutDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        // title: const Text('Sign Out'),
         content: const Text(
           'Are you sure you want to sign out?',
           style: TextStyle(fontWeight: FontWeight.bold)
@@ -296,27 +259,27 @@ class _DashboardPageState extends State<DashboardPage> {
               TextButton(
                 onPressed: () => Navigator.pop(ctx),
                 child: const Text(
-                  'Cancel', 
+                  'Cancel',
                   style: TextStyle(
                     fontWeight: FontWeight.bold, 
                     fontSize: 20
                   )
                 ),
               ),
-              const SizedBox(width: 20,),
+              const SizedBox(width: 20),
               TextButton(
                 onPressed: () async {
-                  Navigator.pop(ctx);
+                  context.back();
                   await context.read<AuthCubit>().logout();
                   // ignore: use_build_context_synchronously
-                  context.pushNamedUnAuthenticated(RouteName.login);
+                  context.goTo(RouteName.login);
                 },
                 child: const Text(
                   'Sign Out',
                   style: TextStyle(
                     fontSize: 20,
-                    color: Colors.red, 
-                    fontWeight: FontWeight.bold, 
+                    color: Colors.red,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
@@ -327,4 +290,3 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 }
-

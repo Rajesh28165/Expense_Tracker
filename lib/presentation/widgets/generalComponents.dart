@@ -4,9 +4,11 @@ import 'package:expense_tracker/constants/app_constants.dart';
 import 'package:expense_tracker/constants/extension.dart';
 import 'package:flutter/material.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import '../../router/route_name.dart';
 import '../../util/colors.dart';
 import '../../util/styles.dart';
 import 'countDownTimer.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
 
 // Components:
 // 1) Gradient
@@ -17,7 +19,7 @@ import 'countDownTimer.dart';
 // 6) Radio Button
 // 7) Image Container
 // 8) Shadow Box
-// 9) Acknowlwdgement Screen
+// 9) Acknowledgement Screen
 // 10) Dialog Box
 // 11) Show/Hide Loader
 // 12) Navigation Button
@@ -58,59 +60,6 @@ extension GeneralComponents on BuildContext {
   }
 
   // ------------------ AppBar ------------------
-  // PreferredSizeWidget customAppBar({
-  //   required String title,
-  //   TextStyle? titleTextStyle,
-  //   Color? backgroundColor,
-  //   bool centerTitle = true,
-  //   List<Widget>? actions,
-  //   Widget? leading,
-  //   double? height,
-  //   double elevation = 0,
-  //   bool showBackButton = true,
-  //   Color arrowColor = WidgetColors.white,
-  // }) {
-  //   final double resolvedHeight = getPercentHeight(height ?? 6);
-
-  //   Widget? resolvedLeading;
-
-  //   if (showBackButton) {
-  //     resolvedLeading = leading ??
-  //         IconButton(
-  //           icon: Icon(
-  //             Icons.arrow_back,
-  //             color: arrowColor,
-  //           ),
-  //           onPressed: () => Navigator.of(this).pop(),
-  //         );
-  //   } else {
-  //     resolvedLeading = null;
-  //   }
-
-  //   return PreferredSize(
-  //     preferredSize: Size.fromHeight(resolvedHeight),
-  //     child: AppBar(
-  //       automaticallyImplyLeading: false,
-  //       backgroundColor: backgroundColor ?? Colors.purple[700],
-  //       elevation: elevation,
-  //       centerTitle: centerTitle,
-  //       leading: resolvedLeading,
-  //       title: Text(
-  //         title,
-  //         style: titleTextStyle ??
-  //           const TextStyle(
-  //             fontSize: 30,
-  //             fontWeight: FontWeight.bold,
-  //             color: WidgetColors.white,
-  //             fontFamily: AppConstants.OpenSans,
-  //           ),
-  //       ),
-  //       actions: actions,
-  //     ),
-  //   );
-  // }
-
-
   PreferredSizeWidget customAppBar({
     required String title,
     TextStyle? titleTextStyle,
@@ -122,6 +71,7 @@ extension GeneralComponents on BuildContext {
     double elevation = 0,
     bool showBackButton = true,
     Color arrowColor = WidgetColors.white,
+    VoidCallback? onBackPressed
   }) {
     final double resolvedHeight = getPercentHeight(height ?? 6);
 
@@ -129,13 +79,13 @@ extension GeneralComponents on BuildContext {
 
     if (showBackButton) {
       resolvedLeading = leading ??
-          IconButton(
-            icon: Icon(
-              Icons.arrow_back,
-              color: arrowColor,
-            ),
-            onPressed: () => Navigator.of(this).pop(),
-          );
+        IconButton(
+          icon: Icon(
+            Icons.arrow_back,
+            color: arrowColor,
+          ),
+          onPressed: onBackPressed ?? () => Navigator.of(this).pop(),
+        );
     }
 
     return PreferredSize(
@@ -149,14 +99,14 @@ extension GeneralComponents on BuildContext {
         title: Text(
           title,
           style: titleTextStyle ??
-              const TextStyle(
-                fontSize: 30,
-                fontWeight: FontWeight.bold,
-                color: WidgetColors.white,
-                fontFamily: AppConstants.OpenSans,
-              ),
+            const TextStyle(
+              fontSize: 30,
+              fontWeight: FontWeight.bold,
+              color: WidgetColors.white,
+              fontFamily: AppConstants.OpenSans,
+            ),
         ),
-        actions: actions, // 👈 key line
+        actions: actions,
       ),
     );
   }
@@ -215,6 +165,7 @@ extension GeneralComponents on BuildContext {
     String? labelText,
     String? hintText,
     ValueChanged<T?>? onChanged,
+    String Function(T item)? itemLabelBuilder,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -224,61 +175,27 @@ extension GeneralComponents on BuildContext {
 
         const SizedBox(height: 10),
 
-        FractionallySizedBox(
-          widthFactor: 0.97,
-          child: DropdownButtonFormField<T>(
+        SizedBox(
+          height: 70,
+          child: DropdownButtonFormField2<T>(
             value: value,
             isExpanded: true,
-
             decoration: InputDecoration(
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 12,
-                vertical: 16, // increase height
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             ),
-
-            hint: hintText != null
-              ? Text(
-                  hintText,
-                  maxLines: 2,
-                  overflow: TextOverflow.visible,
-                )
-              : null,
-
-            items: menuItems.map(
-              (item) => DropdownMenuItem<T>(
-                value: item,
-                child: Text(
-                  item.toString(),
-                  maxLines: 3,
-                  softWrap: true,
-                ),
-              ),
-            ).toList(),
-
-            selectedItemBuilder: (context) {
-              return menuItems.map(
-                (item) => Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    item.toString(),
-                    maxLines: 3, // allow 2–3 lines
-                    softWrap: true,
-                    overflow: TextOverflow.visible,
-                  ),
-                ),
-              ).toList();
-            },
-
+            hint: hintText != null ? Text(hintText!) : null,
+            items: menuItems.map<DropdownMenuItem<T>>((item) {
+              final label = itemLabelBuilder != null ? itemLabelBuilder(item) : item.toString();
+              return DropdownMenuItem<T>(value: item, child: Text(label));
+            }).toList(),
             onChanged: onChanged,
           ),
         ),
       ],
     );
   }
+
 
   void showSecurityQuestionPicker(
     BuildContext context,
@@ -446,11 +363,11 @@ extension GeneralComponents on BuildContext {
                 child: Text(
                   header,
                   style: TextStyle(
-                  fontSize: fontSize,
-                  fontWeight: fontWeight,
-                  fontStyle: fontStyle,
-                  color: textColor,
-                ),
+                    fontSize: fontSize,
+                    fontWeight: fontWeight,
+                    fontStyle: fontStyle,
+                    color: textColor,
+                  ),
                 )
               ),
               SizedBox(height: getPercentHeight(header == "" ? 0 : 2)),
@@ -473,6 +390,7 @@ extension GeneralComponents on BuildContext {
 
   // ------------------ Ack Screen ------------------
   Widget ackScreen({
+    required BuildContext context,
     String title = "",
     String? image,
     String? confirmationText,
@@ -517,14 +435,7 @@ extension GeneralComponents on BuildContext {
             /// COUNTDOWN TIMER
             CountdownTimer(
               timerInSeconds: timer,
-              onTimerComplete: onTimerComplete ??
-                  () {
-                    Navigator.pushNamedAndRemoveUntil(
-                      this,
-                      "/home",
-                      (route) => false,
-                    );
-                  },
+              onTimerComplete: () => context.goTo(RouteName.home)
             ),
           ],
         ),
@@ -636,14 +547,9 @@ extension GeneralComponents on BuildContext {
   }
 
   // ------------------ Hide Loader ------------------
-  void hideLoader() {
-    final navigator = unauthNavigatorKey.currentState;
-    if (navigator != null && navigator.canPop()) {
-      navigator.pop();
-    }
+  void hideLoader(BuildContext context) {
+    context.back();
   }
-
-
 
   // ------------------ Navigation Button ------------------
     Widget navigationButton({
@@ -682,8 +588,6 @@ extension GeneralComponents on BuildContext {
       return Padding(
         padding: const EdgeInsets.all(8.0),
         child: Row(
-          // mainAxisAlignment: MainAxisAlignment.spaceAround,
-          // mainAxisSize: MainAxisSize.min,
           children: [
             iconWidget,
             const SizedBox(width: 30),
@@ -719,7 +623,6 @@ extension GeneralComponents on BuildContext {
       ],
     );
   }
-
 
 
   // ------------------ Texted Button ------------------
@@ -771,7 +674,6 @@ extension GeneralComponents on BuildContext {
 
 
   // -------------------------OTP Field----------------------------------
-
   Widget OtpField({
     required BuildContext context,
     required TextEditingController otpController,
