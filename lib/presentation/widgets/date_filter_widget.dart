@@ -1,3 +1,4 @@
+import 'package:expense_tracker/constants/extension.dart';
 import 'package:expense_tracker/presentation/widgets/generalComponents.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -51,7 +52,6 @@ class _DateFilterWidgetState extends State<DateFilterWidget> {
         break;
 
       case DateFilterType.custom:
-        // Do nothing until user presses fetch
         break;
     }
   }
@@ -132,17 +132,17 @@ class _DateFilterWidgetState extends State<DateFilterWidget> {
 
         /// CUSTOM RANGE UI
         if (selected == DateFilterType.custom) ...[
-          const SizedBox(height: 15),
+          SizedBox(height: context.getPercentHeight(1)),
 
           Row(
             children: [
               Expanded(child: _dateBox("Start Date", tempStart, true)),
-              const SizedBox(width: 10),
+              SizedBox(width: context.getPercentWidth(5)),
               Expanded(child: _dateBox("End Date", tempEnd, false)),
             ],
           ),
 
-          const SizedBox(height: 15),
+          SizedBox(height: context.getPercentHeight(1)),
 
           context.navigationButton(
             text: "Fetch Data",
@@ -164,12 +164,15 @@ class _DateFilterWidgetState extends State<DateFilterWidget> {
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(.9),
+          color: Colors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.black12),
+          border: Border.all(color: Colors.black),
         ),
         child: Text(
-          date == null ? label : DateFormat("dd MMM yyyy").format(date),
+          date == null ? label : DateFormat("dd-MMM-yyyy").format(date),
+          style: TextStyle(
+            fontWeight: date == null ? FontWeight.w300 : FontWeight.bold
+          ),
         ),
       ),
     );

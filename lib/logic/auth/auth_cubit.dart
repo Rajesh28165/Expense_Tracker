@@ -242,10 +242,10 @@ class AuthCubit extends Cubit<AuthState> {
   }) async {
     try {
       final query = await _firestore
-          .collection('users')
-          .where('email', isEqualTo: email)
-          .limit(1)
-          .get();
+        .collection('users')
+        .where('email', isEqualTo: email)
+        .limit(1)
+        .get();
 
       if (query.docs.isEmpty) {
         return 'User not found';

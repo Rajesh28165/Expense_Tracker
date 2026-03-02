@@ -11,7 +11,8 @@ class RouteName {
   static const addExpense = '/addExpense';
   static const addIncome = '/addIncome';
   static const profile = '/profile';
+  static const verifyPassword = '/verifyPassword';
   static const resetPassword = '/resetPassword';
-  static const expenseTransaction = '/expenseTransaction';
-  static const incomeTransaction = '/incomeTransaction';
+  static const showTransactions = '/showTransactions';
+  static const addTransactions = '/addTransactions';
 }

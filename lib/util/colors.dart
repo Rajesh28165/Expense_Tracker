@@ -29,11 +29,6 @@ class WidgetColors {
   static const checkBoxTextColor = Color(0xff484848);
   static const ellipseActive = Color(0x00000000);
   static const ellipseDeactive = Color(0x00a0a0a0);
-  static const landingScreenBottomGradientTop = Color(0x00484800);
-  static const landingScreenCarouselGradientTop = Color(0x73000000);
-  static const landingScreenCarouselGradientMiddletop = Color(0x006E6E6E);
-  static const landingScreenCarouselGradientMiddlebottom = Color(0x00484848);
-  static const landingScreenCarouselGradientBottom = Color(0xFF1D1D1D);
   static const greyCurrentPhoneNumberText = Color(0xff918E8E);
   static const greyDisabledTextColor = Color(0xff9a9a9a);
   static const greyShadow = Color(0x00000019);
@@ -49,6 +44,8 @@ class WidgetColors {
 class CategoryColorHelper {
   static Color getColor(String category) {
     switch (category.toLowerCase()) {
+
+      /// ===== EXPENSE COLORS =====
       case 'food':
         return WidgetColors.orange;
 
@@ -67,6 +64,27 @@ class CategoryColorHelper {
       case 'health':
         return WidgetColors.greenColorCard;
 
+      /// ===== INCOME COLORS =====
+
+      case 'salary':
+        return Colors.green.shade600;
+
+      case 'freelance':
+        return Colors.teal;
+
+      case 'business':
+        return Colors.indigo;
+
+      case 'investment':
+        return Colors.deepPurple;
+
+      case 'gift':
+        return Colors.pink;
+
+      case 'bonus':
+        return Colors.amber.shade700;
+
+      /// ===== COMMON =====
       case 'other':
       default:
         return WidgetColors.grey;
@@ -74,10 +92,3 @@ class CategoryColorHelper {
   }
 }
 
-class PointerGradient {
-  static const List<double> stop1 = [0, 0.5, 1];
-  static const List<double> stop2 = [0, 1];
-  static const List<double> stop3 = [0, 0.5, 0.4];
-  static const List<double> stop4 = [0, 0.1, 0.4];
-  static const List<double> stop5 = [0, 0.1, 0.9];
-}

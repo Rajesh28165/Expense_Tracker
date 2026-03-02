@@ -52,8 +52,6 @@ class _HomePageState extends State<HomePage> {
               );
             },
           ),
-
-
           SizedBox(height: context.getPercentHeight(15)),
           Expanded(
             child: Center(

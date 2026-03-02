@@ -1,23 +1,21 @@
+import 'package:expense_tracker/presentation/screens/verify_password_page.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../logic/auth/auth_cubit.dart';
 import '../logic/auth/auth_state.dart';
-import '../presentation/screens/add_income_page.dart';
-import '../presentation/screens/expense_transaction_page.dart';
+import '../presentation/screens/add_txn_page.dart';
 import '../presentation/screens/forgot_password.dart';
-import '../presentation/screens/income_report.dart';
-import '../presentation/screens/income_transaction_page.dart';
 import '../presentation/screens/login_page.dart';
 import '../presentation/screens/registeration_page.dart';
 import '../presentation/screens/reset_password.dart';
 import '../presentation/screens/security_page.dart';
 import '../presentation/screens/dashboard_page.dart';
-import '../presentation/screens/expense_report.dart';
-import '../presentation/screens/add_expense_page.dart';
 import '../presentation/screens/profile_page.dart';
 import '../presentation/screens/navigation_page.dart';
+import '../presentation/screens/show_txn_page.dart';
+import '../presentation/screens/txn_report.dart';
 import 'route_name.dart';
 
 GoRouter createRouter(BuildContext context) {
@@ -79,39 +77,40 @@ GoRouter createRouter(BuildContext context) {
           ),
           GoRoute(
             path: RouteName.expenseReport,
-            builder: (_, __) => const ExpenseReport(),
+            builder: (_, __) => const TransactionReportPage(type: TransactionType.expense),
           ),
+
           GoRoute(
             path: RouteName.incomeReport,
-            builder: (_, __) => const IncomeReport(),
+            builder: (_, __) => const TransactionReportPage(type: TransactionType.income),
           ),
         ],
       ),
 
       // ---------------- FULLSCREEN ROUTES ----------------
+
       GoRoute(
-        path: RouteName.addExpense,
-        builder: (_, __) => const AddExpensePage(),
+        path: RouteName.addTransactions,
+        builder: (context, state) => AddTransactionPage(
+          type: state.extra as TransactionType,
+        ),
       ),
 
       GoRoute(
-        path: RouteName.addIncome,
-        builder: (_, __) => const AddIncomePage(),
-      ),
-
-      GoRoute(
-        path: RouteName.expenseTransaction,
-        builder: (_, __) => const ExpenseTransactionPage(),
-      ),
-
-      GoRoute(
-        path: RouteName.incomeTransaction,
-        builder: (_, __) => const IncomeTransactionPage(),
+        path: RouteName.showTransactions,
+        builder: (context, state) => ShowTransactionPage(
+          type: state.extra as TransactionType,
+        ),
       ),
 
       GoRoute(
         path: RouteName.profile,
         builder: (_, __) => const ProfilePage(),
+      ),
+
+      GoRoute(
+        path: RouteName.verifyPassword,
+        builder: (_, __) => const VerifyPasswordPage(),
       ),
 
       GoRoute(

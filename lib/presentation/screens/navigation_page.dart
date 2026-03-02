@@ -2,45 +2,44 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../router/route_name.dart';
 
-class NavigationPage extends StatefulWidget {
+class NavigationPage extends StatelessWidget {
   final Widget child;
 
   const NavigationPage({super.key, required this.child});
 
   @override
-  State<NavigationPage> createState() => _NavigationPageState();
-}
-
-class _NavigationPageState extends State<NavigationPage> {
-  int _currentIndex = 0;
-
-  final List<String> _routes = [
-    RouteName.dashboard,
-    RouteName.expenseReport,
-    RouteName.incomeReport
-  ];
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
+  Widget build(BuildContext context) {
     final location = GoRouterState.of(context).matchedLocation;
 
-    _currentIndex = _routes.indexWhere(location.startsWith);
-    if (_currentIndex == -1) _currentIndex = 0;
-  }
+    int currentIndex = 0;
 
-  void _onTabTapped(int index) {
-    if (index == _currentIndex) return;
-    context.go(_routes[index]);
-  }
+    if (location.startsWith(RouteName.dashboard)) {
+      currentIndex = 0;
+    } else if (location.startsWith(RouteName.expenseReport)) {
+      currentIndex = 1;
+    } else if (location.startsWith(RouteName.incomeReport)) {
+      currentIndex = 2;
+    }
 
-  @override
-  Widget build(BuildContext context) {
+    void onTabTapped(int index) {
+      switch (index) {
+        case 0:
+          context.go(RouteName.dashboard);
+          break;
+        case 1:
+          context.go(RouteName.expenseReport);
+          break;
+        case 2:
+          context.go(RouteName.incomeReport);
+          break;
+      }
+    }
+
     return Scaffold(
-      body: widget.child,
+      body: child,
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: _onTabTapped,
+        currentIndex: currentIndex,
+        onTap: onTabTapped,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),

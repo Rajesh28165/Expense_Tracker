@@ -29,7 +29,7 @@ class ProfilePage extends StatelessWidget {
               leading: const Icon(Icons.lock_outline),
               title: const Text('Change / Update Password'),
               trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-              onTap: () => context.pushTo(RouteName.resetPassword),
+              onTap: () => context.pushTo(RouteName.verifyPassword),
             ),
 
             const Divider(),
@@ -43,7 +43,6 @@ class ProfilePage extends StatelessWidget {
             ),
 
             const Divider(),
-            const SizedBox(height: 40),
 
             /// 🚪 Sign Out
             ListTile(

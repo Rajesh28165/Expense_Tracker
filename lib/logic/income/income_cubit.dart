@@ -9,7 +9,9 @@ class IncomeCubit extends Cubit<IncomeState> {
   final IncomeRepository _repository;
   final log = logger(IncomeCubit);
 
-  IncomeCubit(this._repository) : super(IncomeInitial());
+  IncomeCubit(this._repository) : super(IncomeInitial()){
+    loadIncomes();
+  }
 
   /// LOAD INCOMES
   Future<void> loadIncomes() async {

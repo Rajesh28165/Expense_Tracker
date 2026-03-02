@@ -62,6 +62,7 @@ extension GeneralComponents on BuildContext {
   // ------------------ AppBar ------------------
   PreferredSizeWidget customAppBar({
     required String title,
+    double? fontSize = 30,
     TextStyle? titleTextStyle,
     Color? backgroundColor,
     bool centerTitle = true,
@@ -99,8 +100,8 @@ extension GeneralComponents on BuildContext {
         title: Text(
           title,
           style: titleTextStyle ??
-            const TextStyle(
-              fontSize: 30,
+            TextStyle(
+              fontSize: fontSize,
               fontWeight: FontWeight.bold,
               color: WidgetColors.white,
               fontFamily: AppConstants.OpenSans,
@@ -164,6 +165,8 @@ extension GeneralComponents on BuildContext {
     T? value,
     String? labelText,
     String? hintText,
+    TextStyle? labelStyle,
+    double borderRadius = 30,
     ValueChanged<T?>? onChanged,
     String Function(T item)? itemLabelBuilder,
   }) {
@@ -171,7 +174,7 @@ extension GeneralComponents on BuildContext {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (labelText != null && labelText.isNotEmpty)
-          Text(labelText, style: AppStyles.labelStyle()),
+          Text(labelText, style: labelStyle ?? AppStyles.labelStyle()),
 
         const SizedBox(height: 10),
 
@@ -180,11 +183,20 @@ extension GeneralComponents on BuildContext {
           child: DropdownButtonFormField2<T>(
             value: value,
             isExpanded: true,
+            style: const TextStyle(
+              color: Colors.black,
+              fontSize: 16,
+              fontWeight: FontWeight.w900,
+            ),
             decoration: InputDecoration(
               contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              filled: true,
+              fillColor: Colors.white,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(borderRadius),
+              ),
             ),
-            hint: hintText != null ? Text(hintText!) : null,
+            hint: hintText != null ? Text(hintText) : null,
             items: menuItems.map<DropdownMenuItem<T>>((item) {
               final label = itemLabelBuilder != null ? itemLabelBuilder(item) : item.toString();
               return DropdownMenuItem<T>(value: item, child: Text(label));

@@ -24,7 +24,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   void initState() {
     super.initState();
     _emailController.addListener(() {
-      setState(() {}); // rebuild on text change
+      setState(() {});
     });
   }
 
@@ -34,75 +34,44 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     super.dispose();
   }
 
-  // Future<void> _submit() async {
-  //   final email = _emailController.text.trim();
-
-  //   if (email.isEmpty) {
-  //     _showMessage('Please enter email');
-  //     return;
-  //   }
-
-  //   setState(() => _loading = true);
-
-  //   final error = await context.read<AuthCubit>().sendPasswordResetEmail(email);
-
-  //   if (!mounted) return;
-  //   setState(() => _loading = false);
-
-  //   if (error != null) {
-  //     _showMessage(error);
-  //   } else {
-  //     _showMessage(
-  //       'A password reset link is sent to $email',
-  //       onOk: () {
-  //         context.goTo(RouteName.login); // ✅ correct with GoRouter
-  //       },
-  //     );
-  //   }
-  // }
-
-
   Future<void> _submit() async {
-  final email = _emailController.text.trim().toLowerCase();
+    final email = _emailController.text.trim().toLowerCase();
 
-  log.d('🟡 [UI] Forgot password submit clicked');
-  log.d('🟡 [UI] Email entered: $email');
+    log.d('[UI] Forgot password submit clicked');
+    log.d('[UI] Email entered: $email');
 
-  if (email.isEmpty) {
-    log.w('⚠️ [UI] Email is empty');
-    _showMessage('Please enter email');
-    return;
+    if (email.isEmpty) {
+      log.w('⚠️ [UI] Email is empty');
+      _showMessage('Please enter email');
+      return;
+    }
+
+    setState(() => _loading = true);
+
+    final error = await context.read<AuthCubit>().sendPasswordResetEmail(email);
+
+    if (!mounted) return;
+
+    setState(() => _loading = false);
+
+    if (error != null) {
+      log.e('❌ [UI] Reset failed: $error');
+      _showMessage(error);
+    } else {
+      log.d('✅ [UI] Reset flow completed');
+
+      _showMessage(
+        'If an account exists for this email, a password reset link has been sent.',
+        onOk: () => context.goTo(RouteName.login),
+      );
+    }
   }
-
-  setState(() => _loading = true);
-
-  final error =
-      await context.read<AuthCubit>().sendPasswordResetEmail(email);
-
-  if (!mounted) return;
-
-  setState(() => _loading = false);
-
-  if (error != null) {
-    log.e('❌ [UI] Reset failed: $error');
-    _showMessage(error);
-  } else {
-    log.d('✅ [UI] Reset flow completed');
-
-    _showMessage(
-      'If an account exists for this email, a password reset link has been sent.',
-      onOk: () => context.goTo(RouteName.login),
-    );
-  }
-}
-
-
 
 
   void _showMessage(String message, {VoidCallback? onOk}) {
     showDialog(
       context: context,
-      useRootNavigator: true, // ✅ important for GoRouter safety
+      useRootNavigator: true,
       builder: (_) => AlertDialog(
         content: Text(
           message,
@@ -111,7 +80,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.of(context, rootNavigator: true).pop(); // dialog only
+              Navigator.of(context, rootNavigator: true).pop();
               onOk?.call();
             },
             child: const Text(

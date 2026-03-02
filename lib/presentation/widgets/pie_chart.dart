@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 
 import '../../util/colors.dart';
 
-class ExpensePieChart extends StatelessWidget {
+class CustomPieChart extends StatelessWidget {
   final Map<String, double> categoryData;
 
-  const ExpensePieChart({
+  const CustomPieChart({
     super.key,
     required this.categoryData,
   });
@@ -28,7 +28,6 @@ class ExpensePieChart extends StatelessWidget {
           sections: categoryData.entries.map((entry) {
             final percent = (entry.value / total) * 100;
             final color = CategoryColorHelper.getColor(entry.key);
-
             return PieChartSectionData(
               value: entry.value,
               color: color,

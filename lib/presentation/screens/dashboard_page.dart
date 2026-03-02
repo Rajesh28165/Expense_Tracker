@@ -10,6 +10,8 @@ import '../../logic/auth/auth_cubit.dart';
 import '../../logic/expense/expense_cubit.dart';
 import '../../logic/expense/expense_state.dart';
 import '../../logic/income/income_cubit.dart';
+import '../../logic/income/income_state.dart';
+import 'show_txn_page.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -115,14 +117,20 @@ class _DashboardPageState extends State<DashboardPage> {
                     text: "Expense transactions",
                     canNavigate: true,
                     activeBgColor: Colors.blue[100],
-                    onBtnPress: () => context.pushTo(RouteName.expenseTransaction)
+                    onBtnPress: () => context.pushTo(
+                      RouteName.showTransactions,
+                      extra: TransactionType.expense,
+                    ),
                   ),
                   SizedBox(height: context.getPercentHeight(1)),
                   context.navigationButton(
                     text: "Income transactions",
                     canNavigate: true,
                     activeBgColor: Colors.blue[100],
-                    onBtnPress: () => context.pushTo(RouteName.incomeTransaction)
+                    onBtnPress: () => context.pushTo(
+                      RouteName.showTransactions,
+                      extra: TransactionType.income,
+                    ),
                   ),
                 ],
               ),
@@ -139,38 +147,48 @@ class _DashboardPageState extends State<DashboardPage> {
     final firstName = fullName.trim().split(' ').first;
 
     return BlocBuilder<ExpenseCubit, ExpenseState>(
-      builder: (context, state) {
-        final totalExpense = state is ExpenseLoaded ? state.totalExpense : 0.0;
+      builder: (context, expenseState) {
+        final totalExpense =
+            expenseState is ExpenseLoaded ? expenseState.totalExpense : 0.0;
 
-        return Column(
-          children: [
-            context.shadowBox(
-              width: 85,
-              height: 12,
-              textColor: Colors.black,
-              text: 'Welcome to your money management system',
-              fontStyle: FontStyle.italic,
-            ),
-            SizedBox(height: context.getPercentHeight(4)),
-            context.shadowBox(
-              width: 85,
-              height: 15,
-              header: 'Your total expenses',
-              textColor: Colors.black,
-              text: "₹ ${totalExpense.toStringAsFixed(2)}",
-              gradient: LinearGradient(
-                colors: [
-                  Colors.blueAccent.shade100,
-                  Colors.pinkAccent.shade100,
-                  Colors.orangeAccent.shade100,
-                ],
-              ),
-            ),
-          ],
+        return BlocBuilder<IncomeCubit, IncomeState>(
+          builder: (context, incomeState) {
+            final totalIncome = incomeState is IncomeLoaded ? incomeState.totalIncome : 0.0;
+
+            return Column(
+              children: [
+                context.shadowBox(
+                  width: 85,
+                  height: 12,
+                  textColor: Colors.black,
+                  text: 'Welcome to your money management system',
+                  fontStyle: FontStyle.italic,
+                ),
+
+                SizedBox(height: context.getPercentHeight(4)),
+
+                context.shadowBox(
+                  width: 85,
+                  height: 15,
+                  header: 'Your total expenses: ₹ ${totalExpense.toStringAsFixed(2)}',
+                  textColor: Colors.black,
+                  text: "Your total income: ₹ ${totalIncome.toStringAsFixed(2)}",
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.blueAccent.shade100,
+                      Colors.pinkAccent.shade100,
+                      Colors.orangeAccent.shade100,
+                    ],
+                  ),
+                ),
+              ],
+            );
+          },
         );
       },
     );
   }
+
 
   // ================= QUICK ACTIONS =================
   Widget _quickActions(BuildContext context) {
@@ -192,13 +210,19 @@ class _DashboardPageState extends State<DashboardPage> {
             _actionButton(
               icon: Icons.add,
               label: "Add Expense",
-              onTap: () => context.pushTo(RouteName.addExpense),
+              onTap: () => context.pushTo(
+                RouteName.addTransactions,
+                extra: TransactionType.expense,
+              ),
             ),
             const SizedBox(width: 12),
             _actionButton(
               icon: Icons.attach_money,
               label: "Add Income",
-              onTap: () => context.pushTo(RouteName.addIncome),
+              onTap: () => context.pushTo(
+                RouteName.addTransactions,
+                extra: TransactionType.income,
+              ),
             ),
           ],
         ),
@@ -206,15 +230,6 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-
-  Widget _recentTransactions() {
-    return context.navigationButton(
-      text: "Expense transactions",
-      canNavigate: true,
-      activeBgColor: Colors.blue[100],
-      onBtnPress: () => context.pushTo(RouteName.expenseTransaction)
-    );
-  }
 
   Widget _actionButton({
     required IconData icon,
