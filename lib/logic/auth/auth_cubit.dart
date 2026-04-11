@@ -3,14 +3,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../../data/models/user_model.dart';
-import '../../util/logger.dart';
 import 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
   final FirebaseAuth _auth;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn();
-  final log = logger(AuthCubit);
 
   bool _isRegistering = false;
 
@@ -36,7 +34,6 @@ class AuthCubit extends Cubit<AuthState> {
       final doc = await docRef.get(const GetOptions(source: Source.server));
 
       if (!doc.exists) {
-        log.d('user is deleted');
         emit(AuthError('User not registered'));
         await Future.delayed(const Duration(milliseconds: 500));
         try {
@@ -76,8 +73,6 @@ class AuthCubit extends Cubit<AuthState> {
       email: email.toLowerCase(),
       password: password,
     );
-    // ✅ LoginSuccess emitted by stream via AuthAuthenticated
-    // LoginPage listens to AuthAuthenticated for navigation
   } on FirebaseAuthException catch (e) {
     emit(LoginError(_mapFirebaseError(e)));
   } catch (_) {

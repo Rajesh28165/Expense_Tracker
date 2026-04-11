@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:kharchasutra/util/logger.dart';
-
-final log = logger(BuildContext);
 
 
 extension BuildContextExtensionFunctions on BuildContext {
@@ -16,24 +13,18 @@ extension BuildContextExtensionFunctions on BuildContext {
   void goTo(String route, {Object? extra}) {
     try {
       go(route, extra: extra);
-    } catch (e) {
-      log.e("GoRouter goTo failed → $route | $e");
-    }
+    } catch (e) {}
   }
 
   void pushTo(String route, {Object? extra}) {
     try {
       push(route, extra: extra);
-    } catch (e) {
-      log.e("GoRouter pushTo failed → $route | $e");
-    }
+    } catch (e) {}
   }
 
   void back() {
     if (canPop()) {
       pop();
-    } else {
-      log.e("Nothing to pop");
     }
   }
 

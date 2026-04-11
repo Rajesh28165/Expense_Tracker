@@ -22,9 +22,7 @@ class SupportPage extends StatelessWidget {
         emailUri,
         mode: LaunchMode.externalApplication,
       );
-    } catch (e) {
-      debugPrint("Error launching email: $e");
-    }
+    } catch (e) {}
   }
 
   @override

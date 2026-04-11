@@ -24,7 +24,6 @@ class AddTransactionPage extends StatefulWidget {
 class _AddTransactionPageState extends State<AddTransactionPage> {
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _noteController   = TextEditingController();
-  final log = logger(AddTransactionPage);
 
   late String _selectedCategory;
   DateTime _selectedDate = DateTime.now();

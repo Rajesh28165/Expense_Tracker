@@ -119,7 +119,6 @@ class _RegisterationPageState extends State<RegisterationPage> {
       body: context.gradientScreen(
         child: BlocConsumer<AuthCubit, AuthState>(
           listener: (context, state) {
-            log.d('State on Registration page: $state');
             if (!context.isOn(RouteName.registeration)) return;
 
             if (state is RegisterLoading) {

@@ -48,7 +48,6 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
   Widget build(BuildContext context) {
     return BlocListener<AuthCubit, AuthState>(
       listener: (context, state) {
-        log.d('State on email verification page: $state');
         if (state is VerifyLoading) {
           _showLoader(context, 'Verification in progress...');
           return;

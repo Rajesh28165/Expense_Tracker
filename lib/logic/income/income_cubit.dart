@@ -3,11 +3,9 @@ import '../../data/models/income_model.dart';
 
 import '../../data/repositories/income_repository.dart';
 import 'income_state.dart';
-import '../../util/logger.dart';
 
 class IncomeCubit extends Cubit<IncomeState> {
   final IncomeRepository _repository;
-  final log = logger(IncomeCubit);
 
   IncomeCubit(this._repository) : super(IncomeInitial()){
     loadIncomes();
