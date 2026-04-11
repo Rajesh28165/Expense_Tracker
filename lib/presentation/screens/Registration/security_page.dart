@@ -81,94 +81,100 @@ class _SecurityPageState extends State<SecurityPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: context.customAppBar(title: 'Security Setup'),
-      body: context.gradientScreen(
-        child: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.only(
-                  bottom: MediaQuery.of(context).viewInsets.bottom,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: context.getPercentHeight(2)),
-                    const Text(
-                      AppConstants.SecurityQuestionRule,
-                      style: TextStyle(color: AppConstants.commonTextColor),
-                    ),
-                    SizedBox(height: context.getPercentHeight(5)),
-                    Text('Security question', style: AppStyles.labelStyle()),
-                    SizedBox(height: context.getPercentHeight(1)),
-                    GestureDetector(
-                      onTap: () {
-                        context.showSecurityQuestionPicker(
-                          context,
-                          AppConstants.listOfSecurityQuestions,
-                          (selected) {
-                            setState(() => selectedQuestion = selected);
-                            _validateForm();
-                          },
-                        );
-                      },
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 12,
-                        ),
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: AppConstants.commonTextColor,
+    return WillPopScope(
+      onWillPop: () async =>  false,
+      child: Scaffold(
+        appBar: context.customAppBar(
+          title: 'Security Setup',
+          showBackButton: false
+        ),
+        body: context.gradientScreen(
+          child: Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).viewInsets.bottom,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: context.getPercentHeight(2)),
+                      const Text(
+                        AppConstants.SecurityQuestionRule,
+                        style: TextStyle(color: AppConstants.commonTextColor),
+                      ),
+                      SizedBox(height: context.getPercentHeight(5)),
+                      Text('Security question', style: AppStyles.labelStyle()),
+                      SizedBox(height: context.getPercentHeight(1)),
+                      GestureDetector(
+                        onTap: () {
+                          context.showSecurityQuestionPicker(
+                            context,
+                            AppConstants.listOfSecurityQuestions,
+                            (selected) {
+                              setState(() => selectedQuestion = selected);
+                              _validateForm();
+                            },
+                          );
+                        },
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 12,
                           ),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: Text(
-                                selectedQuestion,
-                                maxLines: 3,
-                                overflow: TextOverflow.ellipsis,
-                                style: AppStyles.inputTextStyle(),
-                              ),
-                            ),
-                            const Icon(
-                              Icons.arrow_drop_down,
+                          decoration: BoxDecoration(
+                            border: Border.all(
                               color: AppConstants.commonTextColor,
-                              size: 30,
-                            )
-                          ],
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  selectedQuestion,
+                                  maxLines: 3,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: AppStyles.inputTextStyle(),
+                                ),
+                              ),
+                              const Icon(
+                                Icons.arrow_drop_down,
+                                color: AppConstants.commonTextColor,
+                                size: 30,
+                              )
+                            ],
+                          ),
                         ),
                       ),
+                      SizedBox(height: context.getPercentHeight(5)),
+                      BaseTextField(
+                        labelText: "Security answer",
+                        controller: _securityAnsController,
+                        hintText: "Enter security answer",
+                        maxInputLength: 100,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SafeArea(
+                child: Column(
+                  children: [
+                    SizedBox(height: context.getPercentHeight(1)),
+                    context.navigationButton(
+                      text: "Proceed",
+                      canNavigate: _canProceed,
+                      onBtnPress: onProceed,
                     ),
-                    SizedBox(height: context.getPercentHeight(5)),
-                    BaseTextField(
-                      labelText: "Security answer",
-                      controller: _securityAnsController,
-                      hintText: "Enter security answer",
-                      maxInputLength: 100,
-                    ),
+                    SizedBox(height: context.getPercentHeight(2)),
                   ],
                 ),
               ),
-            ),
-            SafeArea(
-              child: Column(
-                children: [
-                  SizedBox(height: context.getPercentHeight(1)),
-                  context.navigationButton(
-                    text: "Proceed",
-                    canNavigate: _canProceed,
-                    onBtnPress: onProceed,
-                  ),
-                  SizedBox(height: context.getPercentHeight(2)),
-                ],
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

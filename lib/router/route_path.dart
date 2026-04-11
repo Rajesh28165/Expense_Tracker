@@ -30,6 +30,7 @@ GoRouter createRouter(BuildContext context) {
       final authState = context.read<AuthCubit>().state;
       final isLoggedIn = authState is AuthAuthenticated;
       final isEmailUnverified = authState is AuthEmailUnverified;
+      final isVerifySuccess = authState is VerifySuccess;
 
       final isAuthRoute = 
         state.matchedLocation == RouteName.login ||
@@ -37,7 +38,12 @@ GoRouter createRouter(BuildContext context) {
         state.matchedLocation == RouteName.forgotPassword ||
         state.matchedLocation == RouteName.emailVerification;
 
-      if (!isLoggedIn && !isEmailUnverified && !isAuthRoute) {
+      if (
+          !isLoggedIn && 
+          !isEmailUnverified && 
+          !isVerifySuccess && 
+          !isAuthRoute
+        ) {
         return RouteName.login;
       }
 

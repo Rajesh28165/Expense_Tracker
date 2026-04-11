@@ -42,9 +42,13 @@ class AppConstants {
   static const appName = 'Kharcha Sutra';
   static const supportEmail ='support@kharchasutra.com';
 
-  static const Password_rule = 'Your password must be 8 - 20 characters long, and must contain at least 1 number, 1 lower case letter, 1 upper case letter and 1 special character.';
+  static const Password_reset_link_header = 'We will send a password reset link to your registered email.';
+  
+  static const Password_reset_link_warning = 'Use the email link to reset your password and ensure the following requirements are met:';
 
-  static const Password_note = 'If these requirements are not met, you may be able to reset your password, but you will not be able to log in with it.';
+  static const Password_rule = 'Your password must be 8–20 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.';
+
+  static const Password_note = 'If your password does not meet these requirements, you may still be able to reset it, but you will not be able to log in using that password.';
 
   static const Email_rule = 'Enter a valid email address. We’ll send you a verification link to confirm your account.';
   static const SecurityQuestionRule = 'Choose a security question and answer. This will help us verify your identity if you forget your password.';

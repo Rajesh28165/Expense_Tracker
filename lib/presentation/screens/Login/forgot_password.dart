@@ -116,7 +116,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
                     RichText(
                       text: const TextSpan(
-                        text: "Important:",
+                        text: "Important note:",
                         style: TextStyle(
                           fontSize: 18,
                           color: AppConstants.commonTextColor,                        
@@ -125,7 +125,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                         ),
                         children: [
                           TextSpan(
-                            text: ' ${AppConstants.Password_rule}\n${AppConstants.Password_note}',
+                            text: ' \n${AppConstants.Password_reset_link_warning}\n\n${AppConstants.Password_rule}\n\n${AppConstants.Password_note}',
                             style: TextStyle( 
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
@@ -140,7 +140,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                     SizedBox(height: context.getPercentHeight(4)),
 
                     EmailTextField(
-                      controller: _emailController,
+                      controller: _emailController
                     ),
 
                     SizedBox(height: context.getPercentHeight(4)),
@@ -154,7 +154,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 children: [
                   SizedBox(height: context.getPercentHeight(2)),
                   context.navigationButton(
-                    text: _loading ? "Sending..." : "Send Reset Link",
+                    text: _loading ? "Sending..." : "Send Password Reset Link",
                     canNavigate: canSubmit,
                     onBtnPress: _submit,
                   ),

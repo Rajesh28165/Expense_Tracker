@@ -48,87 +48,105 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
   Widget build(BuildContext context) {
     return BlocListener<AuthCubit, AuthState>(
       listener: (context, state) {
-        log.d('state emiting of verification page $state');
-
-        if (state is AuthLoading && state.source == 'verify') {
+        log.d('State on email verification page: $state');
+        if (state is VerifyLoading) {
           _showLoader(context, 'Verification in progress...');
           return;
         }
 
-        if (state is AuthEmailUnverified) {
+        if (state is VerifyEmailUnverified) {
           _hideLoader(context);
           context.showCustomDialog(description: 'Please verify your email before continuing.');
           return;
         }
 
-        if (state is AuthError && state.source == 'verify') {
+        if (state is VerifyError) {
           _hideLoader(context);
           context.showCustomDialog(description: state.message);
           return;
         }
 
-        if (state is AuthAuthenticated) {
+        if (state is VerifySuccess) {
           _hideLoader(context);
           state.securityQuestionSelected
-            ? context.goTo(RouteName.dashboard)
-            : context.goTo(RouteName.security);
+              ? context.goTo(RouteName.dashboard)
+              : context.goTo(RouteName.security);
+          return;
+        }
+
+        if (state is AuthUnauthenticated) {
+          if (_isLoaderShowing) return; 
+          context.goTo(RouteName.login);
           return;
         }
       },
-      child: Scaffold(
-        appBar: context.customAppBar(title: 'Verify Email', showBackButton: false),
-        body: context.gradientScreen(
-          child: Column(
-            children: [
-              Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      Icons.mark_email_unread_outlined,
-                      size: 64, 
-                      color: Colors.white
-                    ),
-                    SizedBox(height: context.getPercentHeight(3)),
-                    const Text(
-                      'Check your inbox',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
+      child: WillPopScope(
+        onWillPop: () async {
+          await context.read<AuthCubit>().logout();
+          context.goTo(RouteName.login);
+          return false;
+        },
+        child: Scaffold(
+          appBar: context.customAppBar(
+            title: 'Verify Email',
+            onBackPressed: () async {
+              await context.read<AuthCubit>().logout();
+              context.goTo(RouteName.login);
+            }
+          ),
+          body: context.gradientScreen(
+            child: Column(
+              children: [
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.mark_email_unread_outlined,
+                        size: 64, 
+                        color: Colors.white
                       ),
-                    ),
-                    SizedBox(height: context.getPercentHeight(2)),
-                    Text(
-                      'We’ve sent a verification link to ${widget.email}.\n\nPlease check your inbox (and spam folder) and click the link to continue.',
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: Colors.white70, 
-                        fontSize: 15
+                      SizedBox(height: context.getPercentHeight(3)),
+                      const Text(
+                        'Check your inbox',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                  ],
+                      SizedBox(height: context.getPercentHeight(2)),
+                      Text(
+                        'We’ve sent a verification link to ${widget.email}.\n\nPlease check your inbox (and spam folder) and click the link to continue.',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Colors.white70, 
+                          fontSize: 15
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              SafeArea(
-                child: Column(
-                  children: [
-                    context.navigationButton(
-                      text: "I’ve completed verification",
-                      canNavigate: true,
-                      onBtnPress: () => context.read<AuthCubit>().checkEmailVerified(),
-                    ),
-                    context.textedButton(
-                      text: "Resend verification email",
-                      textColor: Colors.white,
-                      textUnderline: true,
-                      onButtonPress: () => _resendLink(context)
-                    ),
-                    SizedBox(height: context.getPercentHeight(2)),
-                  ],
+                SafeArea(
+                  child: Column(
+                    children: [
+                      context.navigationButton(
+                        text: "I’ve completed verification",
+                        canNavigate: true,
+                        onBtnPress: () => context.read<AuthCubit>().checkEmailVerified(),
+                      ),
+                      context.textedButton(
+                        text: "Resend verification email",
+                        textColor: Colors.white,
+                        textUnderline: true,
+                        onButtonPress: () => _resendLink(context)
+                      ),
+                      SizedBox(height: context.getPercentHeight(2)),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

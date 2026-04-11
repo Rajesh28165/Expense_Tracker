@@ -348,77 +348,6 @@ extension GeneralComponents on BuildContext {
     );
   }
 
-
-  // ------------------ Shadow Box ------------------
-  Widget shadowBox({
-    required String text,
-    double? width,
-    double? height,
-    double fontSize = 18,
-    FontWeight fontWeight = FontWeight.bold,
-    FontStyle fontStyle = FontStyle.italic,
-    Color backgroundColor = Colors.white,
-    Color textColor = Colors.black,
-    VoidCallback? onTap,
-    Gradient? gradient,
-    String header = ""
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        height: getPercentHeight(height ?? 20),
-        width: getPercentWidth(width ?? 30),
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          gradient: gradient,
-          color: backgroundColor,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.3),
-              blurRadius: 15,
-              spreadRadius: 5,
-              offset: const Offset(5, 8),
-            ),
-          ],
-        ),
-        child: Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: getPercentWidth(4),
-            vertical: getPercentHeight(1),
-          ),
-          child: Column(
-            children: [
-              SizedBox(height: getPercentHeight(header == "" ? 0 : 2)),
-              Center(
-                child: Text(
-                  header,
-                  style: TextStyle(
-                    fontSize: fontSize,
-                    fontWeight: fontWeight,
-                    fontStyle: fontStyle,
-                    color: textColor,
-                  ),
-                )
-              ),
-              SizedBox(height: getPercentHeight(header == "" ? 0 : 2)),
-              Text(
-                text,
-                style: TextStyle(
-                  fontSize: fontSize,
-                  fontWeight: fontWeight,
-                  fontStyle: fontStyle,
-                  color: textColor,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-
   // ------------------ Dialog Box ------------------
   Future<void> showCustomDialog({
     String? title,
@@ -427,6 +356,8 @@ extension GeneralComponents on BuildContext {
     VoidCallback? onPressed,
     IconData? icon,
     Color? iconColor,
+    double paddingValue = 6,
+    bool showIcon = true
   }) {
     return showDialog(
       context: this,
@@ -439,7 +370,7 @@ extension GeneralComponents on BuildContext {
           elevation: 0,
           backgroundColor: Colors.transparent,
           child: Container(
-            padding: EdgeInsets.all(getPercentWidth(6)),
+            padding: EdgeInsets.all(getPercentWidth(paddingValue)),
             decoration: BoxDecoration(
               color: WidgetColors.surface,
               borderRadius: BorderRadius.circular(getPercentWidth(5)),
@@ -455,19 +386,20 @@ extension GeneralComponents on BuildContext {
               mainAxisSize: MainAxisSize.min,
               children: [
                 // Icon
-                Container(
-                  width: getPercentWidth(14),
-                  height: getPercentWidth(14),
-                  decoration: BoxDecoration(
-                    color: (iconColor ?? WidgetColors.indigo500).withOpacity(0.1),
-                    shape: BoxShape.circle,
+                if (showIcon)
+                  Container(
+                    width: getPercentWidth(14),
+                    height: getPercentWidth(14),
+                    decoration: BoxDecoration(
+                      color: (iconColor ?? WidgetColors.indigo500).withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      icon ?? Icons.info_outline_rounded,
+                      color: iconColor ?? WidgetColors.indigo500,
+                      size: getPercentWidth(7),
+                    ),
                   ),
-                  child: Icon(
-                    icon ?? Icons.info_outline_rounded,
-                    color: iconColor ?? WidgetColors.indigo500,
-                    size: getPercentWidth(7),
-                  ),
-                ),
                 SizedBox(height: getPercentHeight(2)),
 
                 // Title
@@ -702,7 +634,7 @@ class CommonMethods {
       context.hideLoader(context);
 
       context.showCustomDialog(
-        description: 'A password reset email has been sent to ${user.email}. Please check your inbox and spam folder. After resetting your password, log in again to set up your security question.',
+        description: 'A password reset email has been sent to ${user.email}.\n\nPlease check your inbox and spam folder.\n\nAfter resetting your password, log in again to set up your security question.',
         onPressed: () async {
           Navigator.of(context).pop();
           await context.read<AuthCubit>().logout();
@@ -737,10 +669,10 @@ class CommonMethods {
               ),
               TextButton(
                 onPressed: () async {
-          Navigator.of(context).pop();
-          await context.read<AuthCubit>().logout();
-          context.goTo(RouteName.login);
-        },
+                  Navigator.of(context).pop();
+                  await context.read<AuthCubit>().logout();
+                  context.goTo(RouteName.login);
+                },
                 child: Text(
                   'Sign Out',
                   style: GoogleFonts.dmSans(

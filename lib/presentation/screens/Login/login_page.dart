@@ -73,12 +73,20 @@ class _LoginPageState extends State<LoginPage> {
         body: context.gradientScreen(
           child: BlocConsumer<AuthCubit, AuthState>(
             listener: (context, state) {
-              log.d('currently emitted state is $state');
-              if (!mounted) return;
+              log.d('State on login page: $state');
               if (!context.isOn(RouteName.login)) return;
 
-              if (state is AuthLoading &&
-                  (state.source == 'login' || state.source == 'google')) {
+              // if  (
+              //       state is VerifyLoading || 
+              //       state is VerifySuccess || 
+              //       state is VerifyEmailUnverified || 
+              //       state is VerifyError ||
+              //       state is RegisterLoading ||
+              //       state is RegisterSuccess ||
+              //       state is RegisterError
+              //     ) return;
+
+              if (state is LoginLoading || state is GoogleSignInLoading) {
                 _showLoader(context, 'Signing you in...');
                 return;
               }
@@ -92,19 +100,32 @@ class _LoginPageState extends State<LoginPage> {
               }
 
               if (state is AuthEmailUnverified) {
-                if (!_isLoaderShowing) return;
                 _hideLoader(context);
                 context.pushTo(RouteName.emailVerification, extra: state.email);
                 return;
               }
 
-              if (state is AuthError &&
-                  (state.source == 'login' || state.source == 'google')) {
+              if (state is LoginError) {
                 _hideLoader(context);
                 context.showCustomDialog(description: state.message);
                 context.read<AuthCubit>().resetState();
                 return;
               }
+
+              if (state is GoogleSignInError) {
+                _hideLoader(context);
+                context.showCustomDialog(description: state.message);
+                context.read<AuthCubit>().resetState();
+                return;
+              }
+
+              if (state is AuthError) {
+                _hideLoader(context);
+                context.showCustomDialog(description: state.message);
+                context.read<AuthCubit>().resetState();
+                return;
+              }
+
               if (state is! AuthLoading) {
                 _hideLoader(context);
                 return;

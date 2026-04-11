@@ -21,188 +21,159 @@ class AuthCubit extends Cubit<AuthState> {
   void resetState() => emit(AuthInitial());
 
   void _listenAuthChanges() {
-    _auth.idTokenChanges().listen((user) async {
+  _auth.idTokenChanges().listen((user) async {
+    if (_isRegistering) return;
 
-      if (_isRegistering) return;
-
-      if (user == null) {
-        if (state is! AuthUnauthenticated) {
-          emit(AuthUnauthenticated());
-        }
-        return;
-      }
-
-      final isGoogleUser = user.providerData.any((p) => p.providerId == 'google.com');
-
-      // ✅ Check Firestore FIRST before anything else
-      try {
-        final docRef = _firestore.collection('users').doc(user.uid);
-        final doc = await docRef.get(const GetOptions(source: Source.server));
-
-        if (!doc.exists) {
-          log.d('user is deleted');
-          final source = isGoogleUser ? 'google' : 'login';
-          emit(AuthError('User not registered', source: source));
-          await Future.delayed(const Duration(milliseconds: 500));
-          try {
-            await user.delete();
-          } catch (_) {
-            await _auth.signOut();
-          }
-          return;
-        }
-
-        final data = doc.data()!;
-
-        // ✅ THEN check email verification
-        if (!user.emailVerified && !isGoogleUser) {
-          if (state is! AuthEmailUnverified) {
-            // In stream when email not verified
-            emit(AuthEmailUnverified(email: user.email ?? '', source: 'stream')); // ✅
-          }
-          return;
-        }
-
-        // ✅ User exists in Firestore and email is verified
-        if (state is! AuthAuthenticated) {
-          emit(AuthAuthenticated(
-            uid: user.uid,
-            securityQuestionSelected: data['securityQuestionSelected'] ?? false,
-          ));
-        }
-
-      } catch (_) {
-        emit(AuthError('Failed to load user data'));
-      }
-    });
-  }
-
-
-  Future<void> login(String email, String password) async {
-    emit(AuthLoading(source: 'login'));
-    try {
-      await _auth.signInWithEmailAndPassword(
-        email: email.toLowerCase(), 
-        password: password
-      );
-    } on FirebaseAuthException catch (e) {
-      emit(AuthError(_mapFirebaseError(e), source: 'login'));
-    } catch (_) {
-      emit(AuthError('Something went wrong', source: 'login'));
+    if (user == null) {
+      if (state is! AuthUnauthenticated) emit(AuthUnauthenticated());
+      return;
     }
-  }
 
-  Future<void> register({
-    required String email, 
-    required String password
-  }) async {
-    emit(AuthLoading(source: 'register'));
-    _isRegistering = true;
-    try {
-      final result = await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-
-      final user = result.user!;
-
-      try {
-        await user.sendEmailVerification();
-      } catch (e) {
-        await user.delete();
-        emit(AuthError('Could not send verification email.', source: 'register'));
-        return;
-      }
-
-      final appUser = AppUser(
-        uid: user.uid,
-        email: email,
-        authProvider: 'email',
-        hasAppPassword: true,
-        securityQuestionSelected: false,
-        createdAt: DateTime.now(),
-      );
-
-      await _firestore.collection('users').doc(user.uid).set(appUser.toMap());
-
-      emit(AuthEmailUnverified(email: email, source: 'register'));
-
-    } on FirebaseAuthException catch (e) {
-      emit(AuthError(_mapFirebaseError(e), source: 'register'));
-    } catch (_) {
-      emit(AuthError('Registration failed', source: 'register'));
-    } finally {
-      _isRegistering = false; // ✅ reset flag
-    }
-  }
-
-  Future<void> signInWithGoogle() async {
-    emit(AuthLoading(source: 'google'));
-    try {
-      final googleUser = await _googleSignIn.signIn();
-      if (googleUser == null) { 
-        emit(AuthInitial());
-        return; 
-      }
-      final googleAuth = await googleUser.authentication;
-      final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken, 
-        idToken: googleAuth.idToken
-      );
-      await _auth.signInWithCredential(credential);
-    } on FirebaseAuthException catch (e) {
-      emit(AuthError(_mapFirebaseError(e), source: 'google'));
-    } catch (_) {
-      emit(AuthError('Google sign-in failed', source: 'google'));
-    }
-  }
-
-
-  Future<void> checkEmailVerified() async {
-    emit(AuthLoading(source: 'verify'));
+    final isGoogleUser = user.providerData.any((p) => p.providerId == 'google.com');
 
     try {
-      final user = _auth.currentUser;
-
-      if (user == null) {
-        emit(AuthUnauthenticated());
-        return;
-      }
-
-      await user.reload();
-      final refreshedUser = _auth.currentUser;
-
-      if (refreshedUser == null) {
-        emit(AuthUnauthenticated());
-        return;
-      }
-
-      if (!refreshedUser.emailVerified) {
-        emit(AuthEmailUnverified(email: refreshedUser.email ?? '', source: 'verify'));
-        return;
-      }
-
-      final doc = await _firestore
-          .collection('users')
-          .doc(refreshedUser.uid)
-          .get();
+      final docRef = _firestore.collection('users').doc(user.uid);
+      final doc = await docRef.get(const GetOptions(source: Source.server));
 
       if (!doc.exists) {
-        emit(AuthError('User data not found', source: 'verify'));
+        log.d('user is deleted');
+        emit(AuthError('User not registered'));
+        await Future.delayed(const Duration(milliseconds: 500));
+        try {
+          await user.delete();
+        } catch (_) {
+          await _auth.signOut();
+        }
         return;
       }
 
       final data = doc.data()!;
 
-      emit(AuthAuthenticated(
-        uid: refreshedUser.uid,
-        securityQuestionSelected: data['securityQuestionSelected'] ?? false,
-      ));
+      if (!user.emailVerified && !isGoogleUser) {
+        if (state is! AuthEmailUnverified) {
+          emit(AuthEmailUnverified(email: user.email ?? ''));
+        }
+        return;
+      }
 
+      if (state is! AuthAuthenticated) {
+        emit(AuthAuthenticated(
+          uid: user.uid,
+          securityQuestionSelected: data['securityQuestionSelected'] ?? false,
+        ));
+      }
     } catch (_) {
-      emit(AuthError('Something went wrong', source: 'verify'));
+      emit(AuthError('Failed to load user data'));
     }
+  });
+}
+
+
+  Future<void> login(String email, String password) async {
+  emit(LoginLoading());
+  try {
+    await _auth.signInWithEmailAndPassword(
+      email: email.toLowerCase(),
+      password: password,
+    );
+    // ✅ LoginSuccess emitted by stream via AuthAuthenticated
+    // LoginPage listens to AuthAuthenticated for navigation
+  } on FirebaseAuthException catch (e) {
+    emit(LoginError(_mapFirebaseError(e)));
+  } catch (_) {
+    emit(LoginError('Something went wrong'));
   }
+}
+
+Future<void> register({required String email, required String password}) async {
+  emit(RegisterLoading());
+  _isRegistering = true;
+  try {
+    final result = await _auth.createUserWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+
+    final user = result.user!;
+
+    try {
+      await user.sendEmailVerification();
+    } catch (e) {
+      await user.delete();
+      emit(RegisterError('Could not send verification email.'));
+      return;
+    }
+
+    final appUser = AppUser(
+      uid: user.uid,
+      email: email,
+      authProvider: 'email',
+      hasAppPassword: true,
+      securityQuestionSelected: false,
+      createdAt: DateTime.now(),
+    );
+
+    await _firestore.collection('users').doc(user.uid).set(appUser.toMap());
+    emit(RegisterSuccess(email: email));
+
+  } on FirebaseAuthException catch (e) {
+    emit(RegisterError(_mapFirebaseError(e)));
+  } catch (_) {
+    emit(RegisterError('Registration failed'));
+  } finally {
+    _isRegistering = false;
+  }
+}
+
+Future<void> signInWithGoogle() async {
+  emit(GoogleSignInLoading());
+  try {
+    final googleUser = await _googleSignIn.signIn();
+    if (googleUser == null) {
+      emit(AuthInitial());
+      return;
+    }
+    final googleAuth = await googleUser.authentication;
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+    await _auth.signInWithCredential(credential);
+    // ✅ Navigation handled by stream via AuthAuthenticated
+  } on FirebaseAuthException catch (e) {
+    emit(GoogleSignInError(_mapFirebaseError(e)));
+  } catch (_) {
+    emit(GoogleSignInError('Google sign-in failed'));
+  }
+}
+
+Future<void> checkEmailVerified() async {
+  emit(VerifyLoading());
+  try {
+    final user = _auth.currentUser;
+    if (user == null) { emit(AuthUnauthenticated()); return; }
+
+    await user.reload();
+    final refreshedUser = _auth.currentUser;
+    if (refreshedUser == null) { emit(AuthUnauthenticated()); return; }
+
+    if (!refreshedUser.emailVerified) {
+      emit(VerifyEmailUnverified(email: refreshedUser.email ?? ''));
+      return;
+    }
+
+    final doc = await _firestore.collection('users').doc(refreshedUser.uid).get();
+    if (!doc.exists) { emit(VerifyError('User data not found')); return; }
+
+    final data = doc.data()!;
+    emit(VerifySuccess(
+      uid: refreshedUser.uid,
+      securityQuestionSelected: data['securityQuestionSelected'] ?? false,
+    ));
+  } catch (_) {
+    emit(VerifyError('Something went wrong'));
+  }
+}
 
 
   Future<String?> resendVerificationEmail() async {

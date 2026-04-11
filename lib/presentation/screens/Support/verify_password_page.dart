@@ -6,7 +6,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../constants/app_constants.dart';
 import '../../../logic/auth/auth_cubit.dart';
 import '../../../router/route_name.dart';
-import '../../../util/colors.dart';
 import '../../components/allFields.dart';
 import 'package:kharchasutra/constants/extension.dart';
 import 'package:kharchasutra/presentation/widgets/generalComponents.dart';
@@ -74,7 +73,13 @@ class _VerifyPasswordPageState extends State<VerifyPasswordPage> {
 
   void _forgotPassword(BuildContext context) {
     if (widget.count >= 2) {
-      CommonMethods.handleFullForgot(context);
+      context.showCustomDialog(
+        description: '${AppConstants.Password_reset_link_header}\n\n${AppConstants.Password_reset_link_warning}\n\n${AppConstants.Password_rule}\n\n${AppConstants.Password_note}',
+        onPressed: () => CommonMethods.handleFullForgot(context),
+        paddingValue: 4,
+        showIcon: false,
+        buttonText: 'Proceed'
+      );
     } else {
       context.pushTo(RouteName.verifySecurityQuestion, extra: {
         'purpose': widget.purpose,
@@ -99,7 +104,7 @@ class _VerifyPasswordPageState extends State<VerifyPasswordPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(height: context.getPercentHeight(6)),
+                    SizedBox(height: context.getPercentHeight(1)),
 
                     const Text(
                       "Please verify your current password to continue",
@@ -122,7 +127,7 @@ class _VerifyPasswordPageState extends State<VerifyPasswordPage> {
                     Align(
                       alignment: Alignment.centerRight,
                       child: context.textedButton(
-                        text: 'Forgot Password?',
+                        text: 'Forgot Password',
                         textUnderline: true,
                         onButtonPress: () => _forgotPassword(context),
                       ),

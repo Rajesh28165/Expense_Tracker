@@ -25,7 +25,7 @@ class _RegisterationPageState extends State<RegisterationPage> {
   final pswdRegex = RegExp(RegexConstants.PASSWORD_PATTERN);
 
   bool _isButtonEnabled = false;
-  bool _isLoaderShowing = false; // ✅ Add this
+  bool _isLoaderShowing = false;
 
   void _showLoader(BuildContext context, String text) {
     if (_isLoaderShowing) return;
@@ -119,17 +119,16 @@ class _RegisterationPageState extends State<RegisterationPage> {
       body: context.gradientScreen(
         child: BlocConsumer<AuthCubit, AuthState>(
           listener: (context, state) {
-            log.d('statee2 is $state');
+            log.d('State on Registration page: $state');
             if (!context.isOn(RouteName.registeration)) return;
 
-            if (state is AuthLoading && state.source == 'register') {
+            if (state is RegisterLoading) {
               _showLoader(context, 'Creating account...');
               return;
             }
 
-            if (state is AuthError && state.source == 'register') {
+            if (state is RegisterError) {
               _hideLoader(context);
-
               context.showCustomDialog(
                 description: state.message,
                 onPressed: () => context.read<AuthCubit>().resetState(),
@@ -137,26 +136,18 @@ class _RegisterationPageState extends State<RegisterationPage> {
               return;
             }
 
-            if (state is AuthEmailUnverified) {
-              if (state.source != 'register') return;
+            if (state is RegisterSuccess) {
               _hideLoader(context);
-
               context.pushTo(
                 RouteName.emailVerification,
-                extra: _emailController.text.trim(),
+                extra: state.email,
               );
               return;
             }
 
-            // if (state is AuthAuthenticated) {
-            //   _hideLoader(context);
-
-            //   state.securityQuestionSelected
-            //       ? context.goTo(RouteName.navigation)
-            //       : context.goTo(RouteName.security);
-            //   return;
-            // }
-            if (state is AuthAuthenticated) return;
+            if (state is AuthAuthenticated) {
+              return;
+            } 
           },
           builder: (context, state) {
             return Stack(

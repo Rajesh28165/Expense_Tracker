@@ -110,7 +110,13 @@ class _VerifySecurityQuestionPageState extends State<VerifySecurityQuestionPage>
 
   void _forgotSecurityQuestion(BuildContext context) {
     if (widget.count >= 2) {
-      CommonMethods.handleFullForgot(context);
+      context.showCustomDialog(
+        description: '${AppConstants.Password_reset_link_header}\n\n${AppConstants.Password_reset_link_warning}\n\n${AppConstants.Password_rule}\n\n${AppConstants.Password_note}',
+        onPressed: () => CommonMethods.handleFullForgot(context),
+        paddingValue: 4,
+        showIcon: false,
+        buttonText: 'Proceed'
+      );
     } else {
       context.pushTo(RouteName.verifyPassword, extra: {
         'purpose': widget.purpose,
@@ -142,7 +148,6 @@ class _VerifySecurityQuestionPageState extends State<VerifySecurityQuestionPage>
                     SizedBox(height: context.getPercentHeight(5)),
                     Text('Security question', style: AppStyles.labelStyle()),
                     SizedBox(height: context.getPercentHeight(1)),
-                    // ── Question picker ──────────────────────
                     GestureDetector(
                       onTap: () {
                         context.showSecurityQuestionPicker(
@@ -188,7 +193,7 @@ class _VerifySecurityQuestionPageState extends State<VerifySecurityQuestionPage>
                       ),
                     ),
                     SizedBox(height: context.getPercentHeight(4)),
-                    // ── Forgot link ──────────────────────────
+                    
                     
                     BaseTextField(
                       labelText: 'Security answer',
@@ -200,7 +205,7 @@ class _VerifySecurityQuestionPageState extends State<VerifySecurityQuestionPage>
                     Align(
                       alignment: Alignment.centerRight,
                       child: context.textedButton(
-                        text: 'Forgot Security Question & Answer?',
+                        text: 'Forgot Security Question & Answer',
                         textUnderline: true,
                         onButtonPress: () =>_forgotSecurityQuestion(context),
                       ),
