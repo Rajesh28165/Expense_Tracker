@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../router/route_name.dart';
+import '../../../router/route_name.dart';
 
 class NavigationPage extends StatelessWidget {
   final Widget child;

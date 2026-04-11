@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:expense_tracker/data/models/txn_model.dart';
+import 'package:kharchasutra/data/models/txn_model.dart';
 
 class IncomeModel implements TransactionModel {
   final String id;

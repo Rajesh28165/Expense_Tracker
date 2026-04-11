@@ -3,7 +3,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 /// Represents application-level user data stored in Firestore
 class AppUser {
   final String uid;
-  final String fullName;
   final String email;
 
   /// auth provider used to create account
@@ -22,7 +21,6 @@ class AppUser {
 
   AppUser({
     required this.uid,
-    required this.fullName,
     required this.email,
     required this.authProvider,
     required this.hasAppPassword,
@@ -35,7 +33,6 @@ class AppUser {
   /// Convert model → Firestore map
   Map<String, dynamic> toMap() {
     return {
-      'fullName': fullName,
       'email': email,
       'authProvider': authProvider,
       'hasAppPassword': hasAppPassword,
@@ -50,7 +47,6 @@ class AppUser {
   factory AppUser.fromMap(String uid, Map<String, dynamic> map) {
     return AppUser(
       uid: uid,
-      fullName: map['fullName'] ?? '',
       email: map['email'] ?? '',
       authProvider: map['authProvider'] ?? 'email',
       hasAppPassword: map['hasAppPassword'] ?? true,

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../constants/app_constants.dart';
-import '../../../util/colors.dart';
-import 'package:expense_tracker/constants/extension.dart';
-import 'package:expense_tracker/presentation/widgets/generalComponents.dart';
-import '../../logic/auth/auth_cubit.dart';
-import '../../logic/auth/auth_state.dart';
-import '../../router/route_name.dart';
-import '../components/allFields.dart';
+import '../../../../constants/app_constants.dart';
+import '../../../../util/colors.dart';
+import 'package:kharchasutra/constants/extension.dart';
+import 'package:kharchasutra/presentation/widgets/generalComponents.dart';
+import '../../../logic/auth/auth_cubit.dart';
+import '../../../logic/auth/auth_state.dart';
+import '../../../router/route_name.dart';
+import '../../components/allFields.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -24,6 +24,19 @@ class _LoginPageState extends State<LoginPage> {
   final pswdRegex = RegExp(RegexConstants.PASSWORD_PATTERN);
 
   bool _isButtonEnabled = false;
+  bool _isLoaderShowing = false;
+
+  void _showLoader(BuildContext context, String text) {
+    if (_isLoaderShowing) return;
+    _isLoaderShowing = true;
+    context.showLoader(text: text);
+  }
+
+  void _hideLoader(BuildContext context) {
+    if (!_isLoaderShowing) return;
+    _isLoaderShowing = false;
+    context.hideLoader(context);
+  }
 
   @override
   void initState() {
@@ -53,37 +66,55 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: context.customAppBar(title: 'Login'),
-      body: context.gradientScreen(
-        child: BlocConsumer<AuthCubit, AuthState>(
-          listener: (context, state) {
-            if (state is AuthLoading) {
-              context.showLoader(text: 'Signing you in...');
-            } else {
-              context.hideLoader(context);
-            }
+    return WillPopScope(
+      onWillPop: null,
+      child: Scaffold(
+        appBar: context.customAppBar(title: 'Login', showBackButton: false),
+        body: context.gradientScreen(
+          child: BlocConsumer<AuthCubit, AuthState>(
+            listener: (context, state) {
+              log.d('currently emitted state is $state');
+              if (!mounted) return;
+              if (!context.isOn(RouteName.login)) return;
 
-            if (state is AuthAuthenticated) {
-              if (state.securityQuestionSelected) {
-                context.goTo(RouteName.dashboard);
-              } else {
-                context.goTo(RouteName.security);
+              if (state is AuthLoading &&
+                  (state.source == 'login' || state.source == 'google')) {
+                _showLoader(context, 'Signing you in...');
+                return;
               }
-            }
 
-            if (state is AuthError) {
-              context.showCustomDialog(description: state.message);
-            }
-          },
-          builder: (context, state) {
-            final isLoading = state is AuthLoading;
+              if (state is AuthAuthenticated) {
+                _hideLoader(context);
+                state.securityQuestionSelected
+                  ? context.goTo(RouteName.dashboard)
+                  : context.goTo(RouteName.security);
+                return;
+              }
 
-            return Stack(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Column(
+              if (state is AuthEmailUnverified) {
+                if (!_isLoaderShowing) return;
+                _hideLoader(context);
+                context.pushTo(RouteName.emailVerification, extra: state.email);
+                return;
+              }
+
+              if (state is AuthError &&
+                  (state.source == 'login' || state.source == 'google')) {
+                _hideLoader(context);
+                context.showCustomDialog(description: state.message);
+                context.read<AuthCubit>().resetState();
+                return;
+              }
+              if (state is! AuthLoading) {
+                _hideLoader(context);
+                return;
+              }
+            },
+
+            builder: (context, state) {    
+              return Stack(
+                children: [
+                  Column(
                     children: [
                       Expanded(
                         child: SingleChildScrollView(
@@ -107,7 +138,7 @@ class _LoginPageState extends State<LoginPage> {
                                 style: TextStyle(
                                   fontSize: 20,
                                   fontFamily: AppConstants.Roboto,
-                                  color: WidgetColors.activeCta,
+                                  color: WidgetColors.activeGreen,
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),
@@ -128,7 +159,6 @@ class _LoginPageState extends State<LoginPage> {
                                 children: [
                                   context.textedButton(
                                     text: "Forgot password",
-                                    textColor: Colors.white,
                                     onButtonPress: () => context.pushTo(RouteName.forgotPassword),
                                   ),
                                 ],
@@ -142,21 +172,24 @@ class _LoginPageState extends State<LoginPage> {
                           children: [
                             SizedBox(height: context.getPercentHeight(1)),
                             context.navigationButton(
-                              height: 6,
-                              width: 100,
                               text: "Signin with Google",
+                              activeTextColor: Colors.black,
                               activeBgColor: Colors.white,
                               borderColor: Colors.black,
-                              canNavigate: !isLoading,
-                              onBtnPress: () => context.read<AuthCubit>().signInWithGoogle(),
-                              iconWidget: Image.asset(ImagePathConstants.googleIcon),
+                              canNavigate: true,
+                              onBtnPress: context.read<AuthCubit>().signInWithGoogle,
+                              iconWidget: SizedBox(
+                                width: context.getPercentWidth(8),
+                                height: context.getPercentHeight(2.5),
+                                child: Image.asset(
+                                  ImagePathConstants.googleIcon,
+                                  fit: BoxFit.cover
+                                ),
+                              ),
                             ),
-                            SizedBox(height: context.getPercentHeight(1)),
                             context.navigationButton(
-                              height: 6,
-                              width: 100,
                               text: "Login",
-                              canNavigate: _isButtonEnabled && !isLoading,
+                              canNavigate: _isButtonEnabled,
                               onBtnPress: () {
                                 context.read<AuthCubit>().login(
                                   emailController.text.trim(),
@@ -164,10 +197,8 @@ class _LoginPageState extends State<LoginPage> {
                                 );
                               },
                             ),
-                            SizedBox(height: context.getPercentHeight(1)),
                             context.textedButton(
                               text: "Don’t have an account? Register",
-                              textColor: Colors.white,
                               textUnderline: true,
                               onButtonPress: () => context.pushTo(RouteName.registeration),
                             )
@@ -176,10 +207,10 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ],
                   ),
-                ),
-              ],
-            );
-          },
+                ],
+              );
+            },
+          ),
         ),
       ),
     );

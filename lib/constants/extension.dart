@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:expense_tracker/util/logger.dart';
+import 'package:kharchasutra/util/logger.dart';
 
 final log = logger(BuildContext);
 
@@ -13,9 +13,9 @@ extension BuildContextExtensionFunctions on BuildContext {
   double getPercentHeight(double percentage) => getHeight() * percentage * 0.01;
 
   // ---------- GoRouter Navigation ----------
-  void goTo(String route) {
+  void goTo(String route, {Object? extra}) {
     try {
-      go(route);
+      go(route, extra: extra);
     } catch (e) {
       log.e("GoRouter goTo failed → $route | $e");
     }

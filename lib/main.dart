@@ -1,10 +1,11 @@
-import 'package:expense_tracker/router/route_path.dart';
+import 'package:kharchasutra/router/route_path.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 
+import 'constants/app_constants.dart';
 import 'data/repositories/income_repository.dart';
 import 'logic/auth/auth_cubit.dart';
 import 'logic/expense/expense_cubit.dart';
@@ -43,12 +44,12 @@ class MyApp extends StatelessWidget {
       ],
       child: Builder(
         builder: (context) {
-          final GoRouter router = createRouter(context);
+          // final GoRouter router = createRouter(context);
 
           return MaterialApp.router(
             debugShowCheckedModeBanner: false,
-            title: 'HISABKITAB',
-            routerConfig: router,
+            title: AppConstants.appName,
+            routerConfig: createRouter(context),
           );
         },
       ),

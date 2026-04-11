@@ -1,4 +1,4 @@
-import 'package:expense_tracker/util/logger.dart';
+import 'package:kharchasutra/util/logger.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../data/models/expense_model.dart';
 import '../../data/repositories/expense_repository.dart';

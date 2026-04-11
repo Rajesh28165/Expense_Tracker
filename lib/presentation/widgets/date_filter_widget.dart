@@ -1,5 +1,5 @@
-import 'package:expense_tracker/constants/extension.dart';
-import 'package:expense_tracker/presentation/widgets/generalComponents.dart';
+import 'package:kharchasutra/constants/extension.dart';
+import 'package:kharchasutra/presentation/widgets/generalComponents.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -106,7 +106,7 @@ class _DateFilterWidgetState extends State<DateFilterWidget> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
 
-        /// ✅ FIXED DROPDOWN (USES YOUR COMPONENT)
+        /// FIXED DROPDOWN (USES YOUR COMPONENT)
         context.customDropdown<DateFilterType>(
           menuItems: DateFilterType.values,
           value: selected,
@@ -147,8 +147,6 @@ class _DateFilterWidgetState extends State<DateFilterWidget> {
           context.navigationButton(
             text: "Fetch Data",
             canNavigate: true,
-            height: 6,
-            width: 100,
             onBtnPress: _applyCustom,
           ),
         ],

@@ -1,94 +1,99 @@
 import 'package:flutter/material.dart';
 
 class WidgetColors {
-  static const borderBlueCard = Color(0xff0060EB);
-  static const greyBorder = Color(0x70707027);
-  static const greyResetPassword = Color(0xff585858);
-  static const darkRed = Color(0xffAF1D28);
-  static const nobel = Color(0xff9B9B9B);
-  static const shadowBlack_19 = Color(0x19000000);
-  static const cyanBlue = Color(0xff092D74);
-  static const silver = Color(0xffBEBBBB);
-  static const blue = Color(0xff2A7DBB);
-  static const orange = Color.fromRGBO(226, 140, 11, 1);
-  static const radicalRed = Color(0xffFF4856);
-  static const darkPink = Color(0xffBB0439);
-  static const dimGray = Color(0xff626262);
-  static const whiteSmoke = Color(0xffF4F4F4);
-  static const geminiGray = Color(0xff707070);
-  static const grey = Color(0xff888888);
-  static const gray_86 = Color(0xff868686);
-  static const gray_91 = Color(0xffE8E8E8);
-  static const gray_93 = Color(0xffEDEDED);
-  static const gray_94 = Color(0xfff0f0f0);
-  static const red = Color(0xffB42826);
-  static const textBlack = Color(0xff2F2F2F);
-  static const white = Color(0xffffffff);
-  static const black = Color(0xff000000);
-  static const activeCta = Color(0xff08B578);
-  static const checkBoxTextColor = Color(0xff484848);
-  static const ellipseActive = Color(0x00000000);
-  static const ellipseDeactive = Color(0x00a0a0a0);
-  static const greyCurrentPhoneNumberText = Color(0xff918E8E);
-  static const greyDisabledTextColor = Color(0xff9a9a9a);
-  static const greyShadow = Color(0x00000019);
+  // ── Brand / legacy ────────────────────────────────────────
+  static const borderBlueCard = Color(0xFF0060EB);
+  static const blue           = Color(0xFF2A7DBB);
+  static const orange         = Color(0xFFE28C0B);
+  static const radicalRed     = Color(0xFFFF4856);
+  static const darkPink       = Color(0xFFBB0439);
+  static const grey           = Color(0xFF888888);
+  static const gray_86        = Color(0xFF868686);
+  static const white          = Color(0xFFFFFFFF);
+  static const black          = Color(0xFF000000);
+  static const activeGreen    = Color(0xFF08B578);
+  static const greenColorCard = Color(0xFF64B472);
 
+  // ── Semantic ──────────────────────────────────────────────
+  static const green      = Color(0xFF16A34A);
+  static const greenBg    = Color(0xFFDCFCE7);
+  static const greenGlow  = Color(0xFF4ADE80);
+  static const red        = Color(0xFFDC2626);
+  static const redBg      = Color(0xFFFEE2E2);
+  static const redGlow    = Color(0xFFF87171);
 
-  //rediness card colors
-  static const greenColorCard = Color(0xff64b472);
-  static const redColorCard = Color(0xffC76B6B);
-  static const blueGradientColor = Color(0xff092C74);
-  static const boxGradientColor = Color(0X00000029);
+  // ── Neutral ───────────────────────────────────────────────
+  static const ink        = Color(0xFF0F1117);
+  static const ink2       = Color(0xFF6B7280);
+  static const ink3       = Color(0xFF9CA3AF);
+  static const page       = Color(0xFFF0F2F8);
+  static const surface    = Color(0xFFFFFFFF);
+  static const opacWhite  = Color(0x73FFFFFF);
+
+  // ── brand ────────────────────────────────────────
+  static const indigo600  = Color(0xFF4338CA);
+  static const indigo500  = Color(0xFF4F46E5);
+  static const indigo400  = Color(0xFF6366F1);
+  static const indigoBg   = Color(0xFFEEF2FF);
+
+  static const teal       = Color(0xFF0D9488);
+  static const deepPurple = Color(0xFF7C3AED);
+  static const pink       = Color(0xFFDB2777);
+  static const amber      = Color(0xFFD97706);
+
+  // ── Balance card ──────────────────────────────────────────
+  static const balanceGreen = Color(0xFF4ADE80);
+  static const balanceRed   = Color(0xFFF87171);
+  static const darkCard     = Color(0xFF0F172A);
+
+  // ── Category icon backgrounds ─────────────────────────────
+  static const catBgFood          = Color(0xFFFFF7ED);
+  static const catBgTransport     = Color(0xFFEFF6FF);
+  static const catBgShopping      = Color(0xFFFDF4FF);
+  static const catBgEntertainment = Color(0xFFF0FDF4);
+  static const catBgBills         = Color(0xFFFEFCE8);
+  static const catBgHealth        = Color(0xFFFFF1F2);
+  static const catBgSalary        = Color(0xFFEFF6FF);
+  static const catBgFreelance     = Color(0xFFEEF2FF);
+  static const catBgBusiness      = Color(0xFFF0FDF4);
+  static const catBgInvestment    = Color(0xFFECFDF5);
+  static const catBgGift          = Color(0xFFFDF4FF);
+  static const catBgBonus         = Color(0xFFFEFCE8);
+  static const catBgOther         = Color(0xFFF8F8F8);
+
+  // ── Date/time picker icon backgrounds ────────────────────
+  static const dateIconBg  = Color(0xFFFFF7ED);
+  static const dateIconFg  = Color(0xFFF97316);
+  static const timeIconBg  = Color(0xFFEFF6FF);
+  static const timeIconFg  = Color(0xFF3B82F6);
+
+  // ── Filter chip ───────────────────────────────────────────
+  static const chipInactive       = Color(0xFFF8F8F8);
+  static const chipInactiveBorder = Color(0xFFF1F1F1);
+
+  // ── Card divider / border ─────────────────────────────────
+  static const cardBorder    = Color(0xFFF5F5F5);
+  static const dividerColor  = Color(0xFFF1F1F1);
 }
+
 
 class CategoryColorHelper {
   static Color getColor(String category) {
     switch (category.toLowerCase()) {
-
-      /// ===== EXPENSE COLORS =====
-      case 'food':
-        return WidgetColors.orange;
-
-      case 'transport':
-        return WidgetColors.blue;
-
-      case 'shopping':
-        return WidgetColors.darkPink;
-
-      case 'entertainment':
-        return WidgetColors.radicalRed;
-
-      case 'bills':
-        return WidgetColors.borderBlueCard;
-
-      case 'health':
-        return WidgetColors.greenColorCard;
-
-      /// ===== INCOME COLORS =====
-
-      case 'salary':
-        return Colors.green.shade600;
-
-      case 'freelance':
-        return Colors.teal;
-
-      case 'business':
-        return Colors.indigo;
-
-      case 'investment':
-        return Colors.deepPurple;
-
-      case 'gift':
-        return Colors.pink;
-
-      case 'bonus':
-        return Colors.amber.shade700;
-
-      /// ===== COMMON =====
+      case 'food':          return WidgetColors.orange;
+      case 'transport':     return WidgetColors.blue;
+      case 'shopping':      return WidgetColors.darkPink;
+      case 'entertainment': return WidgetColors.radicalRed;
+      case 'bills':         return WidgetColors.borderBlueCard;
+      case 'health':        return WidgetColors.greenColorCard;
+      case 'salary':        return WidgetColors.green;
+      case 'freelance':     return WidgetColors.teal;
+      case 'business':      return WidgetColors.indigo600;
+      case 'investment':    return WidgetColors.deepPurple;
+      case 'gift':          return WidgetColors.pink;
+      case 'bonus':         return WidgetColors.amber;
       case 'other':
-      default:
-        return WidgetColors.grey;
+      default:              return WidgetColors.grey;
     }
   }
 }
-

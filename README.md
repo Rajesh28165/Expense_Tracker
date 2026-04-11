@@ -1,4 +1,4 @@
-# expense_tracker
+# kharchasutra
 
 A new Flutter project.
 

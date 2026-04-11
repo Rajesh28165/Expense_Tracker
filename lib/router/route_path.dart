@@ -1,21 +1,25 @@
-import 'package:expense_tracker/presentation/screens/verify_password_page.dart';
+import 'package:kharchasutra/presentation/screens/Support/verify_password_page.dart';
+import 'package:kharchasutra/presentation/screens/Support/verify_security_question_page.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../constants/app_constants.dart';
 import '../logic/auth/auth_cubit.dart';
 import '../logic/auth/auth_state.dart';
-import '../presentation/screens/add_txn_page.dart';
-import '../presentation/screens/forgot_password.dart';
-import '../presentation/screens/login_page.dart';
-import '../presentation/screens/registeration_page.dart';
-import '../presentation/screens/reset_password.dart';
-import '../presentation/screens/security_page.dart';
-import '../presentation/screens/dashboard_page.dart';
-import '../presentation/screens/profile_page.dart';
-import '../presentation/screens/navigation_page.dart';
-import '../presentation/screens/show_txn_page.dart';
-import '../presentation/screens/txn_report.dart';
+import '../presentation/screens/Contents/add_txn_page.dart';
+import '../presentation/screens/Registration/email_verification_page.dart';
+import '../presentation/screens/Login/forgot_password.dart';
+import '../presentation/screens/Login/login_page.dart';
+import '../presentation/screens/Registration/registeration_page.dart';
+import '../presentation/screens/Support/reset_password.dart';
+import '../presentation/screens/Registration/security_page.dart';
+import '../presentation/screens/Contents/dashboard_page.dart';
+import '../presentation/screens/Support/profile_page.dart';
+import '../presentation/screens/Contents/navigation_page.dart';
+import '../presentation/screens/Contents/show_txn_page.dart';
+import '../presentation/screens/Support/support_page.dart';
+import '../presentation/screens/Contents/txn_report.dart';
 import 'route_name.dart';
 
 GoRouter createRouter(BuildContext context) {
@@ -25,13 +29,15 @@ GoRouter createRouter(BuildContext context) {
     redirect: (context, state) {
       final authState = context.read<AuthCubit>().state;
       final isLoggedIn = authState is AuthAuthenticated;
+      final isEmailUnverified = authState is AuthEmailUnverified;
 
       final isAuthRoute = 
         state.matchedLocation == RouteName.login ||
         state.matchedLocation == RouteName.registeration ||
-        state.matchedLocation == RouteName.forgotPassword;
+        state.matchedLocation == RouteName.forgotPassword ||
+        state.matchedLocation == RouteName.emailVerification;
 
-      if (!isLoggedIn && !isAuthRoute) {
+      if (!isLoggedIn && !isEmailUnverified && !isAuthRoute) {
         return RouteName.login;
       }
 
@@ -57,6 +63,13 @@ GoRouter createRouter(BuildContext context) {
       GoRoute(
         path: RouteName.forgotPassword,
         builder: (_, __) => const ForgotPasswordPage(),
+      ),
+
+      GoRoute(
+        path: RouteName.emailVerification,
+        builder: (context, state) => EmailVerificationPage(
+          email: state.extra as String
+        ),
       ),
 
 
@@ -109,13 +122,35 @@ GoRouter createRouter(BuildContext context) {
       ),
 
       GoRoute(
+        path: RouteName.verifySecurityQuestion,
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          return VerifySecurityQuestionPage(
+            purpose: extra?['purpose'] as String? ?? AppConstants.purposeUpdateSecurityQA,
+            count:   extra?['count'] as int? ?? 1,
+          );
+        },
+      ),
+
+      GoRoute(
         path: RouteName.verifyPassword,
-        builder: (_, __) => const VerifyPasswordPage(),
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          return VerifyPasswordPage(
+            purpose: extra?['purpose'] as String? ?? AppConstants.purposeUpdatePassword,
+            count:   extra?['count'] as int? ?? 1,
+          );
+        },
       ),
 
       GoRoute(
         path: RouteName.resetPassword,
         builder: (_, __) => const ResetPasswordPage(),
+      ),
+
+      GoRoute(
+        path: RouteName.support,
+        builder: (_, __) => const SupportPage(),
       ),
     ],
   );

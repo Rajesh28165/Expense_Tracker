@@ -5,8 +5,7 @@ import 'baseField.dart';
 
 // All Fields
 // 1) Email Text Field
-// 2) Phone Number Field
-// 3) Password Field
+// 2) Password Field
 
 class EmailTextField extends StatelessWidget {
   final TextEditingController controller;
@@ -78,65 +77,6 @@ class EmailTextField extends StatelessWidget {
     return null;
   }
 }
-
-
-// ---------------------------------------------------------------------------------------------------------------------------------
-
-class PhoneNumberTextField extends StatelessWidget {
-  final String? labelText, hintText;
-  final int? maxInputLength;
-  final bool? autofocus;
-  final TextEditingController controller;
-  final Function(String)? onChanged;
-  final FormFieldValidator<String>? validator;
-  final TextInputType? keyboardType;
-  final double rightGapWidth;
-
-  const PhoneNumberTextField({
-    super.key,
-    required this.controller,
-    this.labelText, 
-    this.hintText,
-    this.autofocus,
-    this.validator,
-    this.onChanged,
-    this.maxInputLength,
-    this.keyboardType, 
-    this.rightGapWidth=5
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return BaseTextField(
-      controller: controller,
-      labelText: labelText ?? 'Phone Number',
-      hintText: hintText ?? 'Enter your phone number',
-      autofocus: autofocus ?? false,
-      keyboardType: keyboardType ?? TextInputType.number,
-      maxInputLength: maxInputLength ?? 10,
-      validator: validator ?? _validatePhoneNumber,
-      allowedExpression: RegexConstants.DIGIT,
-    );
-  }
-
-  // ================= VALIDATION =================
-
-  static String? _validatePhoneNumber(String? value) {
-    final digits = value
-        ?.replaceAll(RegExp(RegexConstants.NON_NUMERIC), '');
-
-    if (digits == null || digits.length != 10) {
-      return 'Phone number must be exactly 10 digits';
-    }
-
-    if (digits.startsWith('0')) {
-      return 'Phone number cannot start with 0';
-    }
-
-    return null;
-  }
-}
-
 
 
 // ---------------------------------------------------------------------------------------------------------------------------------

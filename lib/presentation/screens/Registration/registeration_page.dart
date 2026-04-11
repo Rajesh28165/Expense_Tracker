@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../constants/app_constants.dart';
-import '../../logic/auth/auth_cubit.dart';
-import '../../logic/auth/auth_state.dart';
-import '../../router/route_name.dart';
-import '../../util/colors.dart';
-import '../components/allFields.dart';
-import '../components/baseField.dart';
-import 'package:expense_tracker/constants/extension.dart';
-import 'package:expense_tracker/presentation/widgets/generalComponents.dart';
+import '../../../constants/app_constants.dart';
+import '../../../logic/auth/auth_cubit.dart';
+import '../../../logic/auth/auth_state.dart';
+import '../../../router/route_name.dart';
+import '../../../util/colors.dart';
+import '../../components/allFields.dart';
+import 'package:kharchasutra/constants/extension.dart';
+import 'package:kharchasutra/presentation/widgets/generalComponents.dart';
 
 class RegisterationPage extends StatefulWidget {
   const RegisterationPage({super.key});
@@ -18,7 +17,6 @@ class RegisterationPage extends StatefulWidget {
 }
 
 class _RegisterationPageState extends State<RegisterationPage> {
-  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _pswdController = TextEditingController();
   final _cnfmPswdController = TextEditingController();
@@ -27,11 +25,23 @@ class _RegisterationPageState extends State<RegisterationPage> {
   final pswdRegex = RegExp(RegexConstants.PASSWORD_PATTERN);
 
   bool _isButtonEnabled = false;
+  bool _isLoaderShowing = false; // ✅ Add this
+
+  void _showLoader(BuildContext context, String text) {
+    if (_isLoaderShowing) return;
+    _isLoaderShowing = true;
+    context.showLoader(text: text);
+  }
+
+  void _hideLoader(BuildContext context) {
+    if (!_isLoaderShowing) return;
+    _isLoaderShowing = false;
+    context.hideLoader(context);
+  }
 
   @override
   void initState() {
     super.initState();
-    _nameController.addListener(_validateForm);
     _emailController.addListener(_validateForm);
     _pswdController.addListener(_validateForm);
     _cnfmPswdController.addListener(_validateForm);
@@ -39,10 +49,9 @@ class _RegisterationPageState extends State<RegisterationPage> {
 
   void _validateForm() {
     final isValid =
-        _nameController.text.trim().isNotEmpty &&
-        emailRegex.hasMatch(_emailController.text.trim()) &&
-        pswdRegex.hasMatch(_pswdController.text.trim()) &&
-        _pswdController.text.trim() == _cnfmPswdController.text.trim();
+      emailRegex.hasMatch(_emailController.text.trim()) &&
+      pswdRegex.hasMatch(_pswdController.text.trim()) &&
+      _pswdController.text.trim() == _cnfmPswdController.text.trim();
 
     if (isValid != _isButtonEnabled) {
       setState(() => _isButtonEnabled = isValid);
@@ -53,7 +62,6 @@ class _RegisterationPageState extends State<RegisterationPage> {
 
   @override
   void dispose() {
-    _nameController.dispose();
     _emailController.dispose();
     _pswdController.dispose();
     _cnfmPswdController.dispose();
@@ -76,9 +84,31 @@ class _RegisterationPageState extends State<RegisterationPage> {
 
   void onRegister() {
     context.read<AuthCubit>().register(
-      fullName: _nameController.text.trim(),
       email: _emailController.text.trim().toLowerCase(),
       password: _pswdController.text.trim(),
+    );
+  }
+
+  Widget _buildFieldHint({required IconData icon, required String text}) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 2.0),
+          child: Icon(icon, size: 13, color: Colors.white54),
+        ),
+        const SizedBox(width: 6),
+        Expanded(
+          child: Text(
+            text,
+            style: const TextStyle(
+              fontSize: 12,
+              color: Colors.white54,
+              height: 1.4,
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -89,21 +119,44 @@ class _RegisterationPageState extends State<RegisterationPage> {
       body: context.gradientScreen(
         child: BlocConsumer<AuthCubit, AuthState>(
           listener: (context, state) {
-            if (state is AuthLoading) {
-              context.showLoader(text: 'Creating account...');
+            log.d('statee2 is $state');
+            if (!context.isOn(RouteName.registeration)) return;
+
+            if (state is AuthLoading && state.source == 'register') {
+              _showLoader(context, 'Creating account...');
+              return;
             }
 
-            if (state is AuthAuthenticated) {
-              if (state.securityQuestionSelected) {
-                context.goTo(RouteName.navigation);
-              } else {
-                context.goTo(RouteName.security);
-              }
+            if (state is AuthError && state.source == 'register') {
+              _hideLoader(context);
+
+              context.showCustomDialog(
+                description: state.message,
+                onPressed: () => context.read<AuthCubit>().resetState(),
+              );
+              return;
             }
 
-            if (state is AuthError) {
-              context.showCustomDialog(description: state.message);
+            if (state is AuthEmailUnverified) {
+              if (state.source != 'register') return;
+              _hideLoader(context);
+
+              context.pushTo(
+                RouteName.emailVerification,
+                extra: _emailController.text.trim(),
+              );
+              return;
             }
+
+            // if (state is AuthAuthenticated) {
+            //   _hideLoader(context);
+
+            //   state.securityQuestionSelected
+            //       ? context.goTo(RouteName.navigation)
+            //       : context.goTo(RouteName.security);
+            //   return;
+            // }
+            if (state is AuthAuthenticated) return;
           },
           builder: (context, state) {
             return Stack(
@@ -119,6 +172,8 @@ class _RegisterationPageState extends State<RegisterationPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             SizedBox(height: context.getPercentHeight(1)),
+
+                            // Header
                             RichText(
                               text: const TextSpan(
                                 text: "Welcome to ",
@@ -135,31 +190,44 @@ class _RegisterationPageState extends State<RegisterationPage> {
                                 ],
                               ),
                             ),
-                            SizedBox(height: context.getPercentHeight(1)),
+                            SizedBox(height: context.getPercentHeight(0.6)),
                             const Text(
                               "Know where your money goes",
                               style: TextStyle(
                                 fontSize: 22,
                                 fontFamily: AppConstants.OpenSans,
-                                color: WidgetColors.activeCta,
+                                color: WidgetColors.activeGreen,
                                 fontWeight: FontWeight.w800,
                               ),
                             ),
-                            SizedBox(height: context.getPercentHeight(4)),
-                            BaseTextField(
-                              controller: _nameController,
-                              labelText: "Full name",
-                              hintText: "Enter your full name",
+
+                            SizedBox(height: context.getPercentHeight(5)),
+
+                            // Email field
+                            _buildFieldHint(
+                              icon: Icons.mail_outline_rounded,
+                              text: 'A verification link will be sent to this address.',
                             ),
-                            SizedBox(height: context.getPercentHeight(4)),
+                            SizedBox(height: context.getPercentHeight(1.2)),
                             EmailTextField(controller: _emailController),
+
                             SizedBox(height: context.getPercentHeight(4)),
+
+                            // Password field
+                            _buildFieldHint(
+                              icon: Icons.lock_outline_rounded,
+                              text: 'Use 8–20 characters with uppercase, lowercase, number & special character'
+                            ),
+                            SizedBox(height: context.getPercentHeight(1.2)),
                             PasswordTextField(
                               controller: _pswdController,
                               hintText: "Enter password",
                               errorText: passwordError(_pswdController.text),
                             ),
-                            SizedBox(height: context.getPercentHeight(4)),
+
+                            SizedBox(height: context.getPercentHeight(3)),
+
+                            // Confirm password field
                             PasswordTextField(
                               controller: _cnfmPswdController,
                               labelText: "Confirm password",
@@ -169,6 +237,7 @@ class _RegisterationPageState extends State<RegisterationPage> {
                                 _cnfmPswdController.text,
                               ),
                             ),
+
                             SizedBox(height: context.getPercentHeight(4)),
                           ],
                         ),
@@ -180,8 +249,6 @@ class _RegisterationPageState extends State<RegisterationPage> {
                           SizedBox(height: context.getPercentHeight(2)),
                           context.navigationButton(
                             text: "Register",
-                            height: 6,
-                            width: 100,
                             canNavigate: _isButtonEnabled,
                             onBtnPress: onRegister,
                           ),

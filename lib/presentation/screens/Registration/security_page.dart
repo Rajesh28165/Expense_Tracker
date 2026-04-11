@@ -1,15 +1,15 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:expense_tracker/constants/extension.dart';
-import 'package:expense_tracker/util/styles.dart';
+import 'package:kharchasutra/constants/extension.dart';
+import 'package:kharchasutra/util/styles.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import '../../../constants/app_constants.dart';
-import 'package:expense_tracker/presentation/widgets/generalComponents.dart';
+import '../../../../constants/app_constants.dart';
+import 'package:kharchasutra/presentation/widgets/generalComponents.dart';
 
-import '../../router/route_name.dart';
-import '../components/baseField.dart';
+import '../../../router/route_name.dart';
+import '../../components/baseField.dart';
 
 class SecurityPage extends StatefulWidget {
   const SecurityPage({super.key});
@@ -162,8 +162,6 @@ class _SecurityPageState extends State<SecurityPage> {
                   context.navigationButton(
                     text: "Proceed",
                     canNavigate: _canProceed,
-                    height: 6,
-                    width: 100,
                     onBtnPress: onProceed,
                   ),
                   SizedBox(height: context.getPercentHeight(2)),

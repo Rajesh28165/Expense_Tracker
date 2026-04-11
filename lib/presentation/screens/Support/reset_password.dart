@@ -1,12 +1,14 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../constants/app_constants.dart';
-import '../../logic/auth/auth_cubit.dart';
-import '../../router/route_name.dart';
-import '../components/allFields.dart';
-import 'package:expense_tracker/constants/extension.dart';
-import 'package:expense_tracker/presentation/widgets/generalComponents.dart';
+import '../../../constants/app_constants.dart';
+import '../../../logic/auth/auth_cubit.dart';
+import '../../../router/route_name.dart';
+import '../../components/allFields.dart';
+import 'package:kharchasutra/constants/extension.dart';
+import 'package:kharchasutra/presentation/widgets/generalComponents.dart';
 
 class ResetPasswordPage extends StatefulWidget {
   const ResetPasswordPage({super.key});
@@ -139,8 +141,6 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
                   context.navigationButton(
                     text: "Update Password",
-                    height: 6,
-                    width: 100,
                     canNavigate: _canProceed,
                     onBtnPress: () => _updatePassword(context),
                   ),

@@ -1,5 +1,5 @@
-import 'package:expense_tracker/logic/user/user_state.dart';
-import 'package:expense_tracker/util/encrption.dart';
+import 'package:kharchasutra/logic/user/user_state.dart';
+import 'package:kharchasutra/util/encrption.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class UserCubit extends Cubit<UserState> {
