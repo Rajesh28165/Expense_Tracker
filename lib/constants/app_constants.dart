@@ -51,6 +51,7 @@ class AppConstants {
   static const Password_note = 'If your password does not meet these requirements, you may still be able to reset it, but you will not be able to log in using that password.';
 
   static const Email_rule = 'Enter a valid email address. We’ll send you a verification link to confirm your account.';
+
   static const SecurityQuestionRule = 'Choose a security question and answer. This will help us verify your identity if you forget your password.';
 
   static const Color commonTextColor = Colors.white;
@@ -60,11 +61,8 @@ class AppConstants {
   static const purposeUpdateSecurityQA = 'updateSecurityQA';
   
   // FontFamily
-  static const Roboto = 'Roboto';
   static const Montserrat = 'Montserrat';
-  static const DancingScript = 'DancingScript';
   static const OpenSans = 'OpenSans';
-  static const Pacifico = 'Pacifico';
   static const PlayfairDisplay = 'PlayfairDisplay';
 
 
@@ -84,54 +82,13 @@ class AppConstants {
     'Your question is related to an entertainment experience.',
   ];
 
-  static const slogans = [
-    'Track Every Rupee, Every Day',
-    'Your Money, Your Control',
-    'Know Where Your Money Goes',
-    'Smart Spending Starts Here',
-    'Track. Analyze. Save.',
-    'Kharcha Sutra – Expenses Made Easy'
-  ];
-
 }
 
 class ImagePathConstants {
   static const String asset = 'lib/asset';
   static const String icons = '$asset/icon';
-  static const String imagePath = '$asset/images';
-  static const String landingPath = '$imagePath/landing';
-  static const String bg = '$imagePath/bg';
-
-  static const String space = '$imagePath/space.jpg';
-  static const String star = '$imagePath/star.jpg';
-  static const String earth = '$imagePath/earth.jpg';
-  static const String lock = '$imagePath/lock.jpg';
-  static const String techWall = '$imagePath/techWall.jpg';
-  static const String shultter = '$imagePath/shultter.jpg';
-
-  static const String barGraph = '$landingPath/bar_graph.png';
-  static const String calculator = '$landingPath/calculator.png';
-  static const String cash = '$landingPath/cash.png';
-  static const String coins = '$landingPath/coins.png';
-  static const String money = '$landingPath/money.png';
-  static const String moneyManagement = '$landingPath/money_management.png';
-  static const String progressGraph = '$landingPath/progress_graph.png';
-
-  static const String solidBlack = '$bg/solid-black.jpg';
-  static const String blackSolid = '$bg/black-solid.jpg';
-  static const String skyBlue = '$bg/sky-blue.jpg';
-  static const String gradient = '$bg/gradient.jpg';
 
   static const String googleIcon = '$icons/google_icon.jpeg';
-}
-
-
-class ErrorMsg {
-  static const String pswdError = "Please enter valid password";  
-}
-
-class SuccessMsg {
-  
 }
 
 

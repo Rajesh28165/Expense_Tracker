@@ -55,22 +55,14 @@ dependencies:
   cloud_firestore: ^4.13.6
 
   # Flutter dependencies
-  flutter_native_image: ^0.0.6+1
   flutter_bloc: ^8.1.1
   flutter_keyboard_visibility: ^5.0.2
-  google_maps_flutter: ^2.2.0
   flutter_animation_progress_bar: ^2.0.0
-  flutter_downloader: ^1.7.1
   flutter_secure_storage: ^8.1.0
   fl_chart: ^0.55.2
 
   # Third party dependencies
-  carousel_slider: ^4.0.0
-  logger: ^2.6.0
-  pdf: ^3.6.3
   localstorage: ^4.0.0+1
-  location: ^5.0.3
-  pin_code_fields: ^8.0.1
   crypto: ^3.0.3
 
 
@@ -115,36 +107,12 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - lib/asset/images/lock.jpg
-    - lib/asset/images/earth.jpg
-    - lib/asset/images/star.jpg
-    - lib/asset/images/space.jpg
-    - lib/asset/images/techWall.jpg
-    - lib/asset/images/shultter.jpg
-    - lib/asset/images/landing/bar_graph.png
-    - lib/asset/images/landing/progress_graph.png
-    - lib/asset/images/landing/cash.png
-    - lib/asset/images/landing/coins.png
-    - lib/asset/images/landing/calculator.png
-    - lib/asset/images/landing/money.png
-    - lib/asset/images/landing/money_management.png
-    - lib/asset/images/bg/black-solid.jpg
-    - lib/asset/images/bg/solid-black.jpg
-    - lib/asset/images/bg/sky-blue.jpg
-    - lib/asset/images/bg/gradient.jpg
     - lib/asset/icon/google_icon.jpeg
     
     
   fonts:
-    # 1) Roboto
-    - family: Roboto
-      fonts:
-        - asset: lib/asset/fonts/Roboto/Regular.ttf
-          weight: 400
-        - asset: lib/asset/fonts/Roboto/Bold.ttf
-          weight: 700
 
-    # 2) Montserrat
+    # 1) Montserrat
     - family: Montserrat
       fonts:
         - asset: lib/asset/fonts/Montserrat/Regular.ttf
@@ -153,53 +121,20 @@ flutter:
           weight: 600
         - asset: lib/asset/fonts/Montserrat/Bold.ttf
           weight: 700
-        - asset: lib/asset/fonts/Montserrat/ExtraBold.ttf
-          weight: 800
-        - asset: lib/asset/fonts/Montserrat/Black.ttf
-          weight: 900
 
-    # 3) DancingScript
-    - family: DancingScript
-      fonts:
-        - asset: lib/asset/fonts/DancingScript/Regular.ttf
-          weight: 400
-        - asset: lib/asset/fonts/DancingScript/Medium.ttf
-          weight: 500
-        - asset: lib/asset/fonts/DancingScript/SemiBold.ttf
-          weight: 600
-        - asset: lib/asset/fonts/DancingScript/Bold.ttf
-          weight: 700
 
-    # 4) OpenSans
+    # 2) OpenSans
     - family: OpenSans
       fonts:
         - asset: lib/asset/fonts/OpenSans/Regular.ttf
           weight: 400
         - asset: lib/asset/fonts/OpenSans/Bold.ttf
           weight: 700
-        - asset: lib/asset/fonts/OpenSans/Light_Italic.ttf
-          weight: 300
-          style: italic
-        - asset: lib/asset/fonts/OpenSans/Condensed_Italic.ttf
-          weight: 400
-          style: italic
 
-    # 5) Pacifico
-    - family: Pacifico
-      fonts:
-        - asset: lib/asset/fonts/Pacifico/Regular.ttf
-          weight: 400
-
-    # 6) PlayfairDisplay
+    # 3) PlayfairDisplay
     - family: PlayfairDisplay
       fonts:
         - asset: lib/asset/fonts/PlayfairDisplay/Regular.ttf
           weight: 400
-        - asset: lib/asset/fonts/PlayfairDisplay/Italic.ttf
-          weight: 400
-          style: italic
         - asset: lib/asset/fonts/PlayfairDisplay/Bold.ttf
           weight: 700
-        - asset: lib/asset/fonts/PlayfairDisplay/Black_Italic.ttf
-          weight: 900
-          style: italic

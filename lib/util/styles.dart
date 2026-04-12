@@ -67,22 +67,4 @@ class AppStyles {
     );
   }
 
-  // static TextStyle headerStyle() {
-  //   return const CustomTextStyle(
-  //     fontSize: 30,
-  //     fontWeight: FontWeight.w900,
-  //     color: Colors.black,
-  //     fontFamily: AppConstants.Montserrat
-  //   );
-  // }
-
-  // static TextStyle subHeaderStyle() {
-  //   return const CustomTextStyle(
-  //     fontSize: 20,
-  //     fontWeight: FontWeight.w900,
-  //     color: Colors.black,
-  //     fontFamily: AppConstants.Montserrat
-  //   );
-  // }
-
 }

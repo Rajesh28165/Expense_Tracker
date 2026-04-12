@@ -147,7 +147,7 @@ class _LoginPageState extends State<LoginPage> {
                                 "Login to manage your expenses",
                                 style: TextStyle(
                                   fontSize: 20,
-                                  fontFamily: AppConstants.Roboto,
+                                  fontFamily: AppConstants.OpenSans,
                                   color: WidgetColors.activeGreen,
                                   fontWeight: FontWeight.w700,
                                 ),

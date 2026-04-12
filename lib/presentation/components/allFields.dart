@@ -126,7 +126,7 @@ class PasswordTextField extends StatelessWidget {
     if (trimmedValue == null || trimmedValue.isEmpty) {
       return '';
     } else if (!regex.hasMatch(trimmedValue)) {
-      return ErrorMsg.pswdError;
+      return "Please enter valid password";
     }
     return null;
   }
