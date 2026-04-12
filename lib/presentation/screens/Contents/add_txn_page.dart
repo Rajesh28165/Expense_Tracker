@@ -1,7 +1,6 @@
 import 'package:uuid/uuid.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kharchasutra/util/logger.dart';
 import 'package:kharchasutra/constants/extension.dart';
 import 'package:kharchasutra/data/models/income_model.dart';
 import 'package:kharchasutra/logic/income/income_cubit.dart';
