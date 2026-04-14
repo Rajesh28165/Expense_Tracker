@@ -208,8 +208,8 @@ class _ShowTransactionPageState extends State<ShowTransactionPage> {
             children: [
               _buildDialogDatePicker(
                 label: _customStart != null
-                    ? DateFormat('dd MMM yyyy').format(_customStart!)
-                    : 'Select Start Date',
+                  ? DateFormat('dd MMM yyyy').format(_customStart!)
+                  : 'Select Start Date',
                 hasValue: _customStart != null,
                 onTap: () async {
                   final picked = await showDatePicker(

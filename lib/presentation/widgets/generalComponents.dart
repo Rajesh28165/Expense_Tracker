@@ -647,13 +647,20 @@ class CommonMethods {
     }
   }
 
-  static void showSignOutDialog(BuildContext context) {
+  static void showActionDialog(
+    BuildContext context,
+    {
+      required String confirmationText,
+      required String purpose,
+      required VoidCallback action
+    }
+  ) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         content: Text(
-          'Are you sure you want to sign out?',
+          confirmationText,
           style: GoogleFonts.dmSans(color: WidgetColors.ink2),
         ),
         actions: [
@@ -667,14 +674,11 @@ class CommonMethods {
                   style: GoogleFonts.dmSans(fontWeight: FontWeight.w600),
                 ),
               ),
+              SizedBox(width: context.getPercentWidth(10)),
               TextButton(
-                onPressed: () async {
-                  Navigator.of(context).pop();
-                  await context.read<AuthCubit>().logout();
-                  context.goTo(RouteName.login);
-                },
+                onPressed: action,
                 child: Text(
-                  'Sign Out',
+                  purpose,
                   style: GoogleFonts.dmSans(
                     color: WidgetColors.red,
                     fontWeight: FontWeight.w700,

@@ -1,3 +1,6 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:go_router/go_router.dart';
 import 'package:kharchasutra/constants/extension.dart';
 import 'package:kharchasutra/presentation/widgets/generalComponents.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -17,6 +20,27 @@ class ProfilePage extends StatelessWidget {
   bool get _isEmailUser => FirebaseAuth.instance.currentUser
     ?.providerData
     .any((p) => p.providerId == 'password') ?? false;
+
+
+  Widget _buildCardWrapper(
+    BuildContext context, {
+    required Widget child,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: WidgetColors.surface,
+        borderRadius: BorderRadius.circular(context.getPercentWidth(5)),
+        boxShadow: [
+          BoxShadow(
+            color: WidgetColors.black.withOpacity(0.05),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: child,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -130,18 +154,8 @@ class ProfilePage extends StatelessWidget {
                 SizedBox(height: context.getPercentHeight(1.2)),
 
                 // ── Settings card ─────────────────────────
-                Container(
-                  decoration: BoxDecoration(
-                    color: WidgetColors.surface,
-                    borderRadius: BorderRadius.circular(context.getPercentWidth(5)),
-                    boxShadow: [
-                      BoxShadow(
-                        color: WidgetColors.black.withOpacity(0.05),
-                        blurRadius: 16,
-                        offset: const Offset(0, 4),
-                      )
-                    ]
-                  ),
+                _buildCardWrapper(
+                  context,
                   child: Column(
                     children: [
                       _buildSettingsTile(
@@ -183,18 +197,8 @@ class ProfilePage extends StatelessWidget {
 
               SizedBox(height: context.getPercentHeight(3)),
 
-              Container(
-                decoration: BoxDecoration(
-                  color: WidgetColors.surface,
-                  borderRadius: BorderRadius.circular(context.getPercentWidth(5)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: WidgetColors.black.withOpacity(0.05),
-                      blurRadius: 16,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
+              _buildCardWrapper(
+                context,
                 child: _buildSettingsTile(
                   context,
                   icon: Icons.mail_outline_rounded,
@@ -210,18 +214,8 @@ class ProfilePage extends StatelessWidget {
               SizedBox(height: context.getPercentHeight(3)),
 
               // ── Sign out card ─────────────────────────
-              Container(
-                decoration: BoxDecoration(
-                  color: WidgetColors.surface,
-                  borderRadius: BorderRadius.circular(context.getPercentWidth(5)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: WidgetColors.black.withOpacity(0.05),
-                      blurRadius: 16,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
+              _buildCardWrapper(
+                context,
                 child: _buildSettingsTile(
                   context,
                   icon: Icons.logout_rounded,
@@ -231,9 +225,72 @@ class ProfilePage extends StatelessWidget {
                   subtitle: 'Log out of your account',
                   showDivider: false,
                   titleColor: WidgetColors.red,
-                  onTap: () => CommonMethods.showSignOutDialog(context),
+                  onTap: () => CommonMethods.showActionDialog(
+                    context, 
+                    purpose: 'Sign Out',
+                    confirmationText: AppConstants.signOutConfirmation,
+                    action: () async {
+                      Navigator.of(context).pop();
+                      await context.read<AuthCubit>().logout();
+                      context.goTo(RouteName.login);
+                    }
+                  ),
                 ),
               ),
+
+              SizedBox(height: context.getPercentHeight(3)),
+
+              _buildCardWrapper(
+                context,
+                child: _buildSettingsTile(
+                  context,
+                  icon: Icons.delete_outline_rounded,
+                  iconColor: WidgetColors.red,
+                  iconBg: WidgetColors.redBg,
+                  title: 'Delete Account',
+                  subtitle: 'Permanently delete your account',
+                  showDivider: false,
+                  titleColor: WidgetColors.red,
+                  onTap: () {
+                    final user = FirebaseAuth.instance.currentUser;
+
+                    final isGoogleUser = user?.providerData
+                        .any((p) => p.providerId == 'google.com') ?? false;
+
+                    CommonMethods.showActionDialog(
+                      context,
+                      confirmationText: AppConstants.deleteAccountConfirmation,
+                      purpose: 'Delete',
+                      action: () async {
+                        context.pop();
+
+                        if (isGoogleUser) {
+                          context.showLoader(text: 'Deleting your account');
+                          final result = await context.read<AuthCubit>().deleteAccount();
+                          context.hideLoader(context);
+
+                          if (result == null) {
+                            await context.showCustomDialog(description: 'Account deleted successfully');
+                            context.goTo(RouteName.login);
+                          } else {
+                            context.showCustomDialog(description: result);
+                          }
+
+                        } else {
+                          context.pushTo(
+                            RouteName.verifyPassword,
+                            extra: {
+                              'purpose': AppConstants.purposeDeleteAccount,
+                              'count': 2,
+                            }
+                          );
+                        }
+                      },
+                    );
+                  }
+                ),
+              ),
+
             ],
           ),
         ),

@@ -52,6 +52,13 @@ class AppConstants {
 
   static const Email_rule = 'Enter a valid email address. We’ll send you a verification link to confirm your account.';
 
+  static const signOutConfirmation = 'Are you sure you want to sign out?';
+
+  static const deleteAccountConfirmation = 
+'Are you sure you want to permanently delete your account?\n\n'
+'All your data, including transactions and account details, will be permanently removed and cannot be recovered.\n\n'
+'You will need to sign up again if you wish to use the app in the future.';
+
   static const SecurityQuestionRule = 'Choose a security question and answer. This will help us verify your identity if you forget your password.';
 
   static const Color commonTextColor = Colors.white;
@@ -59,6 +66,7 @@ class AppConstants {
   // In app_constants.dart
   static const purposeUpdatePassword = 'updatePassword';
   static const purposeUpdateSecurityQA = 'updateSecurityQA';
+  static const purposeDeleteAccount = 'deleteAccount';
   
   // FontFamily
   static const Montserrat = 'Montserrat';

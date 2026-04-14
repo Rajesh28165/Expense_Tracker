@@ -118,10 +118,13 @@ class _VerifySecurityQuestionPageState extends State<VerifySecurityQuestionPage>
         buttonText: 'Proceed'
       );
     } else {
-      context.pushTo(RouteName.verifyPassword, extra: {
-        'purpose': widget.purpose,
-        'count': widget.count + 1,
-      });
+      context.pushTo(
+        RouteName.verifyPassword, 
+        extra: {
+          'purpose': widget.purpose,
+          'count': widget.count + 1,
+        }
+      );
     }
   }
 

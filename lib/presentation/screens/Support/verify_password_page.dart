@@ -68,6 +68,25 @@ class _VerifyPasswordPageState extends State<VerifyPasswordPage> {
       context.pushTo(RouteName.resetPassword);
     } else if (widget.purpose == AppConstants.purposeUpdateSecurityQA) {
       context.pushTo(RouteName.security);
+    } else if (widget.purpose == AppConstants.purposeDeleteAccount) {
+      context.showLoader(text: "Deleting your account...");
+
+      final result = await context.read<AuthCubit>().deleteAccount(
+        email: email,
+        password: password,
+      );
+
+      context.hideLoader(context);
+
+      if (result == null) {
+        await context.showCustomDialog(
+          description: 'Account deleted successfully',
+        );
+
+        context.goTo(RouteName.login);
+      } else {
+        context.showCustomDialog(description: result);
+      }
     }
   }
 
