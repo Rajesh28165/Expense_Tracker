@@ -12,6 +12,7 @@ import '../../../logic/expense/expense_cubit.dart';
 import '../../../logic/expense/expense_state.dart';
 import '../../../logic/income/income_cubit.dart';
 import '../../../logic/income/income_state.dart';
+import '../../../services/services.dart';
 import '../../../util/colors.dart';
 import 'show_txn_page.dart';
 
@@ -38,6 +39,7 @@ class _DashboardPageState extends State<DashboardPage> with SingleTickerProvider
     _loadUser();
     context.read<ExpenseCubit>().loadExpenses();
     context.read<IncomeCubit>().loadIncomes();
+    sessionService.resetTimer();
   }
 
   Future<void> _loadUser() async {

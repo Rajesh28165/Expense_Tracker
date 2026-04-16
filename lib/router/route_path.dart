@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:kharchasutra/presentation/screens/Support/verify_password_page.dart';
 import 'package:kharchasutra/presentation/screens/Support/verify_security_question_page.dart';
 import 'package:go_router/go_router.dart';
@@ -22,15 +24,38 @@ import '../presentation/screens/Support/support_page.dart';
 import '../presentation/screens/Contents/txn_report.dart';
 import 'route_name.dart';
 
-GoRouter createRouter(BuildContext context) {
+class GoRouterRefreshStream extends ChangeNotifier {
+  GoRouterRefreshStream(Stream<dynamic> stream) {
+    notifyListeners();
+    _subscription = stream.asBroadcastStream().listen(
+      (dynamic _) => notifyListeners(),
+    );
+  }
+
+  late final StreamSubscription<dynamic> _subscription;
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
+  }
+}
+
+GoRouter createRouter(BuildContext context, GlobalKey<NavigatorState> navigatorKey) {
   return GoRouter(
+    navigatorKey: navigatorKey,
     initialLocation: RouteName.login,
+
+    refreshListenable: GoRouterRefreshStream(
+      context.read<AuthCubit>().stream,
+    ),
 
     redirect: (context, state) {
       final authState = context.read<AuthCubit>().state;
       final isLoggedIn = authState is AuthAuthenticated;
       final isEmailUnverified = authState is AuthEmailUnverified;
       final isVerifySuccess = authState is VerifySuccess;
+      final isSessionTimeout = authState is AuthSessionTimeout;
 
       final isAuthRoute = 
         state.matchedLocation == RouteName.login ||
@@ -41,7 +66,8 @@ GoRouter createRouter(BuildContext context) {
       if (
           !isLoggedIn && 
           !isEmailUnverified && 
-          !isVerifySuccess && 
+          !isVerifySuccess &&
+          !isSessionTimeout &&
           !isAuthRoute
         ) {
         return RouteName.login;

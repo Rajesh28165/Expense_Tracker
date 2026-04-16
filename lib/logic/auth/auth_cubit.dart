@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../../data/models/user_model.dart';
+import '../../services/services.dart';
 import 'auth_state.dart';
 
 class AuthCubit extends Cubit<AuthState> {
@@ -17,12 +19,14 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   void resetState() => emit(AuthInitial());
+  StreamSubscription? _authSub;
 
   void _listenAuthChanges() {
-    _auth.idTokenChanges().listen((user) async {
+    _authSub = _auth.idTokenChanges().listen((user) async {
       if (_isRegistering) return;
 
       if (user == null) {
+        sessionService.cancel();
         if (state is! AuthUnauthenticated) emit(AuthUnauthenticated());
         return;
       }
@@ -329,11 +333,18 @@ class AuthCubit extends Cubit<AuthState> {
     return methods.isNotEmpty;
   }
 
+  /// SESSION EXPIRED
+  void sessionExpired() {
+    sessionService.cancel();
+    emit(AuthSessionTimeout());
+  }
 
   /// LOGOUT
   Future<void> logout() async {
+    sessionService.cancel();
     await _googleSignIn.signOut();
     await _auth.signOut();
+    emit(AuthUnauthenticated());
   }
 
   /// VERIFY PASSWORD
@@ -441,5 +452,11 @@ class AuthCubit extends Cubit<AuthState> {
       default:
         return 'Authentication failed';
     }
+  }
+
+  @override
+  Future<void> close() {
+    _authSub?.cancel();
+    return super.close();
   }
 }

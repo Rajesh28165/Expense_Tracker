@@ -9,6 +9,7 @@ import '../../../../constants/app_constants.dart';
 import 'package:kharchasutra/presentation/widgets/generalComponents.dart';
 
 import '../../../router/route_name.dart';
+import '../../../services/services.dart';
 import '../../components/baseField.dart';
 
 class SecurityPage extends StatefulWidget {
@@ -27,6 +28,7 @@ class _SecurityPageState extends State<SecurityPage> {
   void initState() {
     super.initState();
     _securityAnsController.addListener(_validateForm);
+    sessionService.resetTimer();
   }
 
   void _validateForm() {

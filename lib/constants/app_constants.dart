@@ -55,9 +55,9 @@ class AppConstants {
   static const signOutConfirmation = 'Are you sure you want to sign out?';
 
   static const deleteAccountConfirmation = 
-'Are you sure you want to permanently delete your account?\n\n'
-'All your data, including transactions and account details, will be permanently removed and cannot be recovered.\n\n'
-'You will need to sign up again if you wish to use the app in the future.';
+    'Are you sure you want to permanently delete your account?\n\n'
+    'All your data, including transactions and account details, will be permanently removed and cannot be recovered.\n\n'
+    'You will need to sign up again if you wish to use the app in the future.';
 
   static const SecurityQuestionRule = 'Choose a security question and answer. This will help us verify your identity if you forget your password.';
 
@@ -89,6 +89,9 @@ class AppConstants {
     'Your question is related to your early mobile experience.',
     'Your question is related to an entertainment experience.',
   ];
+
+  static const int sessionTime = 5;  // In minutes
+  static const int sessionWaringTime = 10;  // In seconds
 
 }
 

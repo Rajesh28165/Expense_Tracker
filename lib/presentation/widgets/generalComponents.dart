@@ -351,7 +351,8 @@ extension GeneralComponents on BuildContext {
   // ------------------ Dialog Box ------------------
   Future<void> showCustomDialog({
     String? title,
-    required String description,
+    String? description = '',
+    Widget? descriptionWidget,
     String? buttonText,
     VoidCallback? onPressed,
     IconData? icon,
@@ -417,15 +418,18 @@ extension GeneralComponents on BuildContext {
                 ],
 
                 // Description
-                Text(
-                  description,
-                  style: GoogleFonts.dmSans(
-                    fontSize: 14,
-                    color: WidgetColors.ink2,
-                    height: 1.5,
+                if (descriptionWidget != null)
+                  descriptionWidget
+                else
+                  Text(
+                    description!,
+                    style: GoogleFonts.dmSans(
+                      fontSize: 14,
+                      color: WidgetColors.ink2,
+                      height: 1.5,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                  textAlign: TextAlign.center,
-                ),
                 SizedBox(height: getPercentHeight(3)),
 
                 dialogContext.navigationButton(
