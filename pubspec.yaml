@@ -37,7 +37,7 @@ flutter_native_splash:
 
 
 environment:
-  sdk: '>=2.19.6 <3.0.0'
+  sdk: '>=3.0.0 <4.0.0'
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -46,20 +46,20 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  win32: ^5.5.0
   flutter:
     sdk: flutter
 
   # Firebase realated dependencies
-  firebase_core: ^2.9.0
-  firebase_auth: ^4.0.1
-  cloud_firestore: ^4.13.6
+  firebase_core: ^2.32.0
+  firebase_auth: ^4.20.0
+  cloud_firestore: ^4.17.5
 
   # Flutter dependencies
-  flutter_bloc: ^8.1.1
-  flutter_keyboard_visibility: ^5.0.2
+  flutter_bloc: ^8.1.6
   flutter_animation_progress_bar: ^2.0.0
   flutter_secure_storage: ^8.1.0
-  fl_chart: ^0.55.2
+  fl_chart: ^0.69.0
 
   # Third party dependencies
   localstorage: ^4.0.0+1
@@ -79,7 +79,7 @@ dependencies:
   dropdown_button2: ^2.1.4
   grouped_list: ^6.0.0
   flutter_spinkit: 5.1.0
-  google_fonts: ^3.0.1
+  google_fonts: ^6.2.1
 
 dev_dependencies:
   flutter_test:
@@ -90,9 +90,9 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^2.0.0
-  flutter_launcher_icons: ^0.13.1
-  flutter_native_splash: 2.2.19
+  flutter_lints: ^4.0.0
+  flutter_launcher_icons: ^0.14.1
+  flutter_native_splash: ^2.4.1
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

@@ -66,8 +66,8 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: null,
+    return PopScope(
+      canPop: false,
       child: Scaffold(
         appBar: context.customAppBar(title: 'Login', showBackButton: false),
         body: context.gradientScreen(

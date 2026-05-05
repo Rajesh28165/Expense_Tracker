@@ -71,10 +71,12 @@ class _TransactionReportPageState extends State<TransactionReportPage>
   }
 
   Widget _buildScaffold() {
-    return WillPopScope(
-      onWillPop: () async {
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+
         context.go(RouteName.dashboard);
-        return false;
       },
       child: Scaffold(
         backgroundColor: WidgetColors.page,

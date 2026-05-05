@@ -79,11 +79,12 @@ class _EmailVerificationPageState extends State<EmailVerificationPage> {
           return;
         }
       },
-      child: WillPopScope(
-        onWillPop: () async {
+      child: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) async {
+          if (didPop) return;
           await context.read<AuthCubit>().logout();
           context.goTo(RouteName.login);
-          return false;
         },
         child: Scaffold(
           appBar: context.customAppBar(
