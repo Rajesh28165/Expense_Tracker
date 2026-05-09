@@ -16,23 +16,26 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.0+3
+version: 1.0.0+4
 
-flutter_icons:
+flutter_launcher_icons:
   android: true
   ios: true
+
   image_path: "lib/asset/icon/icon.png"
 
+  adaptive_icon_background: "#0D1B2A"
+  adaptive_icon_foreground: "lib/asset/icon/icon.png"
+
+  remove_alpha_ios: true
+  min_sdk_android: 21
+
+
 flutter_native_splash:
-  color: "#0D1B2A"
-  image: lib/asset/icon/icon.png
+  color: "#FFFFFF"
 
-  android: true
-  ios: true
-  web: false
-
-  android_gravity: center
-  ios_content_mode: scaleAspectFill
+  android_12:
+    color: "#FFFFFF"
 
 
 
@@ -91,7 +94,7 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^4.0.0
-  flutter_launcher_icons: ^0.14.1
+  flutter_launcher_icons: ^0.14.4
   flutter_native_splash: ^2.4.1
 
 # For information on the generic Dart part of this file, see the
@@ -108,8 +111,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - lib/asset/icon/google_icon.jpeg
-    
-    
+
   fonts:
 
     # 1) Montserrat
@@ -138,3 +140,6 @@ flutter:
           weight: 400
         - asset: lib/asset/fonts/PlayfairDisplay/Bold.ttf
           weight: 700
+
+dependency_overrides:
+  archive: ^4.0.9

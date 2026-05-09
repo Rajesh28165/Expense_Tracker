@@ -5,6 +5,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../constants/app_constants.dart';
 import '../../../logic/auth/auth_cubit.dart';
+import '../../../logic/expense/expense_cubit.dart';
+import '../../../logic/income/income_cubit.dart';
 import '../../../router/route_name.dart';
 import '../../components/allFields.dart';
 import 'package:kharchasutra/constants/extension.dart';
@@ -13,10 +15,13 @@ import 'package:kharchasutra/presentation/widgets/generalComponents.dart';
 class VerifyPasswordPage extends StatefulWidget {
   final String purpose;
   final int count;
+  final String? txnId;
+
   const VerifyPasswordPage({
     super.key,
     required this.purpose,
     required this.count,
+    this.txnId
   });
 
   @override
@@ -66,28 +71,50 @@ class _VerifyPasswordPageState extends State<VerifyPasswordPage> {
 
     if (widget.purpose == AppConstants.purposeUpdatePassword) {
       context.pushTo(RouteName.resetPassword);
+
     } else if (widget.purpose == AppConstants.purposeUpdateSecurityQA) {
       context.pushTo(RouteName.security);
+
     } else if (widget.purpose == AppConstants.purposeDeleteAccount) {
       context.showLoader(text: "Deleting your account...");
-
       final result = await context.read<AuthCubit>().deleteAccount(
         email: email,
         password: password,
       );
-
       context.hideLoader(context);
-
       if (result == null) {
-        await context.showCustomDialog(
-          description: 'Account deleted successfully',
-        );
-
+        await context.showCustomDialog(description: 'Account deleted successfully');
         context.goTo(RouteName.login);
       } else {
         context.showCustomDialog(description: result);
       }
+
+    } else if (widget.purpose == AppConstants.purposeDeleteExpenseTxn ||
+              widget.purpose == AppConstants.purposeDeleteIncomeTxn) {
+      _handleDeleteTxn(context);
     }
+  }
+
+  void _handleDeleteTxn(BuildContext context) {
+    final txnId = widget.txnId;
+    if (txnId == null) {
+      context.showCustomDialog(description: 'Transaction not found');
+      return;
+    }
+
+    if (widget.purpose == AppConstants.purposeDeleteExpenseTxn) {
+      context.read<ExpenseCubit>().deleteExpense(txnId);
+    } else {
+      context.read<IncomeCubit>().deleteIncome(txnId);
+    }
+
+    context.hideLoader(context);
+    context.goTo(RouteName.dashboard);
+    context.showCustomDialog(
+      description: 'Transaction deleted successfully',
+      icon: Icons.check_circle_outline_rounded,
+      iconColor: Colors.green,
+    );
   }
 
   void _forgotPassword(BuildContext context) {
@@ -103,6 +130,7 @@ class _VerifyPasswordPageState extends State<VerifyPasswordPage> {
       context.pushTo(RouteName.verifySecurityQuestion, extra: {
         'purpose': widget.purpose,
         'count': widget.count + 1,
+        'txnId':   widget.txnId,
       });
     }
   }

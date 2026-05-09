@@ -4,13 +4,16 @@ import '../../../router/route_name.dart';
 
 class NavigationPage extends StatelessWidget {
   final Widget child;
+  final String location;
 
-  const NavigationPage({super.key, required this.child});
+  const NavigationPage({
+    super.key,
+    required this.location,
+    required this.child
+  });
 
   @override
   Widget build(BuildContext context) {
-    final location = GoRouterState.of(context).matchedLocation;
-
     int currentIndex = 0;
 
     if (location.startsWith(RouteName.dashboard)) {

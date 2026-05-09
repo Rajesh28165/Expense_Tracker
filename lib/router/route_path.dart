@@ -113,7 +113,10 @@ GoRouter createRouter(BuildContext context, GlobalKey<NavigatorState> navigatorK
       // ---------------- APP WITH BOTTOM NAV ----------------
       ShellRoute(
         builder: (context, state, child) {
-          return NavigationPage(child: child);
+          return NavigationPage(
+            location: state.matchedLocation,
+            child: child
+          );
         },
         routes: [
           GoRoute(
@@ -137,14 +140,14 @@ GoRouter createRouter(BuildContext context, GlobalKey<NavigatorState> navigatorK
       GoRoute(
         path: RouteName.addTransactions,
         builder: (context, state) => AddTransactionPage(
-          type: state.extra as TransactionType,
+          type: (state.extra as TransactionType?) ?? TransactionType.expense,
         ),
       ),
 
       GoRoute(
         path: RouteName.showTransactions,
         builder: (context, state) => ShowTransactionPage(
-          type: state.extra as TransactionType,
+          type: (state.extra as TransactionType?) ?? TransactionType.expense,
         ),
       ),
 
@@ -160,6 +163,7 @@ GoRouter createRouter(BuildContext context, GlobalKey<NavigatorState> navigatorK
           return VerifySecurityQuestionPage(
             purpose: extra?['purpose'] as String? ?? AppConstants.purposeUpdateSecurityQA,
             count:   extra?['count'] as int? ?? 1,
+            txnId:   extra?['txnId']   as String?,
           );
         },
       ),
@@ -171,6 +175,8 @@ GoRouter createRouter(BuildContext context, GlobalKey<NavigatorState> navigatorK
           return VerifyPasswordPage(
             purpose: extra?['purpose'] as String? ?? AppConstants.purposeUpdatePassword,
             count:   extra?['count'] as int? ?? 1,
+            txnId:   extra?['txnId']   as String?,
+
           );
         },
       ),

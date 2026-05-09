@@ -1,23 +1,28 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kharchasutra/constants/extension.dart';
 import 'package:kharchasutra/util/styles.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../../../constants/app_constants.dart';
 import 'package:kharchasutra/presentation/widgets/generalComponents.dart';
+import '../../../logic/expense/expense_cubit.dart';
+import '../../../logic/income/income_cubit.dart';
 import '../../../router/route_name.dart';
 import '../../components/baseField.dart';
 
 class VerifySecurityQuestionPage extends StatefulWidget {
   final String purpose;
   final int count;
+  final String? txnId;
 
   const VerifySecurityQuestionPage({
     super.key,
     required this.purpose,
     required this.count,
+    this.txnId
   });
 
   @override
@@ -88,15 +93,20 @@ class _VerifySecurityQuestionPageState extends State<VerifySecurityQuestionPage>
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (widget.purpose == AppConstants.purposeUpdatePassword) {
             context.pushTo(RouteName.resetPassword);
+
           } else if (widget.purpose == AppConstants.purposeUpdateSecurityQA) {
             context.pushTo(RouteName.security);
+
+          } else if (widget.purpose == AppConstants.purposeDeleteExpenseTxn ||
+                    widget.purpose == AppConstants.purposeDeleteIncomeTxn) {
+            _handleDeleteTxn();
           }
         });
       } else {
-        final hintIndex  = savedIndex ?? _selectedIndex;
+        final hintIndex = savedIndex ?? _selectedIndex;
         final hint = hintIndex < AppConstants.listOfSecurityHints.length
-          ? AppConstants.listOfSecurityHints[hintIndex]
-          : null;
+            ? AppConstants.listOfSecurityHints[hintIndex]
+            : null;
         final hintToShow = hint != null ? '\n\nHint: $hint' : '';
         context.showCustomDialog(
           description: 'Incorrect question or answer.$hintToShow',
@@ -106,6 +116,29 @@ class _VerifySecurityQuestionPageState extends State<VerifySecurityQuestionPage>
       context.hideLoader(context);
       context.showCustomDialog(description: e.toString());
     }
+  }
+
+  void _handleDeleteTxn() {
+    final txnId = widget.txnId;
+
+    if (txnId == null) {
+      context.showCustomDialog(description: 'Transaction not found');
+      return;
+    }
+
+    if (widget.purpose == AppConstants.purposeDeleteExpenseTxn) {
+      context.read<ExpenseCubit>().deleteExpense(txnId);
+    } else {
+      context.read<IncomeCubit>().deleteIncome(txnId);
+    }
+
+    context.hideLoader(context);
+    context.goTo(RouteName.dashboard);
+    context.showCustomDialog(
+      description: 'Transaction deleted successfully',
+      icon: Icons.check_circle_outline_rounded,
+      iconColor: Colors.green,
+    );
   }
 
   void _forgotSecurityQuestion(BuildContext context) {
@@ -123,6 +156,7 @@ class _VerifySecurityQuestionPageState extends State<VerifySecurityQuestionPage>
         extra: {
           'purpose': widget.purpose,
           'count': widget.count + 1,
+          'txnId':   widget.txnId,
         }
       );
     }

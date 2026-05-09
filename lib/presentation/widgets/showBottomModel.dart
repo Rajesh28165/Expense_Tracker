@@ -3,20 +3,31 @@ import 'package:intl/intl.dart';
 import '../../data/models/txn_model.dart';
 
 class ShowBottomModel {
-  static void open(BuildContext context, TransactionModel txn) {
+  static void open(
+    BuildContext context,
+    TransactionModel txn, {
+    VoidCallback? onDelete,
+  }) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => _BottomSheetContent(transaction: txn),
+      builder: (_) => _BottomSheetContent(
+        transaction: txn,
+        onDelete: onDelete,
+      ),
     );
   }
 }
 
 class _BottomSheetContent extends StatelessWidget {
   final TransactionModel transaction;
+  final VoidCallback? onDelete;
 
-  const _BottomSheetContent({required this.transaction});
+  const _BottomSheetContent({
+    required this.transaction,
+    this.onDelete,
+  });
 
   String _formatDate(DateTime date) {
     return DateFormat("dd MMM yyyy | hh:mm a").format(date);
@@ -24,10 +35,7 @@ class _BottomSheetContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // ignore: unnecessary_type_check
-    final isIncome = transaction is! dynamic ||
-        (transaction.runtimeType.toString().contains("Income"));
-
+    final isIncome = transaction.runtimeType.toString().contains("Income");
     final amountColor = isIncome ? Colors.green : Colors.red;
 
     return Container(
@@ -44,21 +52,49 @@ class _BottomSheetContent extends StatelessWidget {
           Container(
             width: 60,
             height: 6,
-            margin: const EdgeInsets.only(bottom: 25),
+            margin: const EdgeInsets.only(bottom: 16),
             decoration: BoxDecoration(
               color: Colors.grey.shade300,
               borderRadius: BorderRadius.circular(50),
             ),
           ),
 
-          /// CATEGORY TITLE
-          Text(
-            transaction.category,
-            style: const TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 0.5,
-            ),
+          /// HEADER ROW: category title + delete icon
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const SizedBox(width: 40), // spacer to center the title
+              Text(
+                transaction.category,
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 0.5,
+                ),
+              ),
+              if (onDelete != null)
+                GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context); // close sheet first
+                    onDelete!();            // then show confirm dialog
+                  },
+                  child: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: Colors.red.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(
+                      Icons.delete_outline_rounded,
+                      color: Colors.red,
+                      size: 20,
+                    ),
+                  ),
+                )
+              else
+                const SizedBox(width: 40), // spacer to keep title centered
+            ],
           ),
 
           const SizedBox(height: 8),

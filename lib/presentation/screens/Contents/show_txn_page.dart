@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:kharchasutra/constants/extension.dart';
 import 'package:kharchasutra/logic/expense/expense_cubit.dart';
 import 'package:kharchasutra/logic/expense/expense_state.dart';
@@ -12,6 +13,7 @@ import 'package:intl/intl.dart';
 
 import '../../../constants/app_constants.dart';
 import '../../../data/models/txn_model.dart';
+import '../../../router/route_name.dart';
 import '../../../util/colors.dart';
 import '../../widgets/showBottomModel.dart';
 
@@ -36,11 +38,58 @@ class _ShowTransactionPageState extends State<ShowTransactionPage> {
   DateTime? _customStart;
   DateTime? _customEnd;
 
-  bool  get _isExpense => widget.type == TransactionType.expense;
-  Color get _accent    => _isExpense ? WidgetColors.red   : WidgetColors.green;
-  Color get _accentBg  => _isExpense ? WidgetColors.redBg : WidgetColors.greenBg;
+  bool get _isExpense => widget.type == TransactionType.expense;
+  Color get _accent => _isExpense ? WidgetColors.red : WidgetColors.green;
+  Color get _accentBg => _isExpense ? WidgetColors.redBg : WidgetColors.greenBg;
 
+  // ── Delete handler ────────────────────────────────────────
+  void _confirmDelete(TransactionModel txn) {
+    final user = FirebaseAuth.instance.currentUser;
+    final isGoogleUser = user?.providerData
+        .any((p) => p.providerId == 'google.com') ?? false;
 
+    context.showCustomDialog(
+      title: 'Delete Transaction',
+      description: 'Are you sure you want to delete "${txn.category}" of ₹${txn.amount.toStringAsFixed(0)}? This action cannot be undone.',
+      icon: Icons.delete_outline_rounded,
+      iconColor: WidgetColors.red,
+      buttonText: 'Delete',
+      onPressed: () {
+        if (isGoogleUser) {
+          _deleteTransaction(txn);
+        } else {
+          context.pushTo(
+            RouteName.verifyPassword,
+            extra: {
+              'purpose': _isExpense
+                  ? AppConstants.purposeDeleteExpenseTxn
+                  : AppConstants.purposeDeleteIncomeTxn,
+              'count': 1,
+              'txnId': txn.id,
+            },
+          );
+        }
+      },
+    );
+  }
+
+  void _deleteTransaction(TransactionModel txn) {
+    if (_isExpense) {
+      context.read<ExpenseCubit>().deleteExpense(txn.id);
+    } else {
+      context.read<IncomeCubit>().deleteIncome(txn.id);
+    }
+
+    context.hideLoader(context);
+    context.goTo(RouteName.dashboard);
+    context.showCustomDialog(
+      description: 'Transaction deleted successfully',
+      icon: Icons.check_circle_outline_rounded,
+      iconColor: Colors.green,
+    );
+  }
+
+  // ── Build ─────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -60,7 +109,7 @@ class _ShowTransactionPageState extends State<ShowTransactionPage> {
         if (state is IncomeLoaded) return _buildContent(state.incomes);
         return Center(
           child: SpinKitThreeBounce(
-            color: _accent, 
+            color: _accent,
             size: context.getPercentWidth(12)
           )
         );
@@ -74,7 +123,7 @@ class _ShowTransactionPageState extends State<ShowTransactionPage> {
         if (state is ExpenseLoaded) return _buildContent(state.expenses);
         return Center(
           child: SpinKitThreeBounce(
-            color: _accent, 
+            color: _accent,
             size: context.getPercentWidth(12)
           )
         );
@@ -91,8 +140,9 @@ class _ShowTransactionPageState extends State<ShowTransactionPage> {
         Column(
           children: [
             _buildFilterBar(),
-            if (_activeFilter == _Filter.custom && _customStart != null && _customEnd != null)
-              _buildCustomDateLabel(),
+            if (_activeFilter == _Filter.custom &&
+                _customStart != null &&
+                _customEnd != null) _buildCustomDateLabel(),
             _buildSummaryRow(data, filtered),
             SizedBox(height: context.getPercentHeight(0.5)),
             Expanded(child: _buildTransactionList(filtered)),
@@ -103,7 +153,7 @@ class _ShowTransactionPageState extends State<ShowTransactionPage> {
             color: Colors.black.withOpacity(0.15),
             child: Center(
               child: SpinKitThreeBounce(
-                color: _accent, 
+                color: _accent,
                 size: context.getPercentWidth(12)
               )
             ),
@@ -139,11 +189,11 @@ class _ShowTransactionPageState extends State<ShowTransactionPage> {
     return GestureDetector(
       onTap: () async {
         if (filter == _Filter.custom) {
-          await _showCustomDateDialog(); 
-          return; 
+          await _showCustomDateDialog();
+          return;
         }
         setState(() {
-          _isFiltering = true; 
+          _isFiltering = true;
           _activeFilter = filter;
         });
         await Future.delayed(const Duration(milliseconds: 600));
@@ -153,7 +203,7 @@ class _ShowTransactionPageState extends State<ShowTransactionPage> {
         duration: const Duration(milliseconds: 180),
         padding: EdgeInsets.symmetric(
           horizontal: context.getPercentWidth(3),
-          vertical:   context.getPercentHeight(0.7),
+          vertical: context.getPercentHeight(0.7),
         ),
         decoration: BoxDecoration(
           color: isActive ? _accentBg : WidgetColors.chipInactive,
@@ -166,7 +216,7 @@ class _ShowTransactionPageState extends State<ShowTransactionPage> {
         child: Text(
           label,
           style: GoogleFonts.dmSans(
-            fontSize: 12, 
+            fontSize: 12,
             fontWeight: FontWeight.w700,
             color: isActive ? _accent : WidgetColors.ink2,
           ),
@@ -196,7 +246,7 @@ class _ShowTransactionPageState extends State<ShowTransactionPage> {
                 child: Text(
                   'Select Date Range',
                   style: GoogleFonts.dmSans(
-                    fontWeight: FontWeight.w700, 
+                    fontWeight: FontWeight.w700,
                     fontSize: 18
                   )
                 ),
@@ -219,7 +269,9 @@ class _ShowTransactionPageState extends State<ShowTransactionPage> {
                     lastDate: DateTime.now(),
                     builder: _datePickerTheme,
                   );
-                  if (picked != null) setDialogState(() => _customStart = picked);
+                  if (picked != null) {
+                    setDialogState(() => _customStart = picked);
+                  }
                 },
               ),
               SizedBox(height: context.getPercentHeight(1.6)),
@@ -236,7 +288,9 @@ class _ShowTransactionPageState extends State<ShowTransactionPage> {
                     lastDate: DateTime.now(),
                     builder: _datePickerTheme,
                   );
-                  if (picked != null) setDialogState(() => _customEnd = picked);
+                  if (picked != null) {
+                    setDialogState(() => _customEnd = picked);
+                  }
                 },
               ),
             ],
@@ -246,15 +300,15 @@ class _ShowTransactionPageState extends State<ShowTransactionPage> {
               onPressed: () {
                 Navigator.of(context).pop();
                 setState(() {
-                  _activeFilter = _Filter.all; 
-                  _customStart = null; 
-                  _customEnd = null; 
+                  _activeFilter = _Filter.all;
+                  _customStart = null;
+                  _customEnd = null;
                 });
               },
               child: Text(
                 'Cancel',
                 style: GoogleFonts.dmSans(
-                  fontSize: 14, 
+                  fontSize: 14,
                   color: WidgetColors.ink3
                 )
               ),
@@ -263,16 +317,18 @@ class _ShowTransactionPageState extends State<ShowTransactionPage> {
               onPressed: () {
                 Navigator.of(context).pop();
                 if (_customStart == null || _customEnd == null) {
-                  this.context.showCustomDialog(description: 'Please select both start and end dates');
+                  this.context.showCustomDialog(
+                    description: 'Please select both start and end dates',
+                  );
                   return;
                 }
                 setState(() {
-                  _isFiltering = true; 
+                  _isFiltering = true;
                   _activeFilter = _Filter.custom;
                 });
                 Future.delayed(
                   const Duration(milliseconds: 600),
-                  () => setState(() => _isFiltering = false)
+                  () => setState(() => _isFiltering = false),
                 );
               },
               style: ElevatedButton.styleFrom(
@@ -280,18 +336,18 @@ class _ShowTransactionPageState extends State<ShowTransactionPage> {
                 foregroundColor: Colors.white,
                 padding: EdgeInsets.symmetric(
                   horizontal: context.getPercentWidth(4),
-                  vertical:   context.getPercentHeight(1.2),
+                  vertical: context.getPercentHeight(1.2),
                 ),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(context.getPercentWidth(12))
+                  borderRadius: BorderRadius.circular(context.getPercentWidth(12)),
                 ),
               ),
               child: Text(
                 'Done',
                 style: GoogleFonts.dmSans(
-                  fontSize: 14, 
-                  fontWeight: FontWeight.w600
-                )
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
           ],
@@ -329,7 +385,7 @@ class _ShowTransactionPageState extends State<ShowTransactionPage> {
             Text(
               label,
               style: GoogleFonts.dmSans(
-                fontSize: 16, 
+                fontSize: 16,
                 fontWeight: FontWeight.w600,
                 color: hasValue ? WidgetColors.ink : WidgetColors.ink3,
               ),
@@ -343,8 +399,8 @@ class _ShowTransactionPageState extends State<ShowTransactionPage> {
   Widget _datePickerTheme(BuildContext context, Widget? child) => Theme(
     data: Theme.of(context).copyWith(
       colorScheme: ColorScheme.light(
-        primary: _accent, 
-        onPrimary: Colors.white, 
+        primary: _accent,
+        onPrimary: Colors.white,
         surface: WidgetColors.surface,
       ),
     ),
@@ -356,15 +412,15 @@ class _ShowTransactionPageState extends State<ShowTransactionPage> {
     final fmt = DateFormat('dd MMM yyyy');
     return Container(
       color: WidgetColors.surface,
-      padding: EdgeInsets.symmetric( 
+      padding: EdgeInsets.symmetric(
         vertical: context.getPercentHeight(1),
         horizontal: context.getPercentWidth(4)
       ),
       child: Row(
         children: [
           Icon(
-            Icons.date_range_rounded, 
-            size: context.getPercentWidth(4), 
+            Icons.date_range_rounded,
+            size: context.getPercentWidth(4),
             color: _accent
           ),
           SizedBox(width: context.getPercentWidth(1.5)),
@@ -372,22 +428,22 @@ class _ShowTransactionPageState extends State<ShowTransactionPage> {
             child: Text(
               '${fmt.format(_customStart!)} → ${fmt.format(_customEnd!)}',
               style: GoogleFonts.dmSans(
-                fontSize: 12, 
-                fontWeight: FontWeight.w600, 
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
                 color: _accent
               ),
             ),
           ),
           GestureDetector(
             onTap: () => setState(() {
-              _activeFilter = _Filter.all; 
-              _customStart = null; 
+              _activeFilter = _Filter.all;
+              _customStart = null;
               _customEnd = null;
             }),
             child: Icon(
-              Icons.close_rounded, 
-              size: context.getPercentWidth(4), 
-              color: WidgetColors.ink3
+              Icons.close_rounded,
+              size: context.getPercentWidth(4),
+              color: WidgetColors.ink3,
             ),
           ),
         ],
@@ -397,28 +453,28 @@ class _ShowTransactionPageState extends State<ShowTransactionPage> {
 
   // ── Summary row ───────────────────────────────────────────
   Widget _buildSummaryRow(
-    List<TransactionModel> all, 
-    List<TransactionModel> filtered
+    List<TransactionModel> all,
+    List<TransactionModel> filtered,
   ) {
     final grandTotal = all.fold<double>(0, (s, e) => s + e.amount);
 
     final String rightLabel;
     final double rightAmount;
-    final int    rightCount;
+    final int rightCount;
 
     if (_activeFilter == _Filter.all) {
       final month = _applyFilter(all, forceFilter: _Filter.thisMonth);
-      rightLabel  = 'This month';
+      rightLabel = 'This month';
       rightAmount = month.fold<double>(0, (s, e) => s + e.amount);
-      rightCount  = month.length;
+      rightCount = month.length;
     } else {
-      rightLabel  = _activeFilter == _Filter.thisWeek  
-                  ? 'This week'
-                  : _activeFilter == _Filter.thisMonth 
-                      ? 'This month' 
-                      : 'Selected range';
+      rightLabel = _activeFilter == _Filter.thisWeek
+        ? 'This week'
+        : _activeFilter == _Filter.thisMonth
+            ? 'This month'
+            : 'Selected range';
       rightAmount = filtered.fold<double>(0, (s, e) => s + e.amount);
-      rightCount  = filtered.length;
+      rightCount = filtered.length;
     }
 
     return Padding(
@@ -432,20 +488,20 @@ class _ShowTransactionPageState extends State<ShowTransactionPage> {
         children: [
           Expanded(
             child: _buildSummaryCard(
-              label: 'Total (All time)', 
+              label: 'Total (All time)',
               amount: grandTotal,
-              count: all.length, 
+              count: all.length,
               isPrimary: false,
-            )
+            ),
           ),
           SizedBox(width: context.getPercentWidth(3)),
           Expanded(
             child: _buildSummaryCard(
-              label: rightLabel, 
+              label: rightLabel,
               amount: rightAmount,
-              count: rightCount, 
+              count: rightCount,
               isPrimary: true,
-            )
+            ),
           ),
         ],
       ),
@@ -453,50 +509,50 @@ class _ShowTransactionPageState extends State<ShowTransactionPage> {
   }
 
   Widget _buildSummaryCard({
-    required String label, 
+    required String label,
     required double amount,
-    required int count, 
-    required bool isPrimary
+    required int count,
+    required bool isPrimary,
   }) {
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: context.getPercentWidth(4),
-        vertical: context.getPercentHeight(1.5)
+        vertical: context.getPercentHeight(1.5),
       ),
       decoration: BoxDecoration(
         color: isPrimary ? _accentBg : WidgetColors.surface,
         borderRadius: BorderRadius.circular(context.getPercentWidth(4)),
         border: Border.all(
-          color: isPrimary ? _accent.withOpacity(0.2) : WidgetColors.dividerColor,
+          color: isPrimary ? _accent.withOpacity(0.2) : WidgetColors.dividerColor
         ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            label, 
+            label,
             style: GoogleFonts.dmSans(
-              fontSize: 11, 
+              fontSize: 11,
               fontWeight: FontWeight.w600,
               color: isPrimary ? _accent.withOpacity(0.7) : WidgetColors.ink3,
-            )
+            ),
           ),
           SizedBox(height: context.getPercentHeight(0.4)),
           Text(
-            '₹ ${amount.toStringAsFixed(0)}', 
+            '₹ ${amount.toStringAsFixed(0)}',
             style: GoogleFonts.sora(
-              fontSize: 18, 
+              fontSize: 18,
               fontWeight: FontWeight.w800,
               color: isPrimary ? _accent : WidgetColors.ink,
-            )
+            ),
           ),
           SizedBox(height: context.getPercentHeight(0.2)),
           Text(
             '$count ${count == 1 ? 'transaction' : 'transactions'}',
             style: GoogleFonts.dmSans(
-              fontSize: 11, 
-              color: WidgetColors.ink3
-            )
+              fontSize: 11,
+              color: WidgetColors.ink3,
+            ),
           ),
         ],
       ),
@@ -509,45 +565,51 @@ class _ShowTransactionPageState extends State<ShowTransactionPage> {
 
     final Map<String, List<TransactionModel>> grouped = {};
     for (final e in list) {
-      grouped.putIfAbsent(DateFormat('dd MMM yyyy').format(e.date), () => []).add(e);
+      grouped.putIfAbsent(
+            DateFormat('dd MMM yyyy').format(e.date),
+            () => [],
+          )
+          .add(e);
     }
 
     return ListView.builder(
       physics: const BouncingScrollPhysics(),
-      padding: EdgeInsets.symmetric(  
+      padding: EdgeInsets.symmetric(
         vertical: context.getPercentHeight(2),
-        horizontal: context.getPercentWidth(4)
+        horizontal: context.getPercentWidth(4),
       ),
       itemCount: grouped.length,
       itemBuilder: (_, i) {
-        final dateKey  = grouped.keys.elementAt(i);
-        final items    = grouped[dateKey]!;
+        final dateKey = grouped.keys.elementAt(i);
+        final items = grouped[dateKey]!;
         final dayTotal = items.fold<double>(0, (s, e) => s + e.amount);
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: EdgeInsets.symmetric(vertical: context.getPercentHeight(1)),
+              padding: EdgeInsets.symmetric(
+                vertical: context.getPercentHeight(1),
+              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    _formatDateHeader(dateKey), 
+                    _formatDateHeader(dateKey),
                     style: GoogleFonts.dmSans(
-                      fontSize: 12, 
+                      fontSize: 12,
                       fontWeight: FontWeight.w700,
-                      color: WidgetColors.ink2, 
-                      letterSpacing: 0.3
-                    )
+                      color: WidgetColors.ink2,
+                      letterSpacing: 0.3,
+                    ),
                   ),
                   Text(
-                    '₹ ${dayTotal.toStringAsFixed(0)}', 
+                    '₹ ${dayTotal.toStringAsFixed(0)}',
                     style: GoogleFonts.sora(
-                      fontSize: 12, 
-                      fontWeight: FontWeight.w700, 
-                      color: _accent
-                    )
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: _accent,
+                    ),
                   ),
                 ],
               ),
@@ -563,12 +625,17 @@ class _ShowTransactionPageState extends State<ShowTransactionPage> {
   // ── Transaction card ──────────────────────────────────────
   Widget _buildTransactionCard(TransactionModel e) {
     return GestureDetector(
-      onTap: () => ShowBottomModel.open(context, e),
+      onTap: () => ShowBottomModel.open(
+        context,
+        e,
+        onDelete: () => _confirmDelete(e),
+      ),
+      onLongPress: () => _confirmDelete(e),
       child: Container(
         margin: EdgeInsets.only(bottom: context.getPercentHeight(1)),
         padding: EdgeInsets.symmetric(
           horizontal: context.getPercentWidth(4),
-          vertical:   context.getPercentHeight(1.6),
+          vertical: context.getPercentHeight(1.6),
         ),
         decoration: BoxDecoration(
           color: WidgetColors.surface,
@@ -577,8 +644,9 @@ class _ShowTransactionPageState extends State<ShowTransactionPage> {
         ),
         child: Row(
           children: [
+            // Category icon
             Container(
-              width:  context.getPercentWidth(11),
+              width: context.getPercentWidth(11),
               height: context.getPercentHeight(5),
               decoration: BoxDecoration(
                 color: TransactionConstants.iconBgFor(e.category),
@@ -592,6 +660,8 @@ class _ShowTransactionPageState extends State<ShowTransactionPage> {
               ),
             ),
             SizedBox(width: context.getPercentWidth(3)),
+
+            // Title & description
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -618,23 +688,25 @@ class _ShowTransactionPageState extends State<ShowTransactionPage> {
                 ],
               ),
             ),
+
+            // Amount & time
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  '₹ ${e.amount.toStringAsFixed(0)}', 
+                  '₹ ${e.amount.toStringAsFixed(0)}',
                   style: GoogleFonts.sora(
-                    fontSize: 15, 
-                    fontWeight: FontWeight.w800, 
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
                     color: _accent,
-                  )
+                  ),
                 ),
                 Text(
                   DateFormat('hh:mm a').format(e.date),
                   style: GoogleFonts.dmSans(
-                    fontSize: 11, 
-                    color: WidgetColors.ink3
-                  )
+                    fontSize: 11,
+                    color: WidgetColors.ink3,
+                  ),
                 ),
               ],
             ),
@@ -651,72 +723,79 @@ class _ShowTransactionPageState extends State<ShowTransactionPage> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            width: context.getPercentWidth(16), 
+            width: context.getPercentWidth(16),
             height: context.getPercentHeight(16),
             decoration: BoxDecoration(
-              color: _accentBg, 
-              shape: BoxShape.circle
+              color: _accentBg,
+              shape: BoxShape.circle,
             ),
             child: Icon(
-              Icons.inbox_rounded, 
-              color: _accent, 
-              size: context.getPercentWidth(7.5)
+              Icons.inbox_rounded,
+              color: _accent,
+              size: context.getPercentWidth(7.5),
             ),
           ),
           SizedBox(height: context.getPercentHeight(2)),
           Text(
-            'No transactions found', 
+            'No transactions found',
             style: GoogleFonts.sora(
-              fontSize: 16, 
-              fontWeight: FontWeight.w700, 
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
               color: WidgetColors.ink,
-            )
+            ),
           ),
           SizedBox(height: context.getPercentHeight(0.8)),
           Text(
             'Select different dates',
             style: GoogleFonts.dmSans(
-              fontSize: 13, 
-              color: WidgetColors.ink3
-            )
+              fontSize: 13,
+              color: WidgetColors.ink3,
+            ),
           ),
         ],
       ),
     );
   }
 
-
-  List<TransactionModel> _applyFilter(List<TransactionModel> list, {_Filter? forceFilter}) {
+  // ── Helpers ───────────────────────────────────────────────
+  List<TransactionModel> _applyFilter(
+    List<TransactionModel> list, {
+    _Filter? forceFilter,
+  }) {
     final filter = forceFilter ?? _activeFilter;
-    final now    = DateTime.now();
+    final now = DateTime.now();
 
     DateTime? start;
     DateTime? end;
 
     if (filter == _Filter.thisWeek) {
-      start = DateTime(now.year, now.month, now.day).subtract(Duration(days: now.weekday - 1));
+      start = DateTime(now.year, now.month, now.day)
+          .subtract(Duration(days: now.weekday - 1));
     } else if (filter == _Filter.thisMonth) {
       start = DateTime(now.year, now.month, 1);
     } else if (filter == _Filter.custom) {
       start = _customStart;
-      end   = _customEnd?.add(const Duration(days: 1));
+      end = _customEnd?.add(const Duration(days: 1));
     }
 
     return list.where((e) {
       if (start != null && e.date.isBefore(start)) return false;
-      if (end   != null && e.date.isAfter(end))    return false;
+      if (end != null && e.date.isAfter(end)) return false;
       return true;
-    }).toList()..sort((a, b) => b.date.compareTo(a.date));
+    }).toList()
+      ..sort((a, b) => b.date.compareTo(a.date));
   }
 
   String _formatDateHeader(String dateKey) {
-    final date  = DateFormat('dd MMM yyyy').parse(dateKey);
-    final now   = DateTime.now();
+    final date = DateFormat('dd MMM yyyy').parse(dateKey);
+    final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    final d     = DateTime(date.year, date.month, date.day);
+    final d = DateTime(date.year, date.month, date.day);
 
     if (d == today) return 'Today · $dateKey';
-    if (d == today.subtract(const Duration(days: 1))) return 'Yesterday · $dateKey';
+    if (d == today.subtract(const Duration(days: 1))) {
+      return 'Yesterday · $dateKey';
+    }
     return dateKey;
   }
 }

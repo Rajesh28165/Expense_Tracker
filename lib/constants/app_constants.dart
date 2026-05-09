@@ -67,6 +67,8 @@ class AppConstants {
   static const purposeUpdatePassword = 'updatePassword';
   static const purposeUpdateSecurityQA = 'updateSecurityQA';
   static const purposeDeleteAccount = 'deleteAccount';
+  static const String purposeDeleteExpenseTxn = 'delete_expense_txn';
+  static const String purposeDeleteIncomeTxn  = 'delete_income_txn';
   
   // FontFamily
   static const Montserrat = 'Montserrat';
