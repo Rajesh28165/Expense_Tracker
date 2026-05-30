@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../constants/app_constants.dart';
 
 class WidgetColors {
   // ── Brand / legacy ────────────────────────────────────────
@@ -30,12 +31,11 @@ class WidgetColors {
   static const surface    = Color(0xFFFFFFFF);
   static const opacWhite  = Color(0x73FFFFFF);
 
-  // ── brand ────────────────────────────────────────
+  // ── Brand ─────────────────────────────────────────────────
   static const indigo600  = Color(0xFF4338CA);
   static const indigo500  = Color(0xFF4F46E5);
   static const indigo400  = Color(0xFF6366F1);
   static const indigoBg   = Color(0xFFEEF2FF);
-
   static const teal       = Color(0xFF0D9488);
   static const deepPurple = Color(0xFF7C3AED);
   static const pink       = Color(0xFFDB2777);
@@ -60,6 +60,33 @@ class WidgetColors {
   static const catBgGift          = Color(0xFFFDF4FF);
   static const catBgBonus         = Color(0xFFFEFCE8);
   static const catBgOther         = Color(0xFFF8F8F8);
+
+  // ── Custom category colors (rotating palette) ─────────────
+  static const List<Color> customCategoryColors = [
+    Color(0xFF7C3AED), // violet
+    Color(0xFF0891B2), // cyan
+    Color(0xFFD97706), // amber
+    Color(0xFF059669), // emerald
+    Color(0xFFDB2777), // pink
+    Color(0xFFEA580C), // orange
+    Color(0xFF4F46E5), // indigo
+    Color(0xFF0F766E), // teal dark
+    Color(0xFF7E22CE), // purple
+    Color(0xFFB45309), // brown amber
+  ];
+
+  static const List<Color> customCategoryBgColors = [
+    Color(0xFFEDE9FE), // violet bg
+    Color(0xFFE0F7FA), // cyan bg
+    Color(0xFFFEF3C7), // amber bg
+    Color(0xFFD1FAE5), // emerald bg
+    Color(0xFFFCE7F3), // pink bg
+    Color(0xFFFFEDD5), // orange bg
+    Color(0xFFEEF2FF), // indigo bg
+    Color(0xFFCCFBF1), // teal bg
+    Color(0xFFF3E8FF), // purple bg
+    Color(0xFFFEF9C3), // brown amber bg
+  ];
 
   // ── Date/time picker icon backgrounds ────────────────────
   static const dateIconBg  = Color(0xFFFFF7ED);
@@ -92,8 +119,9 @@ class CategoryColorHelper {
       case 'investment':    return WidgetColors.deepPurple;
       case 'gift':          return WidgetColors.pink;
       case 'bonus':         return WidgetColors.amber;
-      case 'other':
-      default:              return WidgetColors.grey;
+      case 'other':         return WidgetColors.grey;
+      default:
+        return TransactionConstants.customCategoryColor(category);
     }
   }
 }

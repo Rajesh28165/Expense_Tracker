@@ -23,6 +23,7 @@ class AddTransactionPage extends StatefulWidget {
 class _AddTransactionPageState extends State<AddTransactionPage> {
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _noteController   = TextEditingController();
+  final TextEditingController _customCategoryController = TextEditingController();
 
   late String _selectedCategory;
   DateTime _selectedDate = DateTime.now();
@@ -38,9 +39,20 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
           ? TransactionConstants.expenseCategories
           : TransactionConstants.incomeCategories;
 
+  String get _effectiveCategory {
+    if (_selectedCategory == 'Other') {
+      final custom = _customCategoryController.text.trim();
+      return custom.isEmpty ? 'Other' : custom;
+    }
+    return _selectedCategory;
+  }
+
   bool get _canSave {
     final amount = double.tryParse(_amountController.text.trim());
-    return amount != null && amount > 0;
+    if (amount == null || amount <= 0) return false;
+    // If Other is selected, custom name must be filled
+    if (_selectedCategory == 'Other' && _customCategoryController.text.trim().isEmpty) return false;
+    return true;
   }
 
   @override
@@ -50,12 +62,14 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
     _selectedCategory = _categories.first['label']!;
     _amountController.addListener(() => setState(() {}));
     _noteController.addListener(() => setState(() {}));
+    _customCategoryController.addListener(() => setState(() {}));
   }
 
   @override
   void dispose() {
     _amountController.dispose();
     _noteController.dispose();
+    _customCategoryController.dispose();
     super.dispose();
   }
 
@@ -97,7 +111,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
       await context.read<ExpenseCubit>().addExpense(ExpenseModel(
         id: const Uuid().v4(),
         title: title,
-        category: _selectedCategory,
+        category: _effectiveCategory,
         amount: double.parse(_amountController.text.trim()),
         date: fullDateTime,
       ));
@@ -105,7 +119,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
       await context.read<IncomeCubit>().addIncome(IncomeModel(
         id: const Uuid().v4(),
         title: title,
-        category: _selectedCategory,
+        category: _effectiveCategory,
         amount: double.parse(_amountController.text.trim()),
         date: fullDateTime,
       ));
@@ -143,6 +157,11 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
                     _buildSectionLabel('Category'),
                     SizedBox(height: context.getPercentHeight(1)),
                     _buildCategoryChips(),
+
+                    if (_selectedCategory == 'Other') ...[
+                      SizedBox(height: context.getPercentHeight(1.5)),
+                      _buildCustomCategoryField(),
+                    ],
 
                     SizedBox(height: context.getPercentHeight(2)),
 
@@ -325,6 +344,57 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildCustomCategoryField() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildSectionLabel('Custom Category Name'),
+        SizedBox(height: context.getPercentHeight(1)),
+        Container(
+          decoration: BoxDecoration(
+            color: WidgetColors.surface,
+            borderRadius: BorderRadius.circular(context.getPercentWidth(4)),
+            boxShadow: [
+              BoxShadow(
+                color: WidgetColors.black.withOpacity(0.04),
+                blurRadius: 10,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: TextField(
+            controller: _customCategoryController,
+            maxLength: 30,
+            style: GoogleFonts.dmSans(fontSize: 14, color: WidgetColors.ink),
+            decoration: InputDecoration(
+              hintText: 'e.g. Rent, Gym, Pet...',
+              hintStyle: GoogleFonts.dmSans(color: WidgetColors.ink3),
+              counterText: '',
+              filled: true,
+              fillColor: WidgetColors.surface,
+              contentPadding: EdgeInsets.all(context.getPercentWidth(4)),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(context.getPercentWidth(4)),
+                borderSide: BorderSide.none,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(context.getPercentWidth(4)),
+                borderSide: BorderSide.none,
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(context.getPercentWidth(4)),
+                borderSide: BorderSide(
+                  color: _accent.withOpacity(0.4),
+                  width: 1.5,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 

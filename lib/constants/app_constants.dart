@@ -107,6 +107,32 @@ class ImagePathConstants {
 
 class TransactionConstants {
 
+  // ── Custom category helpers ───────────────────────────────
+  static bool isCustomCategory(String category) {
+    const known = {
+      'Food', 'Transport', 'Shopping', 'Entertainment',
+      'Bills', 'Health', 'Salary', 'Freelance',
+      'Business', 'Investment', 'Gift', 'Bonus', 'Other',
+    };
+    return !known.contains(category);
+  }
+
+  static int customCategoryColorIndex(String category) {
+    int hash = 0;
+    for (final ch in category.codeUnits) {
+      hash = (hash * 31 + ch) & 0x7FFFFFFF;
+    }
+    return hash % WidgetColors.customCategoryColors.length;
+  }
+
+  static Color customCategoryColor(String category) {
+    return WidgetColors.customCategoryColors[customCategoryColorIndex(category)];
+  }
+
+  static Color customCategoryBgColor(String category) {
+    return WidgetColors.customCategoryBgColors[customCategoryColorIndex(category)];
+  }
+
   // ── Categories ────────────────────────────────────────────
   static const List<Map<String, String>> expenseCategories = [
     {'label': 'Food',          'icon': '🍔'},
@@ -128,12 +154,10 @@ class TransactionConstants {
     {'label': 'Other',      'icon': '📦'},
   ];
 
-  // ── Plain label lists (for dropdowns, reports, etc.) ──────
-  static List<String> get expenseCategoryLabels =>
-      expenseCategories.map((c) => c['label']!).toList();
+  // ── Plain label lists ─────────────────────────────────────
+  static List<String> get expenseCategoryLabels => expenseCategories.map((c) => c['label']!).toList();
 
-  static List<String> get incomeCategoryLabels =>
-      incomeCategories.map((c) => c['label']!).toList();
+  static List<String> get incomeCategoryLabels => incomeCategories.map((c) => c['label']!).toList();
 
   // ── Category emoji map ────────────────────────────────────
   static const Map<String, String> categoryEmoji = {
@@ -170,11 +194,9 @@ class TransactionConstants {
   };
 
   // ── Convenience helpers ───────────────────────────────────
-  static String emojiFor(String category) =>
-      categoryEmoji[category] ?? '📦';
+  static String emojiFor(String category) => categoryEmoji[category] ?? '📦';
 
-  static Color iconBgFor(String category) =>
-      categoryIconBg[category] ?? WidgetColors.catBgOther;
+  static Color iconBgFor(String category) => categoryIconBg[category] ?? WidgetColors.catBgOther;
 
   // ── Month names ───────────────────────────────────────────
   static const List<String> monthNames = [

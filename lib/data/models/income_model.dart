@@ -7,6 +7,7 @@ class IncomeModel implements TransactionModel {
   final double amount;
   final String category;
   final DateTime date;
+  final String? customCategory;
 
   IncomeModel({
     required this.id,
@@ -14,6 +15,7 @@ class IncomeModel implements TransactionModel {
     required this.amount,
     required this.category,
     required this.date,
+    this.customCategory
   });
 
   /// Convert object to Firestore Map
@@ -23,6 +25,7 @@ class IncomeModel implements TransactionModel {
       'amount': amount,
       'category': category,
       'date': Timestamp.fromDate(date),
+      'customCategory': customCategory,
     };
   }
 
@@ -37,6 +40,7 @@ class IncomeModel implements TransactionModel {
       amount: (map['amount'] as num).toDouble(),
       category: map['category'] ?? '',
       date: (map['date'] as Timestamp).toDate(),
+      customCategory: map['customCategory'],
     );
   }
 
@@ -46,6 +50,7 @@ class IncomeModel implements TransactionModel {
     double? amount,
     String? category,
     DateTime? date,
+    String? customCategory,
   }) {
     return IncomeModel(
       id: id ?? this.id,
@@ -53,6 +58,7 @@ class IncomeModel implements TransactionModel {
       amount: amount ?? this.amount,
       category: category ?? this.category,
       date: date ?? this.date,
+      customCategory: customCategory ?? this.customCategory,
     );
   }
 }
