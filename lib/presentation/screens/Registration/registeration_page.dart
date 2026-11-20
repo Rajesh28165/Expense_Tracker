@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../constants/app_constants.dart';
-import '../../../logic/auth/auth_cubit.dart';
-import '../../../logic/auth/auth_state.dart';
 import '../../../router/route_name.dart';
 import '../../../util/colors.dart';
 import '../../components/allFields.dart';
 import 'package:kharchasutra/constants/extension.dart';
 import 'package:kharchasutra/presentation/widgets/generalComponents.dart';
+
+import '../../cubit/auth/auth_cubit.dart';
+import '../../cubit/auth/auth_state.dart';
 
 class RegisterationPage extends StatefulWidget {
   const RegisterationPage({super.key});

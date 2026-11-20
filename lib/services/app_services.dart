@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kharchasutra/constants/app_constants.dart';
 
-import '../logic/auth/auth_cubit.dart';
-import '../logic/auth/auth_state.dart';
+import '../presentation/cubit/auth/auth_cubit.dart';
+import '../presentation/cubit/auth/auth_state.dart';
 
 class SessionService {
   static const Duration _sessionTimeout = Duration(minutes: AppConstants.sessionTime);

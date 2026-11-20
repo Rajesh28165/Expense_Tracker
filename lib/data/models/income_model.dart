@@ -2,10 +2,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:kharchasutra/data/models/txn_model.dart';
 
 class IncomeModel implements TransactionModel {
+  @override
   final String id;
+  @override
   final String title;
+  @override
   final double amount;
+  @override
   final String category;
+  @override
   final DateTime date;
   final String? customCategory;
 

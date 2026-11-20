@@ -1,10 +1,4 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:kharchasutra/constants/extension.dart';
-import 'package:kharchasutra/logic/expense/expense_cubit.dart';
-import 'package:kharchasutra/logic/expense/expense_state.dart';
-import 'package:kharchasutra/logic/income/income_cubit.dart';
-import 'package:kharchasutra/logic/income/income_state.dart';
-import 'package:kharchasutra/presentation/widgets/generalComponents.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -12,9 +6,15 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 import '../../../constants/app_constants.dart';
+import '../../../constants/extension.dart';
 import '../../../data/models/txn_model.dart';
 import '../../../router/route_name.dart';
 import '../../../util/colors.dart';
+import '../../cubit/expense/expense_cubit.dart';
+import '../../cubit/expense/expense_state.dart';
+import '../../cubit/income/income_cubit.dart';
+import '../../cubit/income/income_state.dart';
+import '../../widgets/generalComponents.dart';
 import '../../widgets/showBottomModel.dart';
 
 enum TransactionType { income, expense }
@@ -81,7 +81,7 @@ class ShowTransactionPage extends StatefulWidget {
 
 class _ShowTransactionPageState extends State<ShowTransactionPage> {
   _ActiveFilters _filters = _ActiveFilters();
-  bool _isFiltering = false;
+  final bool _isFiltering = false;
 
   bool get _isExpense => widget.type == TransactionType.expense;
   Color get _accent   => _isExpense ? WidgetColors.red   : WidgetColors.green;
@@ -187,7 +187,7 @@ class _ShowTransactionPageState extends State<ShowTransactionPage> {
         ),
         if (_isFiltering)
           Container(
-            color: Colors.black.withOpacity(0.15),
+            color: Colors.black.withValues(alpha: 0.15),
             child: Center(
               child: SpinKitThreeBounce(color: _accent, size: context.getPercentWidth(12)),
             ),
@@ -262,7 +262,7 @@ class _ShowTransactionPageState extends State<ShowTransactionPage> {
           color: isActive ? _accentBg : WidgetColors.chipInactive,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isActive ? _accent.withOpacity(0.4) : WidgetColors.chipInactiveBorder,
+            color: isActive ? _accent.withValues(alpha: 0.4) : WidgetColors.chipInactiveBorder,
             width: 1.5,
           ),
         ),
@@ -368,7 +368,7 @@ class _ShowTransactionPageState extends State<ShowTransactionPage> {
         decoration: BoxDecoration(
           color: _accentBg,
           borderRadius: BorderRadius.circular(context.getPercentWidth(4)),
-          border: Border.all(color: _accent.withOpacity(0.2)),
+          border: Border.all(color: _accent.withValues(alpha: 0.2)),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -381,7 +381,7 @@ class _ShowTransactionPageState extends State<ShowTransactionPage> {
                   style: GoogleFonts.dmSans(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
-                    color: _accent.withOpacity(0.7),
+                    color: _accent.withValues(alpha: 0.7),
                   ),
                 ),
                 SizedBox(height: context.getPercentHeight(0.3)),
@@ -582,10 +582,10 @@ class _ShowTransactionPageState extends State<ShowTransactionPage> {
                               vertical: context.getPercentHeight(1.2),
                             ),
                             decoration: BoxDecoration(
-                              color: isSelected ? color.withOpacity(0.08) : WidgetColors.page,
+                              color: isSelected ? color.withValues(alpha: 0.08) : WidgetColors.page,
                               borderRadius: BorderRadius.circular(context.getPercentWidth(3)),
                               border: Border.all(
-                                color: isSelected ? color.withOpacity(0.5) : WidgetColors.chipInactiveBorder,
+                                color: isSelected ? color.withValues(alpha: 0.5) : WidgetColors.chipInactiveBorder,
                                 width: 1.5,
                               ),
                             ),
@@ -803,7 +803,7 @@ class _ShowTransactionPageState extends State<ShowTransactionPage> {
           color: isSelected ? _accentBg : WidgetColors.page,
           borderRadius: BorderRadius.circular(context.getPercentWidth(3)),
           border: Border.all(
-            color: isSelected ? _accent.withOpacity(0.4) : WidgetColors.chipInactiveBorder,
+            color: isSelected ? _accent.withValues(alpha: 0.4) : WidgetColors.chipInactiveBorder,
             width: 1.5,
           ),
         ),
@@ -1190,7 +1190,7 @@ class _FilterTag extends StatelessWidget {
       decoration: BoxDecoration(
         color: WidgetColors.indigoBg,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: WidgetColors.indigo400.withOpacity(0.4)),
+        border: Border.all(color: WidgetColors.indigo400.withValues(alpha: 0.4)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

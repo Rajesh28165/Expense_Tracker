@@ -1,14 +1,12 @@
 import 'dart:async';
 
-import 'package:kharchasutra/presentation/screens/Support/verify_password_page.dart';
-import 'package:kharchasutra/presentation/screens/Support/verify_security_question_page.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../constants/app_constants.dart';
-import '../logic/auth/auth_cubit.dart';
-import '../logic/auth/auth_state.dart';
+import '../presentation/cubit/auth/auth_cubit.dart';
+import '../presentation/cubit/auth/auth_state.dart';
 import '../presentation/screens/Contents/add_txn_page.dart';
 import '../presentation/screens/Registration/email_verification_page.dart';
 import '../presentation/screens/Login/forgot_password.dart';
@@ -22,6 +20,8 @@ import '../presentation/screens/Contents/navigation_page.dart';
 import '../presentation/screens/Contents/show_txn_page.dart';
 import '../presentation/screens/Support/support_page.dart';
 import '../presentation/screens/Contents/txn_report.dart';
+import '../presentation/screens/Support/verify_password_page.dart';
+import '../presentation/screens/Support/verify_security_question_page.dart';
 import 'route_name.dart';
 
 class GoRouterRefreshStream extends ChangeNotifier {
@@ -176,7 +176,6 @@ GoRouter createRouter(BuildContext context, GlobalKey<NavigatorState> navigatorK
             purpose: extra?['purpose'] as String? ?? AppConstants.purposeUpdatePassword,
             count:   extra?['count'] as int? ?? 1,
             txnId:   extra?['txnId']   as String?,
-
           );
         },
       ),

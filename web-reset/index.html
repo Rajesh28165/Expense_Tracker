@@ -1,0 +1,202 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kharcha Sutra - Reset Password</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f7f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      width: 85%;
+      max-width: 380px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    }
+
+    h2 {
+      text-align: center;
+      color: #245c45;
+    }
+
+    input, button {
+      box-sizing: border-box;
+      width: 100%;
+      padding: 13px;
+      margin-top: 15px;
+      border-radius: 7px;
+      font-size: 15px;
+    }
+
+    input {
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background: #245c45;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+    }
+
+    #message {
+      margin-top: 15px;
+      text-align: center;
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h2>Reset Password</h2>
+
+  <p>Enter your new password below.</p>
+
+  <form id="resetForm">
+
+    <input
+      type="password"
+      id="password"
+      placeholder="New Password"
+      required
+    >
+
+    <input
+      type="password"
+      id="confirmPassword"
+      placeholder="Confirm New Password"
+      required
+    >
+
+    <button type="submit" id="submitButton">
+      Update Password
+    </button>
+
+  </form>
+
+  <p id="message"></p>
+
+</div>
+
+<script type="module">
+
+  import { initializeApp }
+    from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAdP5w33ZaqH1q5I4k2ZCXXA0B-MZ6H3jg",
+    authDomain: "kharcha-sutra.firebaseapp.com",
+    projectId: "kharcha-sutra",
+    storageBucket: "kharcha-sutra.firebasestorage.app",
+    messagingSenderId: "363103510060",
+    appId: "1:363103510060:web:d46575db39a06599967b89"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const RESET_FUNCTION_URL = "https://asia-south1-kharcha-sutra.cloudfunctions.net/completePasswordReset";
+
+  const params = new URLSearchParams(window.location.search);
+
+  const mode = params.get("mode");
+  const actionCode = params.get("oobCode");
+
+  const form = document.getElementById("resetForm");
+  const message = document.getElementById("message");
+  const submitButton = document.getElementById("submitButton");
+
+  let verifiedEmail = null;
+
+  async function initializeReset() {
+
+    if (mode !== "resetPassword" || !actionCode) {
+      form.style.display = "none";
+      message.textContent = "Invalid password reset link.";
+      return;
+    }
+
+    try {
+      verifiedEmail = await verifyPasswordResetCode(
+        auth,
+        actionCode
+      );
+
+      message.textContent = `Reset password for ${verifiedEmail}`;
+
+    } catch (error) {
+      form.style.display = "none";
+      message.textContent = "This password reset link is invalid or expired.";
+    }
+  }
+
+  form.addEventListener("submit", async (event) => {
+
+    event.preventDefault();
+
+    const password = document.getElementById("password").value;
+
+    const confirmPassword = document.getElementById("confirmPassword").value;
+
+    if (password !== confirmPassword) {
+      message.textContent = "Passwords do not match.";
+      return;
+    }
+
+    submitButton.disabled = true;
+    submitButton.textContent = "Updating...";
+
+    try {
+
+      const response = await fetch(RESET_FUNCTION_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          oobCode: actionCode,
+          newPassword: password
+        })
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || "Unable to reset password.");
+      }
+
+      form.style.display = "none";
+
+      message.textContent = "Your password was updated successfully. Now try login.";
+
+    } catch (error) {
+
+      message.textContent = "Unable to update password: " + error.message;
+
+      submitButton.disabled = false;
+      submitButton.textContent = "Update Password";
+    }
+  });
+
+  initializeReset();
+
+</script>
+
+</body>
+</html>

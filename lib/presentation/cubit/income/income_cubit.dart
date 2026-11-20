@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../data/models/income_model.dart';
 
-import '../../data/repositories/income_repository.dart';
+import '../../../data/models/income_model.dart';
+import '../../../data/repositories/income_repository.dart';
 import 'income_state.dart';
 
 class IncomeCubit extends Cubit<IncomeState> {

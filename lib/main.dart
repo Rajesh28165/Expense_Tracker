@@ -1,27 +1,40 @@
 import 'dart:async';
 
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:kharchasutra/firebase_options.dart';
 import 'package:kharchasutra/presentation/widgets/generalComponents.dart';
 import 'package:kharchasutra/router/route_path.dart';
-import 'package:kharchasutra/services/services.dart';
+import 'package:kharchasutra/services/app_services.dart';
+import 'package:kharchasutra/services/notification_services.dart';
 import 'package:kharchasutra/util/colors.dart';
 
 import 'constants/app_constants.dart';
 import 'data/repositories/income_repository.dart';
-import 'logic/auth/auth_cubit.dart';
-import 'logic/auth/auth_state.dart';
-import 'logic/expense/expense_cubit.dart';
+import 'presentation/cubit/auth/auth_cubit.dart';
+import 'presentation/cubit/auth/auth_state.dart';
+import 'presentation/cubit/expense/expense_cubit.dart';
 import 'data/repositories/expense_repository.dart';
-import 'logic/income/income_cubit.dart';
-import 'logic/user/user_cubit.dart';
+import 'presentation/cubit/income/income_cubit.dart';
+import 'presentation/cubit/user/user_cubit.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  FirebaseMessaging.onBackgroundMessage(
+    firebaseMessagingBackgroundHandler,
+  );
+
+  await NotificationService().initialize();
+
   runApp(const MyApp());
 }
 
@@ -45,23 +58,9 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-
     _authCubit = AuthCubit(FirebaseAuth.instance);
-
     countdownNotifier = ValueNotifier(5);
-
-    sessionService.setOnTimeout(() {
-      _authCubit.sessionExpired();
-    });
-  }
-
-  @override
-  void dispose() {
-    _dialogTimer?.cancel();
-    countdownNotifier.dispose();
-    _authCubit.close();
-    sessionService.dispose();
-    super.dispose();
+    sessionService.setOnTimeout(() => _authCubit.sessionExpired());
   }
 
   void _showSessionDialog() {
@@ -75,22 +74,23 @@ class _MyAppState extends State<MyApp> {
     countdownNotifier.value = seconds;
 
     _dialogTimer?.cancel();
-    _dialogTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      seconds--;
-      countdownNotifier.value = seconds;
+    _dialogTimer = Timer.periodic(
+      const Duration(seconds: 1),
+      (timer) {
+        seconds--;
+        countdownNotifier.value = seconds;
 
-      if (seconds <= 0) {
-        timer.cancel();
+        if (seconds <= 0) {
+          timer.cancel();
 
-        if (isDialogOpen) {
-          Navigator.of(navContext, rootNavigator: true).pop();
-          isDialogOpen = false;
+          if (isDialogOpen) {
+            Navigator.of(navContext, rootNavigator: true).pop();
+            isDialogOpen = false;
+          }
+          Future.microtask(() => _authCubit.logout());
         }
-        Future.microtask(() {
-          _authCubit.logout();
-        });
       }
-    });
+    );
 
     navContext.showCustomDialog(
       title: 'Session Expired',
@@ -156,5 +156,14 @@ class _MyAppState extends State<MyApp> {
         },
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _dialogTimer?.cancel();
+    countdownNotifier.dispose();
+    _authCubit.close();
+    sessionService.dispose();
+    super.dispose();
   }
 }

@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../constants/app_constants.dart';
 import '../../../../util/colors.dart';
-import 'package:kharchasutra/constants/extension.dart';
-import 'package:kharchasutra/presentation/widgets/generalComponents.dart';
-import '../../../logic/auth/auth_cubit.dart';
-import '../../../logic/auth/auth_state.dart';
+import '../../../../constants/extension.dart';
+import '../../../../presentation/widgets/generalComponents.dart';
 import '../../../router/route_name.dart';
 import '../../components/allFields.dart';
+import '../../cubit/auth/auth_cubit.dart';
+import '../../cubit/auth/auth_state.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -47,29 +47,24 @@ class _LoginPageState extends State<LoginPage> {
 
   void _validateForm() {
     final isValid =
-        emailRegex.hasMatch(emailController.text.trim()) &&
-        pswdRegex.hasMatch(passwordController.text.trim());
+      emailRegex.hasMatch(emailController.text.trim()) &&
+      pswdRegex.hasMatch(passwordController.text.trim());
 
     if (isValid != _isButtonEnabled) {
       setState(() => _isButtonEnabled = isValid);
-    } else {
-      setState(() {});
     }
   }
 
   @override
-  void dispose() {
-    emailController.dispose();
-    passwordController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final authCubit = context.read<AuthCubit>();
     return PopScope(
       canPop: false,
       child: Scaffold(
-        appBar: context.customAppBar(title: 'Login', showBackButton: false),
+        appBar: context.customAppBar(
+          title: 'Login', 
+          showBackButton: false
+        ),
         body: context.gradientScreen(
           child: BlocConsumer<AuthCubit, AuthState>(
             listener: (context, state) {
@@ -82,9 +77,7 @@ class _LoginPageState extends State<LoginPage> {
 
               if (state is AuthAuthenticated) {
                 _hideLoader(context);
-                state.securityQuestionSelected
-                  ? context.goTo(RouteName.dashboard)
-                  : context.goTo(RouteName.security);
+                context.goTo(state.securityQuestionSelected ? RouteName.dashboard : RouteName.security);
                 return;
               }
 
@@ -94,24 +87,10 @@ class _LoginPageState extends State<LoginPage> {
                 return;
               }
 
-              if (state is LoginError) {
+              if (state is AuthErrorState) {
                 _hideLoader(context);
                 context.showCustomDialog(description: state.message);
-                context.read<AuthCubit>().resetState();
-                return;
-              }
-
-              if (state is GoogleSignInError) {
-                _hideLoader(context);
-                context.showCustomDialog(description: state.message);
-                context.read<AuthCubit>().resetState();
-                return;
-              }
-
-              if (state is AuthError) {
-                _hideLoader(context);
-                context.showCustomDialog(description: state.message);
-                context.read<AuthCubit>().resetState();
+                authCubit.resetState();
                 return;
               }
 
@@ -187,7 +166,7 @@ class _LoginPageState extends State<LoginPage> {
                               activeBgColor: Colors.white,
                               borderColor: Colors.black,
                               canNavigate: true,
-                              onBtnPress: context.read<AuthCubit>().signInWithGoogle,
+                              onBtnPress: authCubit.signInWithGoogle,
                               iconWidget: SizedBox(
                                 width: context.getPercentWidth(8),
                                 height: context.getPercentHeight(2.5),
@@ -201,7 +180,7 @@ class _LoginPageState extends State<LoginPage> {
                               text: "Login",
                               canNavigate: _isButtonEnabled,
                               onBtnPress: () {
-                                context.read<AuthCubit>().login(
+                                authCubit.login(
                                   emailController.text.trim(),
                                   passwordController.text.trim(),
                                 );
@@ -225,4 +204,12 @@ class _LoginPageState extends State<LoginPage> {
       ),
     );
   }
+
+  @override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
+
 }

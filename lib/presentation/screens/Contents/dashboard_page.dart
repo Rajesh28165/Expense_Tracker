@@ -1,19 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:kharchasutra/constants/extension.dart';
-import 'package:kharchasutra/presentation/widgets/generalComponents.dart';
-import 'package:kharchasutra/router/route_name.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../constants/app_constants.dart';
-import '../../../logic/expense/expense_cubit.dart';
-import '../../../logic/expense/expense_state.dart';
-import '../../../logic/income/income_cubit.dart';
-import '../../../logic/income/income_state.dart';
-import '../../../services/services.dart';
+import '../../../constants/extension.dart';
+import '../../../router/route_name.dart';
+import '../../../services/app_services.dart';
 import '../../../util/colors.dart';
+import '../../cubit/expense/expense_cubit.dart';
+import '../../cubit/expense/expense_state.dart';
+import '../../cubit/income/income_cubit.dart';
+import '../../cubit/income/income_state.dart';
+import '../../widgets/generalComponents.dart';
 import 'show_txn_page.dart';
 
 class DashboardPage extends StatefulWidget {
@@ -98,7 +98,7 @@ class _DashboardPageState extends State<DashboardPage> with SingleTickerProvider
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: WidgetColors.indigo500.withOpacity(0.28), 
+              color: WidgetColors.indigo500.withValues(alpha: 0.28), 
               blurRadius: 10, 
               offset: const Offset(0, 4)
             )
@@ -207,7 +207,7 @@ class _DashboardPageState extends State<DashboardPage> with SingleTickerProvider
         borderRadius: BorderRadius.circular(context.getPercentWidth(7)),
         boxShadow: [
           BoxShadow(
-            color: WidgetColors.darkCard.withOpacity(0.30), 
+            color: WidgetColors.darkCard.withValues(alpha: 0.30), 
             blurRadius: 32, 
             offset: const Offset(0, 14)
           )
@@ -315,7 +315,7 @@ class _DashboardPageState extends State<DashboardPage> with SingleTickerProvider
         decoration: BoxDecoration(
           shape: BoxShape.circle,
           border: Border.all(
-            color: Colors.white.withOpacity(0.05), 
+            color: Colors.white.withValues(alpha: 0.05), 
             width: borderWidth
           ),
         ),
@@ -331,7 +331,7 @@ class _DashboardPageState extends State<DashboardPage> with SingleTickerProvider
       color: color, shape: BoxShape.circle,
       boxShadow: [
         BoxShadow(
-          color: color.withOpacity(0.7), 
+          color: color.withValues(alpha: 0.7), 
           blurRadius: 7
         )
       ],
@@ -346,9 +346,9 @@ class _DashboardPageState extends State<DashboardPage> with SingleTickerProvider
         vertical: context.getPercentHeight(0.6)
       ),
       decoration: BoxDecoration(
-        color: accent.withOpacity(0.12),
+        color: accent.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: accent.withOpacity(0.28)),
+        border: Border.all(color: accent.withValues(alpha: 0.28)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min, 
@@ -386,16 +386,16 @@ class _DashboardPageState extends State<DashboardPage> with SingleTickerProvider
           vertical: context.getPercentHeight(1.5)
         ),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.06),
+          color: Colors.white.withValues(alpha: 0.06),
           borderRadius: BorderRadius.circular(context.getPercentWidth(3.5)),
-          border: Border.all(color: Colors.white.withOpacity(0.08)),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
         ),
         child: Row(
           children: [
             Container(
               width: iconSize, height: iconSize,
               decoration: BoxDecoration(
-                color: accentColor.withOpacity(0.15), 
+                color: accentColor.withValues(alpha: 0.15), 
                 shape: BoxShape.circle
               ),
               child: Icon(
@@ -481,7 +481,7 @@ class _DashboardPageState extends State<DashboardPage> with SingleTickerProvider
             color: WidgetColors.surface,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.06), 
+                color: Colors.black.withValues(alpha: 0.06), 
                 blurRadius: 16, 
                 offset: const Offset(0, 4)
               )
@@ -545,7 +545,7 @@ class _DashboardPageState extends State<DashboardPage> with SingleTickerProvider
             borderRadius: BorderRadius.circular(context.getPercentWidth(5)),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.06), 
+                color: Colors.black.withValues(alpha: 0.06), 
                 blurRadius: 16, 
                 offset: const Offset(0, 4)
               )

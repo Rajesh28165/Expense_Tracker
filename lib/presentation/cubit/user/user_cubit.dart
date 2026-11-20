@@ -1,6 +1,6 @@
-import 'package:kharchasutra/logic/user/user_state.dart';
-import 'package:kharchasutra/util/encrption.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../util/encrption.dart';
+import 'user_state.dart';
 
 class UserCubit extends Cubit<UserState> {
   UserCubit() : super(const UserState());

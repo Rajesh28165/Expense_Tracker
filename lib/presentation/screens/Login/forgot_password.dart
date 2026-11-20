@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../constants/app_constants.dart';
-import '../../../logic/auth/auth_cubit.dart';
+import '../../../constants/extension.dart';
 import '../../../util/colors.dart';
 import '../../components/allFields.dart';
-import 'package:kharchasutra/constants/extension.dart';
-import 'package:kharchasutra/presentation/widgets/generalComponents.dart';
 import '../../../router/route_name.dart';
+import '../../cubit/auth/auth_cubit.dart';
+import '../../widgets/generalComponents.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({super.key});
@@ -54,7 +54,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       context.showCustomDialog(description: error);
     } else {
       context.showCustomDialog(
-        description: 'If an account exists for this email, a password reset link has been sent. Please check your inbox and spam folder.',
+        description: AppConstants.Password_reset_link_sent,
         onPressed: () {
           Navigator.of(context).pop();
           context.goTo(RouteName.login);
@@ -103,7 +103,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                     SizedBox(height: context.getPercentHeight(1)),
 
                     const Text(
-                      "We’ll send you a password reset link on your registered email",
+                      AppConstants.Password_reset_link_header,
                       style: TextStyle(
                         fontSize: 18,
                         fontFamily: AppConstants.OpenSans,

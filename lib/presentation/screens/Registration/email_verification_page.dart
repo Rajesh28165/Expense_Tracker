@@ -5,9 +5,9 @@ import 'package:kharchasutra/presentation/widgets/generalComponents.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../logic/auth/auth_cubit.dart';
-import '../../../logic/auth/auth_state.dart';
 import '../../../router/route_name.dart';
+import '../../cubit/auth/auth_cubit.dart';
+import '../../cubit/auth/auth_state.dart';
 
 
 class EmailVerificationPage extends StatefulWidget {

@@ -3,11 +3,17 @@ import 'package:flutter/material.dart';
 import 'colors.dart';
 
 class CustomTextStyle extends TextStyle {
+  @override
   final Color color;
+  @override
   final FontWeight fontWeight;
+  @override
   final double? fontSize;
+  @override
   final String fontFamily;
+  @override
   final FontStyle fontStyle;
+  @override
   final double letterSpacing;
 
   const CustomTextStyle({

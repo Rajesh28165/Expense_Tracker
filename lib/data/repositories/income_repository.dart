@@ -37,9 +37,9 @@ class IncomeRepository {
     try {
       final snapshot = await _incomeRef.orderBy('date', descending: true).get();
 
-      return snapshot.docs
-          .map((doc) => IncomeModel.fromMap(doc.data(), doc.id))
-          .toList();
+      return snapshot.docs.map(
+        (doc) => IncomeModel.fromMap(doc.data(), doc.id)
+      ).toList();
     } catch (e) {
       throw Exception('Failed to fetch incomes');
     }

@@ -1,17 +1,17 @@
-import 'package:kharchasutra/constants/extension.dart';
-import 'package:kharchasutra/logic/expense/expense_cubit.dart';
-import 'package:kharchasutra/logic/expense/expense_state.dart';
-import 'package:kharchasutra/logic/income/income_cubit.dart';
-import 'package:kharchasutra/logic/income/income_state.dart';
-import 'package:kharchasutra/presentation/widgets/generalComponents.dart';
-import 'package:kharchasutra/router/route_name.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../constants/extension.dart';
+import '../../../router/route_name.dart';
 import '../../../util/colors.dart';
+import '../../cubit/expense/expense_cubit.dart';
+import '../../cubit/expense/expense_state.dart';
+import '../../cubit/income/income_cubit.dart';
+import '../../cubit/income/income_state.dart';
 import '../../widgets/date_filter_widget.dart';
+import '../../widgets/generalComponents.dart';
 import '../../widgets/pie_chart.dart';
 import 'show_txn_page.dart';
 
@@ -162,7 +162,7 @@ class _TransactionReportPageState extends State<TransactionReportPage>
         ),
         if (_isFiltering)
           Container(
-            color: Colors.black.withOpacity(0.15),
+            color: Colors.black.withValues(alpha: 0.15),
             child: Center(
               child: SpinKitThreeBounce(
                 color: _accent,
@@ -205,7 +205,7 @@ class _TransactionReportPageState extends State<TransactionReportPage>
         borderRadius: BorderRadius.circular(context.getPercentWidth(6)),
         boxShadow: [
           BoxShadow(
-            color: WidgetColors.darkCard.withOpacity(0.30),
+            color: WidgetColors.darkCard.withValues(alpha: 0.30),
             blurRadius: 28,
             offset: const Offset(0, 12),
           ),
@@ -222,7 +222,7 @@ class _TransactionReportPageState extends State<TransactionReportPage>
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.05),
+                  color: Colors.white.withValues(alpha: 0.05),
                   width: 30,
                 ),
               ),
@@ -241,7 +241,7 @@ class _TransactionReportPageState extends State<TransactionReportPage>
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: _accentGlow.withOpacity(0.7),
+                          color: _accentGlow.withValues(alpha: 0.7),
                           blurRadius: 7,
                         ),
                       ],
@@ -276,9 +276,9 @@ class _TransactionReportPageState extends State<TransactionReportPage>
                   vertical: context.getPercentHeight(0.6),
                 ),
                 decoration: BoxDecoration(
-                  color: _accentGlow.withOpacity(0.12),
+                  color: _accentGlow.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: _accentGlow.withOpacity(0.28)),
+                  border: Border.all(color: _accentGlow.withValues(alpha: 0.28)),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -319,7 +319,7 @@ class _TransactionReportPageState extends State<TransactionReportPage>
         borderRadius: BorderRadius.circular(context.getPercentWidth(6)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.06),
+            color: Colors.black.withValues(alpha: 0.06),
             blurRadius: 20,
             offset: const Offset(0, 6),
           ),
@@ -452,7 +452,7 @@ class _TransactionReportPageState extends State<TransactionReportPage>
               borderRadius: BorderRadius.circular(context.getPercentWidth(4)),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: Colors.black.withValues(alpha: 0.05),
                   blurRadius: 12,
                   offset: const Offset(0, 3),
                 ),
@@ -482,7 +482,7 @@ class _TransactionReportPageState extends State<TransactionReportPage>
                           width: context.getPercentWidth(9),
                           height: context.getPercentWidth(9),
                           decoration: BoxDecoration(
-                            color: color.withOpacity(0.15),
+                            color: color.withValues(alpha: 0.15),
                             shape: BoxShape.circle,
                           ),
                           child: Center(

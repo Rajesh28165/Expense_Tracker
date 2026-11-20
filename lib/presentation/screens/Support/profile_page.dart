@@ -9,10 +9,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../constants/app_constants.dart';
-import '../../../logic/auth/auth_cubit.dart';
-import '../../../logic/auth/auth_state.dart';
 import '../../../router/route_name.dart';
 import '../../../util/colors.dart';
+import '../../cubit/auth/auth_cubit.dart';
+import '../../cubit/auth/auth_state.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -32,7 +32,7 @@ class ProfilePage extends StatelessWidget {
         borderRadius: BorderRadius.circular(context.getPercentWidth(5)),
         boxShadow: [
           BoxShadow(
-            color: WidgetColors.black.withOpacity(0.05),
+            color: WidgetColors.black.withValues(alpha: 0.05),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -76,7 +76,7 @@ class ProfilePage extends StatelessWidget {
                   borderRadius: BorderRadius.circular(context.getPercentWidth(6)),
                   boxShadow: [
                     BoxShadow(
-                      color: WidgetColors.darkCard.withOpacity(0.28),
+                      color: WidgetColors.darkCard.withValues(alpha: 0.28),
                       blurRadius: 24,
                       offset: const Offset(0, 10),
                     ),
@@ -89,10 +89,10 @@ class ProfilePage extends StatelessWidget {
                       width: context.getPercentWidth(14),
                       height: context.getPercentWidth(14),
                       decoration: BoxDecoration(
-                        color: WidgetColors.indigo500.withOpacity(0.2),
+                        color: WidgetColors.indigo500.withValues(alpha: 0.2),
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: WidgetColors.indigo400.withOpacity(0.4),
+                          color: WidgetColors.indigo400.withValues(alpha: 0.4),
                           width: 1.5,
                         ),
                       ),
@@ -117,7 +117,7 @@ class ProfilePage extends StatelessWidget {
                             style: GoogleFonts.sora(
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
-                              color: WidgetColors.white.withOpacity(0.45),
+                              color: WidgetColors.white.withValues(alpha: 0.45),
                               letterSpacing: 1.5,
                             ),
                           ),

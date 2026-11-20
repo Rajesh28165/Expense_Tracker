@@ -42,13 +42,15 @@ class AppConstants {
   static const appName = 'Kharcha Sutra';
   static const supportEmail ='support@kharchasutra.com';
 
-  static const Password_reset_link_header = 'We will send a password reset link to your registered email.';
+  static const Password_reset_link_header = 'We’ll send you a password reset link on your registered email';
   
   static const Password_reset_link_warning = 'Use the email link to reset your password and ensure the following requirements are met:';
 
   static const Password_rule = 'Your password must be 8–20 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.';
 
   static const Password_note = 'If your password does not meet these requirements, you may still be able to reset it, but you will not be able to log in using that password.';
+
+  static const Password_reset_link_sent = 'If an account exists for this email, a password reset link has been sent. Please check your inbox and spam folder.';
 
   static const Email_rule = 'Enter a valid email address. We’ll send you a verification link to confirm your account.';
 

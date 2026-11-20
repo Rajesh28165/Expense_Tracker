@@ -1,16 +1,16 @@
 import 'package:uuid/uuid.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kharchasutra/constants/extension.dart';
-import 'package:kharchasutra/data/models/income_model.dart';
-import 'package:kharchasutra/logic/income/income_cubit.dart';
-import 'package:kharchasutra/data/models/expense_model.dart';
-import 'package:kharchasutra/logic/expense/expense_cubit.dart';
-import 'package:kharchasutra/presentation/screens/Contents/show_txn_page.dart';
-import 'package:kharchasutra/presentation/widgets/generalComponents.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../constants/app_constants.dart';
+import '../../../constants/extension.dart';
+import '../../../data/models/expense_model.dart';
+import '../../../data/models/income_model.dart';
 import '../../../util/colors.dart';
+import '../../cubit/expense/expense_cubit.dart';
+import '../../cubit/income/income_cubit.dart';
+import '../../widgets/generalComponents.dart';
+import 'show_txn_page.dart';
 
 class AddTransactionPage extends StatefulWidget {
   final TransactionType type;
@@ -208,7 +208,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
         borderRadius: BorderRadius.circular(context.getPercentWidth(5)),
         boxShadow: [
           BoxShadow(
-            color: WidgetColors.black.withOpacity(0.05),
+            color: WidgetColors.black.withValues(alpha: 0.05),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -319,7 +319,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
               color: isSelected ? _accentBg : WidgetColors.surface,
               borderRadius: BorderRadius.circular(context.getPercentHeight(2.5)),
               border: Border.all(
-                color: isSelected ? _accent.withOpacity(0.4) : WidgetColors.chipInactiveBorder,
+                color: isSelected ? _accent.withValues(alpha: 0.4) : WidgetColors.chipInactiveBorder,
                 width: 1.5,
               ),
             ),
@@ -359,7 +359,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
             borderRadius: BorderRadius.circular(context.getPercentWidth(4)),
             boxShadow: [
               BoxShadow(
-                color: WidgetColors.black.withOpacity(0.04),
+                color: WidgetColors.black.withValues(alpha: 0.04),
                 blurRadius: 10,
                 offset: const Offset(0, 3),
               ),
@@ -387,7 +387,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(context.getPercentWidth(4)),
                 borderSide: BorderSide(
-                  color: _accent.withOpacity(0.4),
+                  color: _accent.withValues(alpha: 0.4),
                   width: 1.5,
                 ),
               ),
@@ -406,7 +406,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
         borderRadius: BorderRadius.circular(context.getPercentWidth(4)),
         boxShadow: [
           BoxShadow(
-            color: WidgetColors.black.withOpacity(0.04),
+            color: WidgetColors.black.withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
@@ -518,7 +518,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
         borderRadius: BorderRadius.circular(context.getPercentWidth(4)),
         boxShadow: [
           BoxShadow(
-            color: WidgetColors.black.withOpacity(0.04),
+            color: WidgetColors.black.withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
@@ -546,7 +546,7 @@ class _AddTransactionPageState extends State<AddTransactionPage> {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(context.getPercentWidth(4)),
-            borderSide: BorderSide(color: _accent.withOpacity(0.4), width: 1.5),
+            borderSide: BorderSide(color: _accent.withValues(alpha: 0.4), width: 1.5),
           ),
         ),
       ),

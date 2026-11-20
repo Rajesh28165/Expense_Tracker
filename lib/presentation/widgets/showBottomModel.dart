@@ -82,7 +82,7 @@ class _BottomSheetContent extends StatelessWidget {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.1),
+                      color: Colors.red.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: const Icon(
@@ -106,7 +106,7 @@ class _BottomSheetContent extends StatelessWidget {
               horizontal: 20,
             ),
             decoration: BoxDecoration(
-              color: amountColor.withOpacity(.1),
+              color: amountColor.withValues(alpha: .1),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(

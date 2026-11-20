@@ -4,13 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../constants/app_constants.dart';
-import '../../../logic/auth/auth_cubit.dart';
-import '../../../logic/expense/expense_cubit.dart';
-import '../../../logic/income/income_cubit.dart';
 import '../../../router/route_name.dart';
 import '../../components/allFields.dart';
 import 'package:kharchasutra/constants/extension.dart';
 import 'package:kharchasutra/presentation/widgets/generalComponents.dart';
+
+import '../../cubit/auth/auth_cubit.dart';
+import '../../cubit/expense/expense_cubit.dart';
+import '../../cubit/income/income_cubit.dart';
 
 class VerifyPasswordPage extends StatefulWidget {
   final String purpose;

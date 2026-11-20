@@ -6,10 +6,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../logic/auth/auth_cubit.dart';
 import '../../router/route_name.dart';
 import '../../util/colors.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
+
+import '../cubit/auth/auth_cubit.dart';
 
 // Components:
 // 1) Gradient
@@ -187,7 +188,7 @@ extension GeneralComponents on BuildContext {
             borderRadius: BorderRadius.circular(radius),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha: 0.05),
                 blurRadius: 10,
                 offset: const Offset(0, 3),
               ),
@@ -241,7 +242,7 @@ extension GeneralComponents on BuildContext {
                 borderRadius: BorderRadius.circular(radius),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.10),
+                    color: Colors.black.withValues(alpha: 0.10),
                     blurRadius: 16,
                     offset: const Offset(0, 6),
                   ),
@@ -362,7 +363,7 @@ extension GeneralComponents on BuildContext {
   }) {
     return showDialog(
       context: this,
-      barrierColor: Colors.black.withOpacity(0.4),
+      barrierColor: Colors.black.withValues(alpha: 0.4),
       builder: (dialogContext) {
         return Dialog(
           shape: RoundedRectangleBorder(
@@ -377,7 +378,7 @@ extension GeneralComponents on BuildContext {
               borderRadius: BorderRadius.circular(getPercentWidth(5)),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.12),
+                  color: Colors.black.withValues(alpha: 0.12),
                   blurRadius: 24,
                   offset: const Offset(0, 8),
                 ),
@@ -392,7 +393,7 @@ extension GeneralComponents on BuildContext {
                     width: getPercentWidth(14),
                     height: getPercentWidth(14),
                     decoration: BoxDecoration(
-                      color: (iconColor ?? WidgetColors.indigo500).withOpacity(0.1),
+                      color: (iconColor ?? WidgetColors.indigo500).withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
@@ -539,7 +540,7 @@ extension GeneralComponents on BuildContext {
             boxShadow: canNavigate
               ? [
                   BoxShadow(
-                    color: (activeBgColor ?? WidgetColors.darkCard).withOpacity(0.28),
+                    color: (activeBgColor ?? WidgetColors.darkCard).withValues(alpha: 0.28),
                     blurRadius: 16,
                     offset: const Offset(0, 6),
                   ),

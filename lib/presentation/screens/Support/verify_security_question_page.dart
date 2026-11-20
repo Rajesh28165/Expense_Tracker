@@ -8,10 +8,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../../../../constants/app_constants.dart';
 import 'package:kharchasutra/presentation/widgets/generalComponents.dart';
-import '../../../logic/expense/expense_cubit.dart';
-import '../../../logic/income/income_cubit.dart';
+
 import '../../../router/route_name.dart';
 import '../../components/baseField.dart';
+import '../../cubit/expense/expense_cubit.dart';
+import '../../cubit/income/income_cubit.dart';
 
 class VerifySecurityQuestionPage extends StatefulWidget {
   final String purpose;
